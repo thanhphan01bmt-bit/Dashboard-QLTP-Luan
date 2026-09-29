@@ -1,7 +1,9 @@
 import { json, fail, verifyLogin, sessionCookie, sameOriginWrite, readBody, sleep, ROLES } from './_lib/auth.js';
+import { useRequest } from './_lib/store.js';
 
 export default {
   async fetch(req) {
+    useRequest(req);
     if (req.method !== 'POST') return fail('Method not allowed', 405);
     if (!sameOriginWrite(req)) return fail('Yêu cầu không hợp lệ.', 403);
     try {

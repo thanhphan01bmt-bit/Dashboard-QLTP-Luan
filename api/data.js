@@ -1,5 +1,6 @@
 // GET: mọi người đã đăng nhập đọc số liệu. POST: quản trị / cập nhật dữ liệu lưu số liệu mới.
 import { json, fail, currentUser, sameOriginWrite, readBody } from './_lib/auth.js';
+import { useRequest } from './_lib/store.js';
 import { readJSON, writeJSON } from './_lib/store.js';
 
 const CURRENT = 'data/current.json';
@@ -11,6 +12,7 @@ function looksValid(d) {
 
 export default {
   async fetch(req) {
+    useRequest(req);
     try {
       const me = await currentUser(req);
       if (!me) return fail('Chưa đăng nhập.', 401);

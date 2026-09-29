@@ -1,8 +1,10 @@
 // Người dùng tự đổi mật khẩu của mình.
 import { json, fail, currentUser, sameOriginWrite, readBody, loadUsers, saveUsers, checkPassword, hashPassword, sessionCookie, sleep } from './_lib/auth.js';
+import { useRequest } from './_lib/store.js';
 
 export default {
   async fetch(req) {
+    useRequest(req);
     if (req.method !== 'POST') return fail('Method not allowed', 405);
     try {
       const me = await currentUser(req);

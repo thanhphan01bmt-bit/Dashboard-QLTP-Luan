@@ -39,6 +39,12 @@ Số liệu và danh sách tài khoản lưu trong **Vercel Blob (Private)**. Ch
 2. Ở phần quyền truy cập chọn **Private** → đặt tên (ví dụ `kv-qltp-data`) → **Create**.
 3. Khi được hỏi kết nối với dự án, chọn dự án `kv-qltp-dashboard`, tick đủ **Production, Preview, Development** → **Connect**.
 4. Mở tab **Deployments** → bấm **⋯** ở bản mới nhất → **Redeploy** → **Redeploy** (để dự án nhận kho vừa tạo).
+5. Kiểm tra: **Settings → Environment Variables** phải có `BLOB_STORE_ID` hoặc `BLOB_READ_WRITE_TOKEN`.
+
+> **Nếu trang báo "No blob credentials found" hoặc "Chưa kết nối được kho lưu trữ Blob":**
+> 1. Vào **Storage** → bấm vào kho Blob → xem đã **Connect** với dự án chưa (mục Projects). Chưa thì bấm **Connect Project**.
+> 2. Nếu vẫn lỗi: trong trang kho Blob, tìm đoạn `.env.local` (mục Quickstart / Settings) có dòng `BLOB_READ_WRITE_TOKEN=...`, copy giá trị đó. Vào dự án → **Settings → Environment Variables** → thêm biến `BLOB_READ_WRITE_TOKEN` với giá trị vừa copy.
+> 3. **Redeploy** lại (tab Deployments → ⋯ → Redeploy). Biến môi trường chỉ có hiệu lực sau khi Redeploy.
 
 ### Bước 4. Nạp số liệu hiện có
 1. Mở địa chỉ trang (dạng `https://kv-qltp-dashboard-xxxx.vercel.app`, xem ở tab **Overview** → **Domains**).

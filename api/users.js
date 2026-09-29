@@ -1,10 +1,12 @@
 // Quản lý tài khoản (chỉ quản trị): xem danh sách, thêm, đổi quyền, đặt lại mật khẩu, khóa/mở, xóa.
 import { json, fail, currentUser, sameOriginWrite, readBody, loadUsers, saveUsers, hashPassword, normUser, validUser, envAdmin, ROLES } from './_lib/auth.js';
+import { useRequest } from './_lib/store.js';
 
 const pub = (x) => ({ u: x.u, name: x.name || x.u, role: x.role, disabled: !!x.disabled, created: x.created, updated: x.updated });
 
 export default {
   async fetch(req) {
+    useRequest(req);
     try {
       const me = await currentUser(req);
       if (!me) return fail('Chưa đăng nhập.', 401);
