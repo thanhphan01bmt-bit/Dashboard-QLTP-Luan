@@ -708,20 +708,20 @@ function render(){
    if(!gi.dataset.bound){gi.dataset.bound=1;gi.addEventListener('change',()=>{const v=Math.max(-50,Math.min(100,+gi.value||0));if(v!==gp&&window.__setGoal)window.__setGoal(v)})}
    applyEditor();
    {const b=document.getElementById('goalPdf');const noAcc=t=>t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_|_$/g,'');b.onclick=()=>exportGoalPdf(b,`Muc_tieu_ngay_${d9}-${M}-${D.cur.y}_${noAcc(scopeName)}.pdf`)}
-   const left=DIM9-d9;const scope=cur==='all'?SHOPS:[cur];const scopeName=cur==='all'?'Toàn khu vực':shopName(cur);
+   const left=Math.max(1,DIM9-d9+1);const scope=cur==='all'?SHOPS:[cur];const scopeName=cur==='all'?'Toàn khu vực':shopName(cur);
    // giờ cập nhật: lúc lưu số liệu (đang xem trước thì lấy giờ hiện tại); chỉ ghi giờ khi lưu trong chính ngày đổ báo cáo
    const upAt=(()=>{const iso=(typeof PREVIEW_D!=='undefined'&&PREVIEW_D)?null:(window.__META||{}).updatedAt;const dt=iso?new Date(iso):new Date();
      const vn=new Date(dt.getTime()+7*3600e3);const same=vn.getUTCFullYear()===D.cur.y&&vn.getUTCMonth()+1===M&&vn.getUTCDate()===d9;
      return same?String(vn.getUTCHours()).padStart(2,'0')+':'+String(vn.getUTCMinutes()).padStart(2,'0'):null})();
    const dayLbl=upAt?`ngày ${d9}/${M} đến ${upAt}`:`ngày ${d9}/${M}`;
    document.getElementById('goalTitle').textContent=`Mục tiêu ngày ${d9}/${M}/${D.cur.y} · ${scopeName}`;
-   document.getElementById('goalNote').textContent=`Doanh thu ${upAt?`đến ${upAt} ngày ${d9}/${M}`:`đến hết ngày ${d9}/${M}`} · còn ${left} ngày`;
+   document.getElementById('goalNote').textContent=`Doanh thu ${upAt?`đến ${upAt} ngày ${d9}/${M}`:`đến hết ngày ${d9}/${M}`} · ${left>1?`còn ${left} ngày (tính cả ngày ${d9}/${M})`:'ngày cuối tháng'}`;
    document.getElementById('goalHint').textContent=`Mục tiêu tháng ${M} = DT tháng ${P} × ${nf(0).format(100+g*100)}%`;
    // 1. revenue
    document.getElementById('gh1').innerHTML=`1. Doanh thu <small>ngày đổ báo cáo ${d9}/${M}${upAt?`, cập nhật đến ${upAt}`:''}</small>`;
-   const rev=s=>{const st=shopStats(s);const day=(D.sep.daily[s]||{})[d9]||0;const goal=st.aug*(1+g);const avg=st.cum9/d9;const need=left>0?Math.max(0,(goal-st.cum9)/left):0;return{s,day,goal,proj:st.proj,avg,need,cum:st.cum9,aug:st.aug}};
+   const rev=s=>{const st=shopStats(s);const day=(D.sep.daily[s]||{})[d9]||0;const goal=st.aug*(1+g);const avg=st.cum9/d9;const need=Math.max(0,(goal-(st.cum9-day))/left);return{s,day,goal,proj:st.proj,avg,need,cum:st.cum9,aug:st.aug}};
    const pctHT=r=>r.need>0?r.day/r.need:(r.day>0?9:0);const RR=scope.map(rev).sort((a,b)=>pctHT(b)-pctHT(a));
-   const TT={aug:tot(RR.map(r=>r.aug)),day:tot(RR.map(r=>r.day)),goal:tot(RR.map(r=>r.goal)),proj:tot(RR.map(r=>r.proj)),avg:tot(RR.map(r=>r.avg)),cum:tot(RR.map(r=>r.cum))};TT.need=left>0?Math.max(0,(TT.goal-TT.cum)/left):0;
+   const TT={aug:tot(RR.map(r=>r.aug)),day:tot(RR.map(r=>r.day)),goal:tot(RR.map(r=>r.goal)),proj:tot(RR.map(r=>r.proj)),avg:tot(RR.map(r=>r.avg)),cum:tot(RR.map(r=>r.cum))};TT.need=Math.max(0,(TT.goal-(TT.cum-TT.day))/left);
    const note=r=>{if(left<=0)return r.proj>=r.goal?`<span class="pill up">Đạt mục tiêu tháng</span>`:`<span class="pill down">Không đạt</span>`;const d=r.day-r.need;return d>=0?`<span class="pill up">Đạt</span> <small class="pos">+${tr1(d)} tr</small>`:`<span class="pill down">Không đạt</span> <small class="neg">−${tr1(-d)} tr</small>`};
    let t=`<thead><tr><th class="l">Siêu thị</th><th>DT ${dayLbl}</th><th>Mục tiêu T${M}</th><th>TB/ngày</th><th>Dự kiến T${M}</th><th>Tăng trưởng so T${P}</th><th class="need">Cần/ngày</th><th>% hoàn thành</th><th class="l">Ghi chú (so với cần/ngày)</th></tr></thead><tbody>`;
    RR.forEach(r=>{const o=D.shops[r.s];t+=`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(o.name)}</td><td><b>${tr(r.day)} tr</b></td><td>${tr(r.goal)} tr</td><td>${tr(r.avg)} tr</td><td class="${r.proj>=r.goal?'pos':'neg'}">${tr(r.proj)} tr</td><td class="${r.aug?(r.proj>=r.aug?'pos':'neg'):''}"><b>${r.aug?sgn(r.proj/r.aug-1):'—'}</b></td><td class="need">${left>0?tr(r.need)+' tr':'—'}</td><td class="${r.need>0?(r.day>=r.need?'pos':'neg'):''}"><b>${r.need>0?nf(1).format(r.day/r.need*100)+'%':'—'}</b></td><td class="l">${note(r)}</td></tr>`});
