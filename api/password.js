@@ -13,7 +13,7 @@ export default {
       if (me.env) return fail('Tài khoản quản trị chính đổi mật khẩu trong cài đặt Vercel (biến ADMIN_PASSWORD).', 400);
       const { oldPassword, newPassword } = await readBody(req, 10000);
       if (!newPassword || String(newPassword).length < 6) return fail('Mật khẩu mới cần ít nhất 6 ký tự.');
-      const db = await loadUsers();
+      const db = await loadUsers(true);
       const rec = db.users.find((x) => x.u === me.u);
       if (!rec || !(await checkPassword(oldPassword || '', rec.hash))) { await sleep(500); return fail('Mật khẩu hiện tại không đúng.', 401); }
       rec.hash = await hashPassword(newPassword);

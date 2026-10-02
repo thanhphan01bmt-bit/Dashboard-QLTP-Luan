@@ -11,7 +11,7 @@ export default {
       const me = await currentUser(req);
       if (!me) return fail('Chưa đăng nhập.', 401);
       if (me.role !== 'admin') return fail('Chỉ quản trị được quản lý tài khoản.', 403);
-      const db = await loadUsers();
+      const db = await loadUsers(true);
       const ea = envAdmin();
 
       if (req.method === 'GET') {

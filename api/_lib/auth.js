@@ -45,8 +45,24 @@ function safeEq(a, b) {
   return x.length === y.length && crypto.timingSafeEqual(x, y);
 }
 
-export async function loadUsers() { return (await readJSON(USERS_FILE)) || { users: [] }; }
-export async function saveUsers(db) { await writeJSON(USERS_FILE, db); }
+// Giữ danh sách tài khoản trong bộ nhớ 20 giây để giảm số lượt đọc Blob (gói Hobby có hạn mức).
+let USERS_MEM = null, USERS_AT = 0;
+export async function loadUsers(fresh = false) {
+  if (!fresh && USERS_MEM && Date.now() - USERS_AT < 20000) return structuredClone(USERS_MEM);
+  const db = (await readJSON(USERS_FILE)) || { users: [] };
+  USERS_MEM = db; USERS_AT = Date.now();
+  return structuredClone(db);
+}
+export async function saveUsers(db) { await writeJSON(USERS_FILE, db); USERS_MEM = structuredClone(db); USERS_AT = Date.now(); }
+
+// Chỉ kiểm tra chữ ký cookie (không đọc Blob) — dùng cho việc hỏi giờ cập nhật số liệu.
+export function sessionOk(req) {
+  const tok = readCookie(req);
+  if (!tok) return false;
+  const [payload, sig] = tok.split('.');
+  if (!payload || !sig || !safeEq(sig, sign(payload))) return false;
+  try { const p = JSON.parse(Buffer.from(payload, 'base64url').toString()); return !!p.exp && p.exp > Date.now(); } catch { return false; }
+}
 
 export function envAdmin() {
   const u = normUser(process.env.ADMIN_USER);

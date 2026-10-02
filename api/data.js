@@ -39,6 +39,7 @@ export default {
         const now = new Date();
         const doc = { meta: { updatedAt: now.toISOString(), by: me.u, byName: me.name }, data };
         await writeJSON(CURRENT, doc);
+        try { await writeJSON('data/meta.json', doc.meta); } catch (e) { console.error('meta failed', e); }
         // Sao lưu mỗi ngày 1 bản (ghi đè trong ngày), giờ Việt Nam.
         const vn = new Date(now.getTime() + 7 * 3600e3).toISOString().slice(0, 10);
         try { await writeJSON(`backup/${vn}.json`, doc); } catch (e) { console.error('backup failed', e); }

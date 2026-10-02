@@ -24,14 +24,14 @@ function friendly(e) {
   return e;
 }
 
-export async function readJSON(name) {
+export async function readJSON(name, { cache = false } = {}) {
   if (LOCAL) {
     try { return JSON.parse(await fs.readFile(path.join(LOCAL, name), 'utf8')); }
     catch (e) { if (e.code === 'ENOENT') return null; throw e; }
   }
   const { get } = await import('@vercel/blob');
   let r;
-  try { r = await get(name, { access: 'private', useCache: false, ...auth() }); }
+  try { r = await get(name, { access: 'private', useCache: cache, ...auth() }); }
   catch (e) { if (/not.?found/i.test(String(e && (e.name + e.message)))) return null; throw friendly(e); }
   if (!r || r.statusCode !== 200 || !r.stream) return null;
   return JSON.parse(await new Response(r.stream).text());

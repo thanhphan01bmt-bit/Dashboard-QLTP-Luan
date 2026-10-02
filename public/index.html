@@ -297,6 +297,15 @@ body.pv .wrap{padding-bottom:120px}
 .tag-off{font-size:11px;color:var(--bad);margin-left:4px}
 </style>
 <style>html,body{margin:0;padding:0}
+.stm{font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--axis);border-radius:8px;padding:5px 8px}
+.stbars{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:3px;height:90px;align-items:end;margin:0 0 14px;padding-bottom:16px;position:relative;border-bottom:1px solid var(--axis)}
+.stb{position:relative;height:100%;display:flex;align-items:flex-end}.stb i{display:block;width:100%;background:var(--accent);border-radius:3px 3px 0 0;min-height:1px}
+.stb.fut i{background:var(--grid)}.stb span{position:absolute;bottom:-16px;left:0;right:0;text-align:center;font-size:9px;color:var(--muted)}
+.strip{display:inline-flex;gap:2px;flex-wrap:nowrap}.strip i{width:7px;height:14px;border-radius:2px;background:var(--grid)}.strip i.on{background:var(--accent)}.strip i.fut{opacity:.35}.strip i.td{outline:1.5px solid var(--ink);outline-offset:1px}
+.sttbl td,.sttbl th{vertical-align:middle}
+@media (max-width:760px){.stb span:not(.lb){visibility:hidden}}
+.newdata{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));z-index:45;display:flex;gap:12px;align-items:center;background:var(--ink);color:var(--surface);border-radius:12px;padding:10px 12px 10px 16px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:13px;width:max-content;max-width:calc(100% - 24px)}
+.newdata .btn.primary{padding:6px 12px;flex:none}
 /* điện thoại: bảng gọn và tự co vừa màn hình */
 @media (max-width:760px){
  .wrap{padding-inline:10px!important;gap:14px}
@@ -326,9 +335,11 @@ body.pv .wrap{padding-bottom:120px}
   </form>
 </div>
 <div class="boot-msg" id="bootMsg">Đang tải…</div>
+<div class="newdata" id="newData" hidden role="status"><span id="newDataTxt"></span><button class="btn primary" type="button" id="newDataBtn">Tải lại</button></div>
 <div class="ubar" id="ubar" hidden>
   <span class="who">Xin chào, <b id="ubName"></b><span class="rtag" id="ubRole"></span></span>
   <span class="upd" id="ubUpd"></span>
+  <button class="btn" type="button" id="ubStats" hidden>Thống kê lượt xem</button>
   <button class="btn" type="button" id="ubUsers" hidden>Quản lý tài khoản</button>
   <button class="btn" type="button" id="ubBackup" hidden>Tải bản sao lưu</button>
   <button class="btn" type="button" id="ubPass">Đổi mật khẩu</button>
@@ -353,6 +364,16 @@ body.pv .wrap{padding-bottom:120px}
   </div>
 </div>
 
+<div class="ov" id="statsPanel" hidden>
+  <div class="panel wide" role="dialog" aria-modal="true" aria-labelledby="statsTitle" style="max-width:900px">
+    <div class="sec-title"><h2 id="statsTitle">Thống kê lượt xem</h2><div class="row"><label class="muted" for="stM" style="font-size:12px">Tháng</label><input type="month" id="stM" class="stm"><button class="btn" type="button" data-close>Đóng</button></div></div>
+    <p class="hint">Mỗi ô là 1 ngày trong tháng, ô tô màu là ngày tài khoản đó có mở dashboard. Mỗi người được tính tối đa 1 lượt/ngày.</p>
+    <div class="fresh-kpis" id="stKpis"></div>
+    <div class="stbars" id="stBars"></div>
+    <div class="tbl-wrap"><table class="utbl sttbl" id="stTbl"></table></div>
+    <p class="msg-err" id="stMsg"></p>
+  </div>
+</div>
 <div class="ov" id="passPanel" hidden>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="passTitle" style="max-width:420px">
     <div class="sec-title"><h2 id="passTitle">Đổi mật khẩu</h2><button class="btn" type="button" data-close>Đóng</button></div>
@@ -1255,7 +1276,7 @@ function showLogin(){
 function showUbar(me){
   document.body.classList.toggle('is-admin',me.role==='admin');
   $('ubar').hidden=false;$('ubName').textContent=me.name||me.u;$('ubRole').textContent=me.roleName||me.role;
-  $('ubUsers').hidden=me.role!=='admin';$('ubBackup').hidden=me.role!=='admin';$('ubPass').hidden=!!me.envAdmin;
+  $('ubUsers').hidden=me.role!=='admin';$('ubStats').hidden=me.role!=='admin';$('ubStats').onclick=()=>{openPanel('statsPanel');loadStats()};$('ubBackup').hidden=me.role!=='admin';$('ubPass').hidden=!!me.envAdmin;
   $('ubOut').onclick=async()=>{try{await api('/api/logout',{method:'POST',body:{}})}catch(e){}location.reload()};
   $('ubPass').onclick=()=>openPanel('passPanel');
   $('ubUsers').onclick=()=>{openPanel('usersPanel');loadUsers()};
@@ -1268,7 +1289,30 @@ function setUpd(meta){$('ubUpd').textContent=meta&&meta.updatedAt?`Số liệu l
 let lastFocus=null;
 function openPanel(id){lastFocus=document.activeElement;const p=$(id);p.hidden=false;const f=p.querySelector('input,select,button');f&&f.focus()}
 function closePanel(p){p.hidden=true;lastFocus&&lastFocus.focus&&lastFocus.focus()}
-document.querySelectorAll('#usersPanel,#passPanel').forEach(p=>{
+// ---- thống kê lượt xem
+const vnToday=()=>new Date(Date.now()+7*3600e3).toISOString().slice(0,10);
+async function recordView(){const me=window.__ME;if(!me)return;const k=`kvv:${me.u}:${vnToday()}`;
+  try{if(localStorage.getItem(k))return}catch(e){}
+  try{const r=await api('/api/stats',{method:'POST',body:{}});if(r.ok){try{localStorage.setItem(k,'1')}catch(e){}}}catch(e){}}
+window.__recordView=recordView;
+async function loadStats(){const inp=$('stM');if(!inp.value)inp.value=vnToday().slice(0,7);inp.onchange=loadStats;$('stMsg').textContent='';
+  const r=await api('/api/stats?m='+encodeURIComponent(inp.value));if(!r.ok){$('stMsg').textContent=r.j.error||'Không tải được thống kê.';return}
+  const j=r.j,[Y,Mo]=j.month.split('-').map(Number),dim=new Date(Y,Mo,0).getDate(),isCur=j.today.slice(0,7)===j.month,lastDay=isCur?+j.today.slice(8):dim;
+  const U=j.users.filter(u=>!u.disabled||u.days.length);const viewers=U.filter(u=>u.days.length);
+  const todayN=isCur?U.filter(u=>u.days.includes(j.today)).length:null;
+  const per=Array.from({length:dim},(_,i)=>U.filter(u=>u.days.includes(`${j.month}-${String(i+1).padStart(2,'0')}`)).length);
+  const avg=lastDay?per.slice(0,lastDay).reduce((a,b)=>a+b,0)/lastDay:0;
+  $('stKpis').innerHTML=`<div class="fk"><span class="lbl">Tài khoản</span><span class="val">${U.length}</span></div><div class="fk"><span class="lbl">Đã xem trong tháng</span><span class="val">${viewers.length}</span></div>
+    <div class="fk"><span class="lbl">${isCur?'Đã xem hôm nay':'Ngày nhiều nhất'}</span><span class="val">${isCur?todayN:Math.max(0,...per)}</span></div><div class="fk"><span class="lbl">TB người xem / ngày</span><span class="val">${avg.toLocaleString('vi-VN',{maximumFractionDigits:1})}</span></div>`;
+  const mx=Math.max(1,...per);
+  $('stBars').innerHTML=per.map((n,i)=>`<div class="stb${i+1>lastDay?' fut':''}" title="Ngày ${i+1}/${Mo}: ${n} người xem"><i style="height:${n/mx*100}%"></i><span${i===0||(i+1)%5===0?' class="lb"':''}>${i+1}</span></div>`).join('');
+  const rows=U.slice().sort((a,b)=>b.days.length-a.days.length||(b.days[b.days.length-1]||'').localeCompare(a.days[a.days.length-1]||'')||a.u.localeCompare(b.u));
+  const fmtD=d=>{const [y,m,dd]=d.split('-');return `${+dd}/${+m}`};
+  $('stTbl').innerHTML=`<thead><tr><th class="l">Tài khoản</th><th class="l">Quyền</th><th>Số ngày xem</th><th class="l">Lần gần nhất</th><th class="l">Từng ngày</th></tr></thead><tbody>${rows.map(u=>{const last=u.days[u.days.length-1];const ft=last&&u.first&&u.first[last]?new Date(u.first[last]).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Ho_Chi_Minh'}):'';
+    return `<tr${u.days.length?'':' class="muted-row"'}><td class="l"><b>${esc(u.name)}</b><br><small class="muted">${esc(u.u)}${u.deleted?' · đã xóa':''}${u.disabled?' · đã khóa':''}</small></td><td class="l">${esc(u.roleName||'')}</td><td><b>${u.days.length}</b>/${lastDay}</td><td class="l">${last?`${fmtD(last)}${ft?' · '+ft:''}`:'<span class="neg">Chưa xem</span>'}</td>
+    <td class="l"><span class="strip">${Array.from({length:dim},(_,i)=>{const d=`${j.month}-${String(i+1).padStart(2,'0')}`;return `<i class="${u.days.includes(d)?'on':''}${i+1>lastDay?' fut':''}${d===j.today?' td':''}" title="${i+1}/${Mo}"></i>`}).join('')}</span></td></tr>`}).join('')}</tbody>`;
+}
+document.querySelectorAll('#usersPanel,#passPanel,#statsPanel').forEach(p=>{
   p.addEventListener('click',e=>{if(e.target===p||e.target.closest('[data-close]'))closePanel(p)});
   p.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel(p)});
 });
@@ -1325,12 +1369,27 @@ async function start(){
   const d=await api('/api/data');
   if(d.status===404){showEmpty(me.j);return}
   if(!d.ok){msg(esc(d.j.error||('Không tải được số liệu ('+d.status+').')));return}
-  window.__DOC=d.j;window.__META=d.j.meta||null;setUpd(window.__META);
+  window.__DOC=d.j;window.__META=d.j.meta||null;setUpd(window.__META);recordView();
   const s=document.createElement('script');s.type='application/json';s.id='data';s.textContent=JSON.stringify(d.j.data);document.body.appendChild(s);
   $('bootMsg').hidden=true;$('appRoot').hidden=false;
   const m=document.createElement('script');m.textContent=$('mainsrc').textContent;document.body.appendChild(m);
 }
 start();
+// tự kiểm tra số liệu mới: khi quay lại app / tab và 5 phút một lần khi đang mở
+let lastChk=0,chkBusy=false;
+const busy=()=>!$('pvBar').hidden||!$('upPanel').hidden||!$('usersPanel').hidden||!$('passPanel').hidden||!$('statsPanel').hidden;
+async function checkNew(auto){
+  if(chkBusy||!window.__META||!window.__ME)return;const now=Date.now();if(now-lastChk<60000)return;lastChk=now;chkBusy=true;
+  try{const r=await api('/api/version');if(!r.ok||!r.j.updatedAt)return;
+    if(r.j.updatedAt!==window.__META.updatedAt&&new Date(r.j.updatedAt)>new Date(window.__META.updatedAt||0)){
+      if(auto&&!busy()){location.reload();return}
+      const b=$('newData');$('newDataTxt').textContent=`Đã có số liệu mới lưu lúc ${fmtTime(r.j.updatedAt)}${r.j.byName||r.j.by?' bởi '+(r.j.byName||r.j.by):''}.`;b.hidden=false}}
+  catch(e){}finally{chkBusy=false}}
+$('newDataBtn').onclick=()=>location.reload();
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){checkNew(true);recordView()}});
+addEventListener('pageshow',e=>{if(e.persisted)checkNew(true)});
+addEventListener('focus',()=>checkNew(true));
+setInterval(()=>{if(document.visibilityState==='visible')checkNew(false)},5*60000);
 // tự co bảng cho vừa bề ngang màn hình điện thoại (vẫn có thể chụm 2 ngón để phóng to)
 let fitQ=0;function fitTables(){fitQ=0;const small=innerWidth<=760;
   document.querySelectorAll('.tbl-wrap>table').forEach(t=>{t.style.zoom='';if(!small)return;const w=t.parentElement.clientWidth,sw=Math.max(t.scrollWidth,t.parentElement.scrollWidth,t.getBoundingClientRect().width);
