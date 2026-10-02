@@ -168,6 +168,7 @@ tr.muted-row td{color:var(--muted)}
 @media (max-width:900px){.goal2{grid-template-columns:1fr}}
 .gh{margin:0 0 8px;font-size:14px;font-weight:600}.gh small{font-weight:400;color:var(--muted);font-size:12px;margin-left:6px}
 .goal2 table{min-width:0}
+#goalFresh .need{background:var(--accent-soft)}#goalFresh th.need{color:var(--accent)}#goalFresh td.need b{font-size:13.5px}
 .ghero{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px;margin:0 0 12px;padding:14px 16px;border-radius:12px;background:var(--surface2);border:1.5px solid var(--line)}
 .ghero.is-ok{border-color:var(--good);background:var(--good-bg)}.ghero.is-bad{border-color:var(--bad);background:var(--bad-bg)}
 .gh-l{font-size:13px;font-weight:600;color:var(--ink2)}
@@ -820,7 +821,8 @@ function render(){
        <div class="gh-bar"><i style="width:${pc!=null?Math.min(100,pc*100):0}%"></i></div>
        <div class="gh-s">${pc!=null?`<b>Đạt ${nf(1).format(pc*100)}%</b> so với cần/ngày · ${ok?'vượt':'còn thiếu'} <b>${tr1(Math.abs(gap))} tr</b>`:'Đã hết ngày trong tháng'}</div></div>
        <div class="gh-side gh-one"><div><span>Cần/ngày</span><b>${left>0?tr(r.need)+' tr':'—'}</b></div></div>`;
-     gt.querySelectorAll('tbody td:nth-child(2)').forEach(td=>td.classList.add('dt-big'))}else{hero.hidden=true;hero.innerHTML=''}}
+     gt.dataset.orig=JSON.stringify({H:[...gt.tHead.rows[0].cells].map(c=>c.textContent.trim()),R:[...gt.tBodies[0].rows[0].cells].map(c=>c.textContent.replace(/\s+/g,' ').trim())});
+     gt.querySelectorAll('tr').forEach(tr=>[3,2,1].forEach(i=>tr.cells[i]&&tr.cells[i].remove()))}else{hero.hidden=true;hero.innerHTML='';delete gt.dataset.orig}}
    gt.querySelectorAll('tr[data-s]').forEach(tr=>{const go=()=>setShop(tr.dataset.s);tr.onclick=go;tr.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}});
    // 2. fresh: DT from ngành report (fresh categories) of report day, giá vốn cơ bản hôm nay from fresh file
    document.getElementById('gh2').innerHTML=`2. Hiệu quả Fresh <small>ngày ${d9}/${M}</small>`;
@@ -834,9 +836,9 @@ function render(){
      const dd=dayDT(s);if('_' in dd){let gv=0;D.fresh.forEach(r=>{if(r[0]===s)gv+=r[6]||0});m['Tổng Fresh (tải lại file ngành hàng để xem từng ngành)']=[dd._,gv]}else{for(const c in dd)add(c,0,dd[c]);D.fresh.forEach(r=>{if(r[0]===s&&r[6]!=null)add(FMAP(r[1]),1,r[6])})}
      rows=Object.keys(m).map(c=>({k:null,n:c,dt:m[c][0],gv:m[c][1],r:m[c][1]>0?m[c][0]/m[c][1]:null}))}
     rows.sort((x,y)=>(x.r??9)-(y.r??9));
-    let fdt=0,fgv=0;let h=`<thead><tr><th class="l">${col1}</th><th>Giá vốn</th><th>Doanh thu</th><th>DT/giá vốn</th></tr></thead><tbody>`;
-    rows.forEach(r=>{fdt+=r.dt;fgv+=r.gv;h+=`<tr${r.k?` tabindex="0" data-s="${r.k}"`:''}><td class="l">${esc(r.n)}</td><td>${tr1(r.gv)} tr</td><td>${tr1(r.dt)} tr</td><td class="${r.r!=null?(r.r>=1?'pos':'neg'):''}"><b>${r.r!=null?pct(r.r):'—'}</b></td></tr>`});
-    h+=rows.length>1?`</tbody><tfoot><tr><th class="l">${single?'Tổng Fresh':'Toàn khu vực'}</th><th>${tr1(fgv)} tr</th><th>${tr1(fdt)} tr</th><th class="${fgv>0?(fdt>=fgv?'pos':'neg'):''}">${fgv>0?pct(fdt/fgv):'—'}</th></tr></tfoot>`:'</tbody>';fe.innerHTML=h}
+    let fdt=0,fgv=0;let h=`<thead><tr><th class="l">${col1}</th><th>Giá vốn</th><th class="need">${upAt?`DT đến ${upAt}`:`DT ngày ${d9}/${M}`}</th><th>DT/giá vốn</th></tr></thead><tbody>`;
+    rows.forEach(r=>{fdt+=r.dt;fgv+=r.gv;h+=`<tr${r.k?` tabindex="0" data-s="${r.k}"`:''}><td class="l">${esc(r.n)}</td><td>${tr1(r.gv)} tr</td><td class="need"><b>${tr1(r.dt)} tr</b></td><td class="${r.r!=null?(r.r>=1?'pos':'neg'):''}"><b>${r.r!=null?pct(r.r):'—'}</b></td></tr>`});
+    h+=rows.length>1?`</tbody><tfoot><tr><th class="l">${single?'Tổng Fresh':'Toàn khu vực'}</th><th>${tr1(fgv)} tr</th><th class="need">${tr1(fdt)} tr</th><th class="${fgv>0?(fdt>=fgv?'pos':'neg'):''}">${fgv>0?pct(fdt/fgv):'—'}</th></tr></tfoot>`:'</tbody>';fe.innerHTML=h}
    // 3. loss by category for latest day
    const LG=c=>{const k=c.normalize('NFC').toLowerCase();if(/^th[uủ]y h[aả]i s[aả]n (nh[aậ]p kh[aẩ]u|t[aậ]p trung)$/.test(k))return 'Thủy Hải Sản Các Loại';if(/^th[iị]t (đ[iị]a ph[uư][oơ]ng|nh[aậ]p kh[aẩ]u)$/.test(k))return 'Thịt gia cầm gia súc các loại';return c};
    const L=D.loss&&D.loss.daily&&D.loss.y===D.cur.y&&D.loss.m===D.cur.m?D.loss:null;let ld=0;if(L)for(const s in L.daily)for(const k in L.daily[s])ld=Math.max(ld,+k);
@@ -1359,10 +1361,10 @@ async function loadStats(){const inp=$('stM');if(!inp.value)inp.value=vnToday().
 // ---- tóm tắt mục tiêu ngày (đọc từ bảng Doanh thu đang hiển thị)
 function goalSummary(){
   const t=document.getElementById('goalTbl');if(!t||!t.tHead)return null;
-  const H=[...t.tHead.rows[0].cells].map(c=>c.textContent.trim());const ix=k=>H.findIndex(h=>h.startsWith(k));
+  const O=t.dataset.orig?JSON.parse(t.dataset.orig):null;const H=O?O.H:[...t.tHead.rows[0].cells].map(c=>c.textContent.trim());const ix=k=>H.findIndex(h=>h.startsWith(k));
   const iD=ix('DT'),iN=ix('Cần'),iP=ix('%'),iL=ix('Lũy'),iF=ix('Dự kiến'),iG=ix('Tăng');
   const cell=(r,i)=>i>=0&&r.cells[i]?r.cells[i].textContent.replace(/\s+/g,' ').trim():'';
-  const rows=[...t.tBodies[0].rows];const ft=t.tFoot&&t.tFoot.rows[0];const tot=ft||rows[0];if(!tot)return null;
+  const fake=a=>({cells:a.map(x=>({textContent:x}))});const rows=O?[fake(O.R)]:[...t.tBodies[0].rows];const ft=!O&&t.tFoot&&t.tFoot.rows[0];const tot=ft||rows[0];if(!tot)return null;
   const title=(document.getElementById('goalTitle')||{}).textContent||'';const scope=title.split('·').pop().trim();
   const dLbl=H[iD]?H[iD].replace(/^DT\s*/,''):'';
   const short=`${scope}: DT ${dLbl} ${cell(tot,iD)}, đạt ${cell(tot,iP)} cần/ngày (${cell(tot,iN)}).`;
