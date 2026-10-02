@@ -1343,16 +1343,16 @@ function goalSummary(){
   const title=(document.getElementById('goalTitle')||{}).textContent||'';const scope=title.split('·').pop().trim();
   const dLbl=H[iD]?H[iD].replace(/^DT\s*/,''):'';
   const short=`${scope}: DT ${dLbl} ${cell(tot,iD)}, đạt ${cell(tot,iP)} cần/ngày (${cell(tot,iN)}).`;
-  const nm=r=>cell(r,0);const top=rows.slice(0,3),bot=rows.length>3?rows.slice(-3).reverse():[];
-  const lines=[`DT KV QLTP Luân – ${title.replace(' · ',' – ')}`,
-    `• DT ${dLbl}: ${cell(tot,iD)} / cần ${cell(tot,iN)} mỗi ngày → đạt ${cell(tot,iP)}`,
-    iL>=0?`• Lũy kế: ${cell(tot,iL)} · Dự kiến cả tháng: ${cell(tot,iF)} (${cell(tot,iG)} so tháng trước)`:''];
-  if(rows.length>1){lines.push(`• Cao nhất: ${top.map(r=>`${nm(r)} ${cell(r,iP)}`).join(', ')}`);if(bot.length)lines.push(`• Thấp nhất: ${bot.map(r=>`${nm(r)} ${cell(r,iP)}`).join(', ')}`)}
-  lines.push(`Xem chi tiết: ${location.origin}/`);
-  return{short,text:lines.filter(Boolean).join('\n')};
+  const nm=r=>cell(r,0);
+  const top=rows.slice(0,3);
+  const lines=[`DT KV QLTP Luân – ${title.replace(' · ',' – ')}:`,'',
+    `- DT ${dLbl}: ${cell(tot,iD)} / cần ${cell(tot,iN)} mỗi ngày → đạt ${cell(tot,iP)}`];
+  if(rows.length>1){lines.push('- Top 3 siêu thị đạt doanh thu ngày:');top.forEach((r,i)=>lines.push(`Top ${i+1}: ${nm(r)} – ${cell(r,iD)} (đạt ${cell(r,iP)})`))}
+  lines.push('',`Xem chi tiết: https://luan56605.app/`);
+  return{short,text:lines.join('\n')};
 }
 window.__goalSummary=goalSummary;
-function openZalo(){const s=goalSummary();$('zaloTxt').value=s?s.text:`DT KV QLTP Luân đã cập nhật số liệu.\nXem chi tiết: ${location.origin}/`;$('zaloMsg').textContent='';openPanel('zaloPanel');$('zaloTxt').focus()}
+function openZalo(){const s=goalSummary();$('zaloTxt').value=s?s.text:`DT KV QLTP Luân đã cập nhật số liệu.\n\nXem chi tiết: https://luan56605.app/`;$('zaloMsg').textContent='';openPanel('zaloPanel');$('zaloTxt').focus()}
 $('zaloCopy').onclick=async()=>{const ta=$('zaloTxt');let ok=false;try{await navigator.clipboard.writeText(ta.value);ok=true}catch(e){try{ta.select();ok=document.execCommand('copy')}catch(_){}}
   $('zaloMsg').className=ok?'msg-ok':'msg-err';$('zaloMsg').textContent=ok?'Đã sao chép. Mở Zalo và dán vào nhóm.':'Không sao chép tự động được, hãy bôi đen rồi sao chép thủ công.'};
 
