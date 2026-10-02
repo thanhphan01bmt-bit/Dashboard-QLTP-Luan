@@ -3,6 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DT KV Luân">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f2f5f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0c1210" media="(prefers-color-scheme: dark)">
 <title data-page>Doanh thu KV QLTP Luân</title>
 <link data-page rel="preconnect" href="https://fonts.googleapis.com">
 <link data-page rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -287,7 +296,9 @@ body.pv .wrap{padding-bottom:120px}
 .msg-err{color:var(--bad);font-size:12.5px;min-height:18px}
 .tag-off{font-size:11px;color:var(--bad);margin-left:4px}
 </style>
-<style>html,body{margin:0;padding:0}</style>
+<style>html,body{margin:0;padding:0}
+@media (display-mode: standalone){body{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}.wrap{padding-bottom:calc(48px + env(safe-area-inset-bottom))}}
+</style>
 <style>body:not(.is-admin) .ed-admin{display:none}</style>
 </head>
 <body>

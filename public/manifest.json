@@ -1,0 +1,17 @@
+{
+  "name": "Doanh thu KV QLTP Luân",
+  "short_name": "DT KV Luân",
+  "description": "Dashboard doanh thu, mục tiêu ngày, hiệu quả Fresh và hủy của KV QLTP Luân",
+  "lang": "vi",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f2f5f3",
+  "theme_color": "#01723a",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
