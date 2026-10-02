@@ -2,6 +2,7 @@
 import { json, fail, currentUser, sameOriginWrite, readBody } from './_lib/auth.js';
 import { useRequest } from './_lib/store.js';
 import { readJSON, writeJSON } from './_lib/store.js';
+import { sendAll } from './_lib/webpush.js';
 
 const CURRENT = 'data/current.json';
 
@@ -43,7 +44,17 @@ export default {
         // Sao lưu mỗi ngày 1 bản (ghi đè trong ngày), giờ Việt Nam.
         const vn = new Date(now.getTime() + 7 * 3600e3).toISOString().slice(0, 10);
         try { await writeJSON(`backup/${vn}.json`, doc); } catch (e) { console.error('backup failed', e); }
-        return json({ ok: true, meta: doc.meta });
+        // Gửi thông báo đẩy cho các máy đã bật (trừ máy của người vừa lưu), tối đa 8 giây.
+        let push = null;
+        try {
+          const hm = new Date(now.getTime() + 7 * 3600e3).toISOString().slice(11, 16);
+          const notice = String(body.notice || '').replace(/\s+/g, ' ').trim().slice(0, 180) || `Số liệu đã được cập nhật lúc ${hm}.`;
+          push = await Promise.race([
+            sendAll({ title: 'DT KV Luân · số liệu mới', body: notice, url: '/#muctieu', tag: 'kv-update' }, new URL(req.url).origin, (s) => s.u !== me.u),
+            new Promise((r) => setTimeout(() => r({ timeout: true }), 8000)),
+          ]);
+        } catch (e) { console.error('push failed', e); }
+        return json({ ok: true, meta: doc.meta, push });
       }
       return fail('Method not allowed', 405);
     } catch (e) { console.error(e); return fail(e.message || 'Lỗi máy chủ.', e.status || 500); }
