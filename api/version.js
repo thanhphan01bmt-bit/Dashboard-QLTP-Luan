@@ -9,7 +9,7 @@ export default {
     if (!sessionOk(req)) return fail('Chưa đăng nhập.', 401);
     try {
       const meta = await readJSON('data/meta.json', { cache: true });
-      return json(meta || { updatedAt: null });
+      return json(meta ? { updatedAt: meta.updatedAt, by: meta.by, byName: meta.byName } : { updatedAt: null });
     } catch (e) { return fail(e.message, e.status || 500); }
   },
 };

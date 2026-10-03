@@ -45,15 +45,18 @@ export default {
         const vn = new Date(now.getTime() + 7 * 3600e3).toISOString().slice(0, 10);
         try { await writeJSON(`backup/${vn}.json`, doc); } catch (e) { console.error('backup failed', e); }
         // Gửi thông báo đẩy cho các máy đã bật (trừ máy của người vừa lưu), tối đa 8 giây.
-        let push = null;
-        try {
-          const hm = new Date(now.getTime() + 7 * 3600e3).toISOString().slice(11, 16);
-          const notice = String(body.notice || '').replace(/\s+/g, ' ').trim().slice(0, 180) || `Số liệu đã được cập nhật lúc ${hm}.`;
-          push = await Promise.race([
-            sendAll({ title: 'DT KV Luân · số liệu mới', body: notice, url: '/#muctieu', tag: 'kv-update' }, new URL(req.url).origin, (s) => s.u !== me.u),
-            new Promise((r) => setTimeout(() => r({ timeout: true }), 8000)),
-          ]);
-        } catch (e) { console.error('push failed', e); }
+        const hm = new Date(now.getTime() + 7 * 3600e3).toISOString().slice(11, 16);
+        const timeout = (ms) => new Promise((r) => setTimeout(() => r({ timeout: true }), ms));
+        const pushJob = (async () => {
+          try {
+            const notice = String(body.notice || '').replace(/\s+/g, ' ').trim().slice(0, 180) || `Số liệu đã được cập nhật lúc ${hm}.`;
+            return await Promise.race([
+              sendAll({ title: 'DT KV Luân · số liệu mới', body: notice, url: '/#muctieu', tag: 'kv-update' }, new URL(req.url).origin, (s) => s.u !== me.u),
+              timeout(8000),
+            ]);
+          } catch (e) { console.error('push failed', e); return null; }
+        })();
+        const push = await pushJob;
         return json({ ok: true, meta: doc.meta, push });
       }
       return fail('Method not allowed', 405);

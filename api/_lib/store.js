@@ -55,3 +55,29 @@ export async function writeJSON(name, obj) {
     cacheControlMaxAge: 60,
   }); } catch (e) { throw friendly(e); }
 }
+
+// Liệt kê file theo tiền tố (vd 'backup/'). Trả về [{ name, size, uploadedAt }].
+export async function listNames(prefix) {
+  if (LOCAL) {
+    const dir = path.join(LOCAL, prefix);
+    let files = [];
+    try { files = await fs.readdir(dir); } catch (e) { if (e.code === 'ENOENT') return []; throw e; }
+    return Promise.all(files.map(async (f) => { const st = await fs.stat(path.join(dir, f)); return { name: prefix + f, size: st.size, uploadedAt: st.mtime.toISOString() }; }));
+  }
+  const { list } = await import('@vercel/blob');
+  const out = []; let cursor;
+  try {
+    do {
+      const r = await list({ prefix, cursor, limit: 1000, ...auth() });
+      for (const b of r.blobs) out.push({ name: b.pathname, size: b.size, uploadedAt: new Date(b.uploadedAt).toISOString() });
+      cursor = r.hasMore ? r.cursor : undefined;
+    } while (cursor);
+  } catch (e) { throw friendly(e); }
+  return out;
+}
+
+export async function deleteName(name) {
+  if (LOCAL) { try { await fs.unlink(path.join(LOCAL, name)); } catch (e) { if (e.code !== 'ENOENT') throw e; } return; }
+  const { del } = await import('@vercel/blob');
+  try { await del(name, { ...auth() }); } catch (e) { throw friendly(e); }
+}
