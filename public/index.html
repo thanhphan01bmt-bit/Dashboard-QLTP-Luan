@@ -837,12 +837,11 @@ function render(){
    const pctHT=r=>r.need>0?r.day/r.need:(r.day>0?9:0);const RR=scope.map(rev).sort((a,b)=>pctHT(b)-pctHT(a));
    const TT={aug:tot(RR.map(r=>r.aug)),day:tot(RR.map(r=>r.day)),goal:tot(RR.map(r=>r.goal)),proj:tot(RR.map(r=>r.proj)),avg:tot(RR.map(r=>r.avg)),cum:tot(RR.map(r=>r.cum))};TT.need=Math.max(0,(TT.goal-(TT.cum-TT.day))/left);
    // Cảnh báo tự động (tính lại mỗi khi có số liệu mới)
-   {const WARN={need:.8,wow:.2,wow2:.3,lossMin:.03,lossX:2,bill:.15};
+   {const WARN={need:.8,wow:.2,wow2:.3,lossMin:.03,lossX:2};
     const box=document.getElementById('goalWarn');const fd=k=>`${k}/${M}`;const PM=D.prev.dim;
     const dl=(s,k)=>k>=1?+((D.sep.daily[s]||{})[k]||0):+(((D.aug.daily||{})[s]||{})[PM+k]||0);
-    const lastFull=upAt?d9-1:d9; // ngày đang cập nhật dở thì chưa xét
+    const lastFull=upAt&&upAt<'21:00'?d9-1:d9; // lưu từ 21h00 thì coi ngày đổ báo cáo là đủ ngày; trước 21h xét đến ngày hôm trước
     const Lw=D.loss&&D.loss.daily&&D.loss.y===D.cur.y&&D.loss.m===D.cur.m?D.loss:null;let ldw=0;if(Lw)for(const x in Lw.daily)for(const k in Lw.daily[x])ldw=Math.max(ldw,+k);
-    const bd=D.sep.billDays||0,lb=bd===d9&&upAt?bd-1:bd;
     const W=[];
     scope.forEach(s=>{const st=shopStats(s);const goal=st.aug*(1+g);const it=[];
      // 1. 3 ngày liền dưới mức cần/ngày
@@ -856,17 +855,14 @@ function render(){
        const [n1,h1]=sm(ldw);let n0=0,h0=0;for(let k=Math.max(1,ldw-7);k<ldw;k++){const [a,b]=sm(k);n0+=a;h0+=b}
        const r1=n1>0?h1/n1:0,r0=n0>0?h0/n0:0;
        if(n1>0&&r1>=WARN.lossMin&&r1>=WARN.lossX*r0)it.push({lv:r1>=2*WARN.lossMin?2:1,t:`Tỷ lệ hủy ngày ${fd(ldw)} là ${pct(r1)}${r0>0?`, gấp ${nf(1).format(r1/r0)} lần TB 7 ngày trước (${pct(r0)})`:' (7 ngày trước gần như không hủy)'}`})}
-     // 4. Số bill giảm
-     if(lb>=8){const B=D.sep.bills[s]||{};const a=+B[lb]||0;let t0=0,c0=0;for(let k=lb-7;k<lb;k++){const v=+B[k]||0;if(v>0){t0+=v;c0++}}const avg=c0?t0/c0:0;
-       if(a>0&&avg>0&&a/avg-1<=-WARN.bill)it.push({lv:1,t:`Số bill ngày ${fd(lb)} là ${nf(0).format(a)}, giảm ${nf(0).format((1-a/avg)*100)}% so với TB 7 ngày trước (${nf(0).format(avg)})`})}
      if(it.length)W.push({s,it,lv:Math.max(...it.map(x=>x.lv))})});
     W.sort((a,b)=>b.lv-a.lv||b.it.length-a.it.length);
     const single=scope.length===1,LIM=5;
-    if(!W.length){box.hidden=false;box.className='warnbox ok';box.innerHTML=`✓ Không có cảnh báo${single?' cho '+esc(scopeName):''} theo số liệu mới nhất.`}
+    if(!W.length){box.hidden=false;box.className='warnbox ok';box.innerHTML=`✓ Không có cảnh báo${single?' cho '+esc(scopeName):''} (doanh thu xét đến ngày ${fd(lastFull)}).`}
     else{box.hidden=false;box.className='warnbox';const open=box.dataset.open==='1';const show=open?W:W.slice(0,LIM);
      box.innerHTML=`<div class="wb-h"><span class="ic" aria-hidden="true">!</span>Cảnh báo tự động <small>${single?esc(scopeName):`${W.length} siêu thị cần chú ý`}</small>${W.length>LIM?`<button class="btn" type="button" id="wbMore">${open?'Thu gọn':`Xem tất cả (${W.length})`}</button>`:''}</div>
       <ul class="wb-list">${show.map(w=>`<li class="lv${w.lv}">${single?'':`<b class="sh" data-ws="${w.s}" tabindex="0" role="button">${esc(shopName(w.s))}</b>`}${w.it.map(x=>`<span class="wi">${x.t}</span>`).join('')}</li>`).join('')}</ul>
-      <p class="wb-note">Tự xét: 3 ngày liền dưới ${WARN.need*100}% mức bình quân cần đạt (mục tiêu tháng ÷ số ngày) · DT giảm từ ${WARN.wow*100}% so cùng thứ tuần trước · tỷ lệ hủy từ ${WARN.lossMin*100}% và gấp ${WARN.lossX} lần TB 7 ngày · số bill giảm từ ${WARN.bill*100}%. Viền đỏ là mức nặng.</p>`;
+      <p class="wb-note">Tự xét: 3 ngày liền dưới ${WARN.need*100}% mức bình quân cần đạt (mục tiêu tháng ÷ số ngày) · DT giảm từ ${WARN.wow*100}% so cùng thứ tuần trước · tỷ lệ hủy từ ${WARN.lossMin*100}% và gấp ${WARN.lossX} lần TB 7 ngày. Doanh thu xét đến ngày ${fd(lastFull)}${lastFull<d9?' (ngày '+fd(d9)+' sẽ được xét khi có số liệu lưu từ 21h00)':''}. Viền đỏ là mức nặng.</p>`;
      const mb=document.getElementById('wbMore');if(mb)mb.onclick=()=>{box.dataset.open=open?'0':'1';render()};
      box.querySelectorAll('[data-ws]').forEach(b=>{const go=()=>setShop(b.dataset.ws);b.onclick=go;b.onkeydown=e=>{if(e.key==='Enter')go()}})}}
    const note=r=>{if(left<=0)return r.proj>=r.goal?`<span class="pill up">Đạt mục tiêu tháng</span>`:`<span class="pill down">Không đạt</span>`;const d=r.day-r.need;return d>=0?`<span class="pill up">Đạt</span> <small class="pos">+${tr1(d)} tr</small>`:`<span class="pill down">Không đạt</span> <small class="neg">−${tr1(-d)} tr</small>`};
