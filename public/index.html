@@ -320,6 +320,7 @@ body.pv .wrap{padding-bottom:120px}
 .stb.fut i{background:var(--grid)}.stb span{position:absolute;bottom:-16px;left:0;right:0;text-align:center;font-size:9px;color:var(--muted)}
 .strip{display:inline-flex;gap:2px;flex-wrap:nowrap}.strip i{width:7px;height:14px;border-radius:2px;background:var(--grid)}.strip i.on{background:var(--accent)}.strip i.fut{opacity:.35}.strip i.td{outline:1.5px solid var(--ink);outline-offset:1px}
 .sttbl td,.sttbl th{vertical-align:middle}
+@media (max-width:760px){.m-hide,#goalPdf{display:none!important}}
 @media (max-width:760px){.stb span:not(.lb){visibility:hidden}}
 .newdata{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));z-index:45;display:flex;gap:12px;align-items:center;background:var(--ink);color:var(--surface);border-radius:12px;padding:10px 12px 10px 16px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:13px;width:max-content;max-width:calc(100% - 24px)}
 .newdata .btn.primary{padding:6px 12px;flex:none}
@@ -447,7 +448,7 @@ body.pv .wrap{padding-bottom:120px}
 
   <section class="card" id="goalSec">
     <div class="sec-title"><h2 id="goalTitle">Mục tiêu ngày</h2><div class="row"><span class="note" id="goalNote"></span><button class="btn primary no-cap" id="goalPdf" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 10l6 6 6-6M4 20h16"/></svg>Tải PDF</button></div></div>
-    <div class="goalbar"><label for="goalPct" class="ed-only" hidden>Mục tiêu tăng trưởng so với tháng <span data-t="P"></span>: <input type="number" id="goalPct" step="1" min="-50" max="100" value="0"> %</label><span class="view-only" style="font-size:12.5px;color:var(--ink2)">Mục tiêu tăng trưởng so với tháng <span data-t="P"></span>: <b id="goalPctTxt"></b></span><span class="muted" style="font-size:12px" id="goalHint"></span></div>
+    <div class="goalbar"><label for="goalPct" class="ed-only" hidden>Mục tiêu tăng trưởng so với tháng <span data-t="P"></span>: <input type="number" id="goalPct" step="1" min="-50" max="100" value="0"> %</label><span class="view-only" style="font-size:12.5px;color:var(--ink2)">Mục tiêu tăng trưởng so với tháng <span data-t="P"></span>: <b id="goalPctTxt"></b></span><span class="muted m-hide" style="font-size:12px" id="goalHint"></span></div>
     <div id="goalBlk1"><h3 class="gh" id="gh1">1. Doanh thu</h3>
     <div class="ghero" id="goalHero" hidden></div>
     <div class="tbl-wrap"><table id="goalTbl"></table></div></div>
@@ -700,7 +701,7 @@ const sel=document.getElementById('shopSel');
 sel.innerHTML='<option value="all">Toàn khu vực ('+SHOPS.length+' siêu thị)</option>'+
   [...SHOPS].sort((a,b)=>D.shops[a].name.localeCompare(D.shops[b].name,'vi')).map(s=>`<option value="${s}">${s} · ${esc(D.shops[s].name)}</option>`).join('');
 document.getElementById('meta').innerHTML=
-  `<span class="chip">Doanh thu ngành hàng đến <b>${d9}/${MM}/${Y}</b></span><span class="chip">So sánh: tháng ${P}/${PY} (${PDIM} ngày)</span>`;
+  `<span class="chip">Doanh thu ngành hàng đến <b>${d9}/${MM}/${Y}</b></span><span class="chip m-hide">So sánh: tháng ${P}/${PY} (${PDIM} ngày)</span>`;
 
 let cur='all';let lossOpen=null;const LOSS_MIN=10;
 try{const v=localStorage.getItem('qltp-shop');if(v&&(v==='all'||D.shops[v]))cur=v}catch(e){}
