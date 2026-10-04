@@ -1104,14 +1104,14 @@ function render(){
     if(VIEW_SHOP){rk.length=0;cs.length=0;if(SN){SN.rk.forEach(r=>rk.push(r));SN.ot.forEach(r=>cs.push(r))}}
     const shopName0=shopName,shopNameR=s=>(NM[s]&&NM[s].n)||shopName0(s);
     const rowS=s=>!VIEW_SHOP||s===VIEW_SHOP?` tabindex="0" data-s="${s}"`:'';
-    const mgrCell=s=>{const i=NM[s]?{qlName:NM[s].qn,ql:NM[s].ql}:(D.shops[s]||{});return i.qlName?`<div class="shopcell"><span style="font-weight:600">${esc(i.qlName)}</span><small>User ${esc(i.ql||'')}</small></div>`:'<span class="muted">Chưa có tên QL</span>'};
+    const mgrCell=s=>{const i=NM[s]?{qlName:NM[s].qn,ql:NM[s].ql}:(D.shops[s]||{});return i.qlName?`<div class="shopcell"><span style="font-weight:600">${esc(i.qlName)}</span><small>User ${esc(i.ql||'')}</small></div>`:`<div class="shopcell"><span class="muted">Chưa có tên QL</span><small>${esc(shopNameR(s))}</small></div>`};
     const cell=(val,pts,max,cls)=>`<td><span class="${cls||''}">${val}</span><small class="pts">${f1.format(pts)}/${max}</small></td>`;
-    let h=`<thead><tr><th>#</th><th class="l">Quản lý</th><th class="l">Siêu thị</th><th>DT so T${P}</th><th>DT / giá vốn</th><th>Chỉ số hủy</th><th class="l">Tổng điểm</th><th class="l">Ghi chú</th></tr></thead><tbody>`;
-    if(VIEW_SHOP&&!SN)h+=`<tr><td colspan="8" class="l muted" style="white-space:normal">Bảng xếp hạng sẽ có sau lần cập nhật số liệu tới.</td></tr>`;
-    rk.forEach((c,i)=>{h+=`<tr${rowS(c.s)} class="${cur===c.s?'sel':''}"><td><span class="rk ${c.prize?'top top'+c.prize:(c.bot?'hot':'')}">${i+1}</span></td><td class="l">${mgrCell(c.s)}</td><td class="l"><div class="shopcell"><span>${esc(shopNameR(c.s))}</span><small>${c.s}</small></div></td>`+
+    let h=`<thead><tr><th>#</th><th class="l">Quản lý</th><th>DT so T${P}</th><th>DT / giá vốn</th><th>Chỉ số hủy</th><th class="l">Tổng điểm</th></tr></thead><tbody>`;
+    if(VIEW_SHOP&&!SN)h+=`<tr><td colspan="6" class="l muted" style="white-space:normal">Bảng xếp hạng sẽ có sau lần cập nhật số liệu tới.</td></tr>`;
+    rk.forEach((c,i)=>{h+=`<tr${rowS(c.s)} class="${cur===c.s?'sel':''}"><td><span class="rk ${c.prize?'top top'+c.prize:(c.bot?'hot':'')}">${i+1}</span></td><td class="l">${mgrCell(c.s)}</td>`+
       cell(sgn(c.ch),c.p1,W1,c.ch>=0?'pos':'neg')+cell(pct(c.ratio),c.p2,W2,c.ratio>=1?'pos':'neg')+cell(c.li==null?'—':f2.format(c.li),c.p3,W3,c.li==null?'':(c.li<=1?'pos':'neg'))+
-      `<td class="l"><span class="cbar"><i style="width:${c.tot}%"></i></span><b>${f1.format(c.tot)}</b></td><td class="l">${c.prize?`<span class="pill up">Top ${c.prize}</span>`:(c.bot?`<span class="pill down">Bottom ${c.bot}</span>`:'')}${c.ok?'':`<span class="pill down" title="${c.lr!=null&&c.lr>LOSS_MAX?'Tỷ lệ hủy '+pct(c.lr)+' trên 25%':'DT/giá vốn '+pct(c.ratio)+' dưới 95%'}">Không xét giải</span>`}</td></tr>`});
-    cs.filter(c=>c.isNew||c.ratio==null).forEach(c=>{h+=`<tr${rowS(c.s)} class="muted-row ${cur===c.s?'sel':''}"><td><span class="rk">–</span></td><td class="l">${mgrCell(c.s)}</td><td class="l"><div class="shopcell"><span>${esc(shopNameR(c.s))}</span><small>${c.s}</small></div></td><td>${sgn(c.ch)}</td><td>${c.ratio==null?'—':pct(c.ratio)}</td><td>${c.li==null?'—':f2.format(c.li)}</td><td class="l">—</td><td class="l"><span class="pill warn">${c.isNew?'Shop mới, chưa đủ tháng '+P:'Thiếu dữ liệu Fresh'}</span></td></tr>`});
+      `<td class="l"><span class="cbar"><i style="width:${c.tot}%"></i></span><b>${f1.format(c.tot)}</b></td></tr>`});
+    cs.filter(c=>c.isNew||c.ratio==null).forEach(c=>{h+=`<tr${rowS(c.s)} class="muted-row ${cur===c.s?'sel':''}"><td><span class="rk">–</span></td><td class="l">${mgrCell(c.s)}</td><td>${sgn(c.ch)}</td><td>${c.ratio==null?'—':pct(c.ratio)}</td><td>${c.li==null?'—':f2.format(c.li)}</td><td class="l"><span class="pill warn">${c.isNew?'Shop mới, chưa đủ tháng '+P:'Thiếu dữ liệu Fresh'}</span></td></tr>`});
     document.getElementById('compTbl').innerHTML=h+'</tbody>';}
 
   // fresh
