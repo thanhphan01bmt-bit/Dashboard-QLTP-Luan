@@ -335,6 +335,29 @@ body.pv .wrap{padding-bottom:120px}
 @media (max-width:760px){.stb span:not(.lb){visibility:hidden}}
 .newdata{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));z-index:45;display:flex;gap:12px;align-items:center;background:var(--ink);color:var(--surface);border-radius:12px;padding:10px 12px 10px 16px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:13px;width:max-content;max-width:calc(100% - 24px)}
 .newdata .btn.primary{padding:6px 12px;flex:none}
+.tab .ts{display:none}.ub-btn{display:none}
+@media (min-width:761px){.ub-menu{display:contents}}
+.offbar{position:sticky;top:0;z-index:44;background:var(--warn-bg);color:var(--ink);font-size:12.5px;text-align:center;padding:7px 14px;padding-top:calc(7px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--line)}
+/* điện thoại: thanh tab dưới đáy + menu tài khoản */
+@media (max-width:760px){
+ .tabs{position:fixed;left:0;right:0;bottom:0;z-index:38;margin:0;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:0 -4px 16px rgba(0,0,0,.08);padding:5px 6px calc(5px + env(safe-area-inset-bottom,0px));gap:4px;overflow:visible;background:var(--surface)}
+ .tab{flex:1 1 0;min-width:0;flex-direction:column;gap:3px;padding:6px 2px 5px;font-size:11px;font-weight:600;border:0;background:transparent;border-radius:10px;box-shadow:none}
+ .tab svg{width:21px;height:21px}
+ .tab:hover{background:transparent;color:var(--ink2)}
+ .tab.on,.tab.on:hover{background:var(--accent-soft);color:var(--accent);box-shadow:none}
+ .tab .tl{display:none}.tab .ts{display:inline}
+ body{padding-bottom:calc(66px + env(safe-area-inset-bottom,0px))}
+ .pv-bar{bottom:calc(62px + env(safe-area-inset-bottom,0px));padding-bottom:0}
+ .newdata{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+ .ubar{position:relative;flex-wrap:wrap;justify-content:flex-start;padding:10px 16px 0}
+ .ubar .who{flex:1;min-width:0}
+ .ubar .upd{order:3;width:100%;font-size:11.5px}
+ .ub-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px!important;font-size:13px!important;font-weight:600}
+ .ub-menu{display:none;position:absolute;right:16px;top:calc(100% + 4px);z-index:60;flex-direction:column;gap:2px;min-width:230px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.2);padding:6px}
+ .ub-menu.open{display:flex}
+ .ub-menu .btn{width:100%;justify-content:flex-start;text-align:left;border:0;background:transparent;padding:11px 12px!important;font-size:14px!important;border-radius:8px}
+ .ub-menu .btn:active,.ub-menu .btn:hover{background:var(--accent-soft)}
+}
 /* điện thoại: bảng gọn và tự co vừa màn hình */
 @media (max-width:760px){
  .wrap{padding-inline:10px!important;gap:14px}
@@ -364,10 +387,13 @@ body.pv .wrap{padding-bottom:120px}
   </form>
 </div>
 <div class="boot-msg" id="bootMsg">Đang tải…</div>
+<div class="offbar" id="offBar" hidden role="status"></div>
 <div class="newdata" id="newData" hidden role="status"><span id="newDataTxt"></span><button class="btn primary" type="button" id="newDataBtn">Tải lại</button></div>
 <div class="ubar" id="ubar" hidden>
   <span class="who">Xin chào, <b id="ubName"></b><span class="rtag" id="ubRole"></span></span>
   <span class="upd" id="ubUpd"></span>
+  <button class="btn ub-btn" type="button" id="ubMenuBtn" aria-haspopup="true" aria-expanded="false" aria-controls="ubMenu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Menu</button>
+  <div class="ub-menu" id="ubMenu">
   <button class="btn" type="button" id="ubPush" hidden><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:4px"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span id="ubPushTxt">Bật thông báo</span></button>
   <button class="btn" type="button" id="ubZalo" hidden>Tin nhắn nhóm</button>
   <button class="btn" type="button" id="ubStats" hidden>Thống kê lượt xem</button>
@@ -375,6 +401,7 @@ body.pv .wrap{padding-bottom:120px}
   <button class="btn" type="button" id="ubBackup" hidden>Sao lưu &amp; khôi phục</button>
   <button class="btn" type="button" id="ubPass">Đổi mật khẩu</button>
   <button class="btn" type="button" id="ubOut">Đăng xuất</button>
+  </div>
 </div>
 
 <div class="ov" id="usersPanel" hidden>
@@ -460,10 +487,10 @@ body.pv .wrap{padding-bottom:120px}
   </header>
 
   <nav class="tabs" role="tablist" aria-label="Chọn trang">
-    <button class="tab" role="tab" type="button" data-view="goal" id="tabGoal"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>Mục tiêu ngày</button>
-    <button class="tab" role="tab" type="button" data-view="dash" id="tabDash"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12l4-4 4 4 6-6 4 4M3 20h18"/></svg>Dashboard doanh thu</button>
-    <button class="tab" role="tab" type="button" data-view="comp" id="tabComp"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>Bảng thi đua Quản lý</button>
-    <button class="tab" role="tab" type="button" data-view="year" id="tabYear"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Doanh thu năm</button>
+    <button class="tab" role="tab" type="button" data-view="goal" id="tabGoal"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span class="tl">Mục tiêu ngày</span><span class="ts">Mục tiêu</span></button>
+    <button class="tab" role="tab" type="button" data-view="dash" id="tabDash"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12l4-4 4 4 6-6 4 4M3 20h18"/></svg><span class="tl">Dashboard doanh thu</span><span class="ts">Dashboard</span></button>
+    <button class="tab" role="tab" type="button" data-view="comp" id="tabComp"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg><span class="tl">Bảng thi đua Quản lý</span><span class="ts">Thi đua</span></button>
+    <button class="tab" role="tab" type="button" data-view="year" id="tabYear"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="tl">Doanh thu năm</span><span class="ts">Năm</span></button>
   </nav>
 
   <section class="card" id="goalSec">
@@ -1342,7 +1369,7 @@ saveBtn.addEventListener('click',async()=>{
     if(r.status===409){const m=r.j.meta||{};
       if(confirm(`Số liệu vừa được ${m.byName||m.by||'người khác'} lưu lúc ${new Date(m.updatedAt).toLocaleString('vi-VN')}.\nBấm OK để vẫn lưu số liệu của bạn (ghi đè), Cancel để hủy rồi tải lại trang xem số mới.`))r=await post({data:PREVIEW_D,force:true,...extra});
       else{pvMsg.textContent='Đã hủy lưu. Tải lại trang để xem số liệu mới nhất.';saveBtn.disabled=false;return}}
-    if(r.ok){pvMsg.textContent='Đã lưu. Đang tải lại…';try{sessionStorage.setItem('kvSaved',JSON.stringify(r.j.push||{}))}catch(e){}setTimeout(()=>location.reload(),400);return}
+    if(r.ok){pvMsg.textContent='Đã lưu. Đang tải lại…';try{sessionStorage.setItem('kvSaved',JSON.stringify(r.j.push||{}))}catch(e){}window.__dropDoc&&await window.__dropDoc();setTimeout(()=>location.reload(),400);return}
     if(r.status===401){pvMsg.textContent='Phiên đăng nhập đã hết. Tải lại trang, đăng nhập rồi tải file lên lại.';return}
     pvMsg.textContent=r.j.error||('Lưu chưa thành công ('+r.status+').');saveBtn.disabled=false}
   catch(e){pvMsg.textContent='Lưu chưa thành công do lỗi kết nối. Bấm lưu lại sau ít giây.';saveBtn.disabled=false}
@@ -1380,8 +1407,13 @@ function showUbar(me){
   document.body.classList.toggle('is-admin',me.role==='admin');
   $('ubar').hidden=false;$('ubName').textContent=me.name||me.u;$('ubRole').textContent=me.roleName||me.role;
   $('ubUsers').hidden=me.role!=='admin';$('ubZalo').hidden=!(me.role==='admin'||me.role==='editor');$('ubZalo').onclick=openZalo;$('ubPush').onclick=()=>{openPanel('pushPanel');pushUI()};$('ubStats').hidden=me.role!=='admin';$('ubStats').onclick=()=>{openPanel('statsPanel');loadStats()};$('ubBackup').hidden=me.role!=='admin';$('ubPass').hidden=!!me.envAdmin;
-  $('ubOut').onclick=async()=>{try{await api('/api/logout',{method:'POST',body:{}})}catch(e){}location.reload()};
+  $('ubOut').onclick=async()=>{try{await api('/api/logout',{method:'POST',body:{}})}catch(e){}await cClear();location.reload()};
   $('ubPass').onclick=()=>openPanel('passPanel');
+  {const mb=$('ubMenuBtn'),mn=$('ubMenu');const close=()=>{mn.classList.remove('open');mb.setAttribute('aria-expanded','false')};
+   mb.onclick=e=>{e.stopPropagation();const o=!mn.classList.contains('open');mn.classList.toggle('open',o);mb.setAttribute('aria-expanded',String(o));if(o){const f=[...mn.querySelectorAll('.btn')].find(b=>!b.hidden);f&&f.focus()}};
+   if(!mn.dataset.bound){mn.dataset.bound=1;mn.addEventListener('click',e=>{if(e.target.closest('.btn'))close()});
+    document.addEventListener('click',e=>{if(!e.target.closest('#ubMenu,#ubMenuBtn'))close()});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&mn.classList.contains('open')){close();mb.focus()}})}}
   $('ubUsers').onclick=()=>{openPanel('usersPanel');loadUsers()};
   $('ubBackup').onclick=()=>{openPanel('backupPanel');loadBackups()};
 }
@@ -1521,7 +1553,7 @@ async function loadBackups(){const box=$('bkBody'),m=$('bkMsg');m.textContent=''
   $('bkNow').onclick=()=>{if(!window.__DOC)return;const d=new Date();dlJSON(window.__DOC,`Sao_luu_KV_QLTP_${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}.json`)};
   box.querySelectorAll('[data-dl]').forEach(b=>b.onclick=async()=>{b.disabled=true;const r=await api('/api/backup?d='+b.dataset.dl);b.disabled=false;if(r.ok)dlJSON(r.j,`Sao_luu_KV_QLTP_${b.dataset.dl}.json`);else m.textContent=r.j.error||'Không tải được.'});
   const act=async(body,ask,btn)=>{if(!confirm(ask))return;btn.disabled=true;m.className='msg-err';m.textContent='Đang khôi phục…';
-    const r=await api('/api/backup',{method:'POST',body});if(r.ok){m.className='msg-ok';m.textContent='Đã khôi phục. Đang tải lại…';setTimeout(()=>location.reload(),600)}else{btn.disabled=false;m.textContent=r.j.error||'Khôi phục chưa thành công.'}};
+    const r=await api('/api/backup',{method:'POST',body});if(r.ok){m.className='msg-ok';m.textContent='Đã khôi phục. Đang tải lại…';await cDrop('doc');setTimeout(()=>location.reload(),600)}else{btn.disabled=false;m.textContent=r.j.error||'Khôi phục chưa thành công.'}};
   box.querySelectorAll('[data-rs]').forEach(b=>b.onclick=()=>act({action:'restore',date:b.dataset.rs},`Khôi phục số liệu về bản sao lưu ngày ${dmy(b.dataset.rs)}?\nMọi người sẽ thấy số liệu của bản này. Có thể hoàn tác ngay sau đó.`,b));
   const u=$('bkUndo');if(u)u.onclick=()=>act({action:'undo'},'Hoàn tác: quay lại số liệu trước lần khôi phục gần nhất?',u);
 }
@@ -1569,20 +1601,65 @@ function showEmpty(me){
     catch(err){m.textContent=err.message}};
 }
 
+// ---- lưu sẵn trên máy (mở nhanh, xem được khi mất mạng). Đăng xuất / hết phiên thì xóa.
+const DC='kv-data-v1';
+async function cGet(){try{if(!('caches' in window))return null;const c=await caches.open(DC);const [m,d]=await Promise.all([c.match('/__me'),c.match('/__doc')]);if(!m||!d)return null;return{me:await m.json(),doc:await d.json()}}catch(e){return null}}
+async function cPut(k,obj){try{if(!('caches' in window))return;const c=await caches.open(DC);await c.put('/__'+k,new Response(JSON.stringify(obj),{headers:{'Content-Type':'application/json'}}))}catch(e){}}
+async function cDrop(k){try{if('caches' in window)await (await caches.open(DC)).delete('/__'+k)}catch(e){}}
+async function cClear(){try{if('caches' in window)await caches.delete(DC)}catch(e){}}
+window.__dropDoc=()=>cDrop('doc');
+function setOffline(on){const b=$('offBar');if(!on){b.hidden=true;return}const m=window.__META;
+  b.textContent=`Chưa kết nối mạng · đang xem số liệu lưu lúc ${m&&m.updatedAt?fmtTime(m.updatedAt):'trước đó'}. Có mạng lại sẽ tự cập nhật.`;b.hidden=false}
+// tải số liệu mới nhất, lưu sẵn rồi mở lại trang
+async function refreshData(){try{const d=await api('/api/data');if(d.ok){await cPut('doc',d.j);
+  const same=(d.j.meta||{}).updatedAt===(window.__META||{}).updatedAt;
+  // chống tải lại liên tục: tối đa 3 lần tự tải lại trong 1 phút
+  let n=[];try{n=JSON.parse(sessionStorage.getItem('kvRl')||'[]').filter(t=>Date.now()-t<60000)}catch(e){}
+  if(!same&&n.length<3){n.push(Date.now());try{sessionStorage.setItem('kvRl',JSON.stringify(n))}catch(e){}location.reload()}
+  return true}}catch(e){}return false}
+function bootApp(me,doc){
+  window.__ME=me;showUbar(me);window.__DOC=doc;window.__META=doc.meta||null;setUpd(window.__META);
+  const s=document.createElement('script');s.type='application/json';s.id='data';s.textContent=JSON.stringify(doc.data);document.body.appendChild(s);
+  $('bootMsg').hidden=true;$('appRoot').hidden=false;
+  const m=document.createElement('script');m.textContent=$('mainsrc').textContent;document.body.appendChild(m);savedToast();showShellNew();
+}
+// đã mở từ bản lưu trên máy: kiểm tra phiên đăng nhập và số liệu mới ở nền
+let revBusy=false;
+async function revalidate(){if(revBusy)return;revBusy=true;
+  try{let me;try{me=await api('/api/me')}catch(e){setOffline(true);return}
+    if(me.status===401){await cClear();location.reload();return}
+    if(!me.ok){if(me.status>=500)setOffline(true);return}
+    setOffline(false);
+    const old=window.__ME||{};await cPut('me',me.j);
+    if(old.role!==me.j.role||old.u!==me.j.u){location.reload();return}
+    recordView();pushInit();
+    let v=null;try{v=await api('/api/version')}catch(e){}
+    if(v&&v.ok&&v.j.updatedAt&&new Date(v.j.updatedAt)>new Date((window.__META||{}).updatedAt||0)){
+      if(!busy())await refreshData();
+      else{$('newDataTxt').textContent=`Đã có số liệu mới lưu lúc ${fmtTime(v.j.updatedAt)}.`;$('newData').hidden=false}}}
+  finally{revBusy=false}}
 // ---- khởi động
 async function start(){
+  if('serviceWorker' in navigator)swReady().catch(()=>{});
+  const c=await cGet();
+  if(c&&c.me&&c.doc&&c.doc.data){bootApp(c.me,c.doc);lastChk=Date.now();revalidate();return}
   let me;try{me=await api('/api/me')}catch(e){msg('Không kết nối được máy chủ. Kiểm tra mạng rồi tải lại trang.');return}
-  if(me.status===401){showLogin();return}
+  if(me.status===401){await cClear();showLogin();return}
   if(!me.ok){msg(esc(me.j.error||('Lỗi máy chủ ('+me.status+').')));return}
   window.__ME=me.j;showUbar(me.j);
   const d=await api('/api/data');
   if(d.status===404){showEmpty(me.j);return}
   if(!d.ok){msg(esc(d.j.error||('Không tải được số liệu ('+d.status+').')));return}
-  window.__DOC=d.j;window.__META=d.j.meta||null;setUpd(window.__META);recordView();pushInit();
-  const s=document.createElement('script');s.type='application/json';s.id='data';s.textContent=JSON.stringify(d.j.data);document.body.appendChild(s);
-  $('bootMsg').hidden=true;$('appRoot').hidden=false;
-  const m=document.createElement('script');m.textContent=$('mainsrc').textContent;document.body.appendChild(m);savedToast();
+  cPut('me',me.j);cPut('doc',d.j);
+  bootApp(me.j,d.j);recordView();pushInit();
 }
+addEventListener('online',()=>{if(window.__ME)revalidate()});
+addEventListener('offline',()=>{if(window.__ME)setOffline(true)});
+// có phiên bản dashboard mới (service worker báo sau khi tải ngầm)
+let SHELL_NEW=false;
+function showShellNew(){if(!SHELL_NEW||!window.__ME)return;$('newDataTxt').textContent='Đã có phiên bản dashboard mới.';$('newData').hidden=false;$('newDataBtn').onclick=()=>location.reload()}
+if('serviceWorker' in navigator)navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.type==='shell-updated'){SHELL_NEW=true;showShellNew()}});
+try{navigator.serviceWorker&&navigator.serviceWorker.startMessages()}catch(e){}
 start();
 // tự kiểm tra số liệu mới: khi quay lại app / tab và 5 phút một lần khi đang mở
 let lastChk=0,chkBusy=false;
@@ -1591,10 +1668,10 @@ async function checkNew(auto){
   if(chkBusy||!window.__META||!window.__ME)return;const now=Date.now();if(now-lastChk<60000)return;lastChk=now;chkBusy=true;
   try{const r=await api('/api/version');if(!r.ok||!r.j.updatedAt)return;
     if(r.j.updatedAt!==window.__META.updatedAt&&new Date(r.j.updatedAt)>new Date(window.__META.updatedAt||0)){
-      if(auto&&!busy()){location.reload();return}
+      if(auto&&!busy()){if(!(await refreshData()))location.reload();return}
       const b=$('newData');$('newDataTxt').textContent=`Đã có số liệu mới lưu lúc ${fmtTime(r.j.updatedAt)}${r.j.byName||r.j.by?' bởi '+(r.j.byName||r.j.by):''}.`;b.hidden=false}}
   catch(e){}finally{chkBusy=false}}
-$('newDataBtn').onclick=()=>location.reload();
+$('newDataBtn').onclick=async()=>{$('newDataBtn').disabled=true;if(!(await refreshData()))location.reload()};
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){checkNew(true);recordView()}});
 addEventListener('pageshow',e=>{if(e.persisted)checkNew(true)});
 addEventListener('focus',()=>checkNew(true));
