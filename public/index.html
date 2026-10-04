@@ -335,7 +335,25 @@ body.pv .wrap{padding-bottom:120px}
 @media (max-width:760px){.stb span:not(.lb){visibility:hidden}}
 .newdata{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));z-index:45;display:flex;gap:12px;align-items:center;background:var(--ink);color:var(--surface);border-radius:12px;padding:10px 12px 10px 16px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:13px;width:max-content;max-width:calc(100% - 24px)}
 .newdata .btn.primary{padding:6px 12px;flex:none}
-.tab .ts{display:none}.ub-btn{display:none}
+.tab .ts{display:none}.ub-btn{display:none}#goalNote .sm{display:none}
+/* điện thoại: phần đầu trang gọn */
+@media (max-width:760px){
+ header.top{gap:8px}
+ header.top .eyebrow{display:none}
+ .wrap.v-goal #meta{display:none}
+ header.top h1{font-size:20px;margin:0 0 4px}
+ #meta .chip{font-size:11.5px;padding:2px 9px}
+ header.top .tools{width:100%;gap:8px}
+ header.top .filter{flex:1 1 100%}
+ .filter label{display:none}
+ #shopSel{padding:7px 32px 7px 10px;font-size:14px;width:100%}
+ body.viewer-shop header.top .filter{display:none}
+ #goalTitle{font-size:16px;line-height:1.3}
+ #goalSec .sec-title{gap:4px}
+ #goalNote .lg{display:none}#goalNote .sm{display:inline}
+ #goalSec .goalbar .view-only{display:none!important}
+ #goalSec .goalbar:not(:has(.ed-only:not([hidden]))){display:none}
+}
 @media (min-width:761px){.ub-menu{display:contents}}
 .offbar{position:sticky;top:0;z-index:44;background:var(--warn-bg);color:var(--ink);font-size:12.5px;text-align:center;padding:7px 14px;padding-top:calc(7px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--line)}
 /* điện thoại: thanh tab dưới đáy + menu tài khoản */
@@ -760,7 +778,7 @@ document.getElementById('meta').innerHTML=
 
 let cur='all';let lossOpen=null;const LOSS_MIN=10;
 try{const v=localStorage.getItem('qltp-shop');if(v&&(v==='all'||D.shops[v]))cur=v}catch(e){}
-if(VIEW_SHOP){cur=VIEW_SHOP;sel.value=VIEW_SHOP;sel.disabled=true;sel.title='Tài khoản của bạn chỉ xem được siêu thị này'}
+if(VIEW_SHOP){document.body.classList.add('viewer-shop');cur=VIEW_SHOP;sel.value=VIEW_SHOP;sel.disabled=true;sel.title='Tài khoản của bạn chỉ xem được siêu thị này'}
 sel.value=cur;
 sel.addEventListener('change',()=>setShop(sel.value));
 function setShop(v){if(VIEW_SHOP&&v!==VIEW_SHOP)return;cur=v;sel.value=v;try{localStorage.setItem('qltp-shop',v)}catch(e){}render()}
@@ -859,7 +877,7 @@ function render(){
      return same?String(vn.getUTCHours()).padStart(2,'0')+':'+String(vn.getUTCMinutes()).padStart(2,'0'):null})();
    const dayLbl=upAt?`ngày ${d9}/${M} đến ${upAt}`:`ngày ${d9}/${M}`;
    document.getElementById('goalTitle').textContent=`Mục tiêu ngày ${d9}/${M}/${D.cur.y} · ${scopeName}`;
-   document.getElementById('goalNote').textContent=`Doanh thu ${upAt?`đến ${upAt} ngày ${d9}/${M}`:`đến hết ngày ${d9}/${M}`} · ${left>1?`còn ${left} ngày (tính cả ngày ${d9}/${M})`:'ngày cuối tháng'}`;
+   document.getElementById('goalNote').innerHTML=`<span class="lg">Doanh thu ${upAt?`đến ${upAt} ngày ${d9}/${M}`:`đến hết ngày ${d9}/${M}`} · ${left>1?`còn ${left} ngày (tính cả ngày ${d9}/${M})`:'ngày cuối tháng'}</span><span class="sm">${upAt?`Đến ${upAt}`:'Cả ngày'} · ${left>1?`còn ${left} ngày`:'ngày cuối tháng'} · MT ${g>0?'+':''}${nf(0).format(g*100)}% so T${P}</span>`;
    document.getElementById('goalHint').textContent=`Mục tiêu tháng ${M} = DT tháng ${P} × ${nf(0).format(100+g*100)}%`;
    // 1. revenue
    document.getElementById('gh1').innerHTML=`1. Doanh thu <small>ngày đổ báo cáo ${d9}/${M}${upAt?`, cập nhật đến ${upAt}`:''}</small>`;
