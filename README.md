@@ -6,7 +6,7 @@ Trang dashboard có đăng nhập. Mỗi người dùng một tài khoản riên
 |---|---|
 | **Quản trị** | Xem, tải file cập nhật số liệu, đặt % mục tiêu tăng trưởng, quản lý tài khoản, tải bản sao lưu |
 | **Cập nhật dữ liệu** | Xem, tải file Excel lên và lưu số liệu mới |
-| **Chỉ xem** | Chỉ xem dashboard, tải PDF mục tiêu ngày |
+| **Chỉ xem** | Chỉ xem số liệu siêu thị được gán (Quản lý tài khoản → cột "Siêu thị được xem") và Bảng thi đua Quản lý. Gán "Toàn khu vực" để xem cả khu vực. Chưa gán thì tự khớp tên đăng nhập với mã user QL của siêu thị, không khớp thì không vào được |
 
 Số liệu và danh sách tài khoản lưu trong **Vercel Blob (Private)**. Chưa đăng nhập thì không đọc được số liệu.
 

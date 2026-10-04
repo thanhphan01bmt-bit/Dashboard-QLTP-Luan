@@ -106,7 +106,7 @@ export async function currentUser(req) {
   const db = await loadUsers();
   const rec = db.users.find((x) => x.u === p.u);
   if (!rec || rec.disabled || (rec.pwVer || 0) !== (p.v || 0)) return null;
-  return { u: rec.u, name: rec.name || rec.u, role: rec.role };
+  return { u: rec.u, name: rec.name || rec.u, role: rec.role, shop: rec.shop || '' };
 }
 
 // Chặn gửi form từ trang khác: mọi request ghi phải là JSON và có header X-Req.

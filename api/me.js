@@ -7,7 +7,7 @@ export default {
     try {
       const me = await currentUser(req);
       if (!me) return fail('Chưa đăng nhập.', 401);
-      return json({ u: me.u, name: me.name, role: me.role, roleName: ROLES[me.role], envAdmin: !!me.env });
+      return json({ u: me.u, name: me.name, role: me.role, roleName: ROLES[me.role], envAdmin: !!me.env, shop: me.shop || '' });
     } catch (e) { return fail(e.message, 500); }
   },
 };

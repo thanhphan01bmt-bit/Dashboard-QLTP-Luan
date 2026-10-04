@@ -407,7 +407,7 @@ body.pv .wrap{padding-bottom:120px}
 <div class="ov" id="usersPanel" hidden>
   <div class="panel wide" role="dialog" aria-modal="true" aria-labelledby="usersTitle">
     <div class="sec-title"><h2 id="usersTitle">Quản lý tài khoản</h2><button class="btn" type="button" data-close>Đóng</button></div>
-    <p class="hint"><b>Quản trị</b>: xem, cập nhật dữ liệu, đặt % mục tiêu và quản lý tài khoản. <b>Cập nhật dữ liệu</b>: xem và tải file lên. <b>Chỉ xem</b>: chỉ xem dashboard.</p>
+    <p class="hint"><b>Quản trị</b>: xem, cập nhật dữ liệu, đặt % mục tiêu và quản lý tài khoản. <b>Cập nhật dữ liệu</b>: xem và tải file lên. <b>Chỉ xem</b>: chỉ xem số liệu siêu thị được gán và Bảng thi đua Quản lý (gán "Toàn khu vực" để xem cả khu vực).</p>
     <div class="tbl-wrap"><table class="utbl" id="usersTbl"></table></div>
     <h3 class="gh" style="margin-top:18px">Thêm tài khoản</h3>
     <form id="addUser">
@@ -416,6 +416,7 @@ body.pv .wrap{padding-bottom:120px}
         <div class="fld"><label for="nuN">Tên hiển thị</label><input id="nuN" placeholder="vd: Nguyễn Văn A"></div>
         <div class="fld"><label for="nuR">Quyền</label><select id="nuR"><option value="viewer">Chỉ xem</option><option value="editor">Cập nhật dữ liệu</option><option value="admin">Quản trị</option></select></div>
         <div class="fld"><label for="nuP">Mật khẩu (ít nhất 6 ký tự)</label><input id="nuP" autocomplete="new-password" required></div>
+        <div class="fld" id="nuSWrap"><label for="nuS">Siêu thị được xem (quyền Chỉ xem)</label><select id="nuS"></select></div>
       </div>
       <div class="row" style="justify-content:space-between"><span class="msg-err" id="usersMsg" role="status"></span><button class="btn primary" type="submit">Thêm tài khoản</button></div>
     </form>
@@ -751,16 +752,18 @@ const ALL=SHOPS.map(shopStats);
 
 // ---- header
 const sel=document.getElementById('shopSel');
-sel.innerHTML='<option value="all">Toàn khu vực ('+SHOPS.length+' siêu thị)</option>'+
+const VIEW_SHOP=D.viewer&&D.viewer.shop&&D.shops[D.viewer.shop]?D.viewer.shop:null; // tài khoản chỉ xem 1 siêu thị
+sel.innerHTML=(VIEW_SHOP?'':'<option value="all">Toàn khu vực ('+SHOPS.length+' siêu thị)</option>')+
   [...SHOPS].sort((a,b)=>D.shops[a].name.localeCompare(D.shops[b].name,'vi')).map(s=>`<option value="${s}">${s} · ${esc(D.shops[s].name)}</option>`).join('');
 document.getElementById('meta').innerHTML=
   `<span class="chip">Doanh thu ngành hàng đến <b>${d9}/${MM}/${Y}</b></span><span class="chip m-hide">So sánh: tháng ${P}/${PY} (${PDIM} ngày)</span>`;
 
 let cur='all';let lossOpen=null;const LOSS_MIN=10;
 try{const v=localStorage.getItem('qltp-shop');if(v&&(v==='all'||D.shops[v]))cur=v}catch(e){}
+if(VIEW_SHOP){cur=VIEW_SHOP;sel.value=VIEW_SHOP;sel.disabled=true;sel.title='Tài khoản của bạn chỉ xem được siêu thị này'}
 sel.value=cur;
 sel.addEventListener('change',()=>setShop(sel.value));
-function setShop(v){cur=v;sel.value=v;try{localStorage.setItem('qltp-shop',v)}catch(e){}render()}
+function setShop(v){if(VIEW_SHOP&&v!==VIEW_SHOP)return;cur=v;sel.value=v;try{localStorage.setItem('qltp-shop',v)}catch(e){}render()}
 
 // ---- trend chart
 const tEl=document.getElementById('trend');let trendData=null;
@@ -1076,13 +1079,21 @@ function render(){
     const sc=(k,v,hi)=>{const vs=rk.map(c=>c[k]).filter(x=>x!=null&&x>0);if(v==null||v<=0||!vs.length)return 0;return hi?v/Math.max(...vs):Math.min(...vs)/v};
     rk.forEach(c=>{c.gi=1+c.ch});rk.forEach(c=>{c.p1=W1*sc('gi',c.gi,true);c.p2=W2*sc('ratio',c.ratio,true);c.p3=L?W3*sc('li',c.li,false):0;c.tot=c.p1+c.p2+c.p3;c.ok=true});
     rk.sort((a,b)=>b.tot-a.tot);if(rk.length>6)rk.slice(-3).forEach((c,i)=>{c.bot=3-i});let prize=0;rk.forEach(c=>{if(c.ok&&prize<3){c.prize=++prize}});
-    const mgrCell=s=>{const i=D.shops[s]||{};return i.qlName?`<div class="shopcell"><span style="font-weight:600">${esc(i.qlName)}</span><small>User ${esc(i.ql||'')}</small></div>`:'<span class="muted">Chưa có tên QL</span>'};
+    // bảng tính sẵn: lưu kèm số liệu để tài khoản chỉ xem (chỉ có số liệu 1 siêu thị) vẫn xem được xếp hạng
+    const snapRow=c=>{const i=D.shops[c.s]||{};return{s:c.s,n:shopName(c.s),qn:i.qlName||'',ql:i.ql||'',ch:c.ch,ratio:c.ratio,li:c.li,lr:c.lr,isNew:!!c.isNew,p1:c.p1||0,p2:c.p2||0,p3:c.p3||0,tot:c.tot||0,prize:c.prize||0,bot:c.bot||0,ok:c.ok!==false}};
+    if(!VIEW_SHOP)window.__RANK={rk:rk.map(snapRow),ot:cs.filter(c=>c.isNew||c.ratio==null).map(snapRow)};
+    const SN=VIEW_SHOP?D.rankSnap:window.__RANK;const NM={};if(SN)[...SN.rk,...SN.ot].forEach(r=>NM[r.s]=r);
+    if(VIEW_SHOP){rk.length=0;cs.length=0;if(SN){SN.rk.forEach(r=>rk.push(r));SN.ot.forEach(r=>cs.push(r))}}
+    const shopName0=shopName,shopNameR=s=>(NM[s]&&NM[s].n)||shopName0(s);
+    const rowS=s=>!VIEW_SHOP||s===VIEW_SHOP?` tabindex="0" data-s="${s}"`:'';
+    const mgrCell=s=>{const i=NM[s]?{qlName:NM[s].qn,ql:NM[s].ql}:(D.shops[s]||{});return i.qlName?`<div class="shopcell"><span style="font-weight:600">${esc(i.qlName)}</span><small>User ${esc(i.ql||'')}</small></div>`:'<span class="muted">Chưa có tên QL</span>'};
     const cell=(val,pts,max,cls)=>`<td><span class="${cls||''}">${val}</span><small class="pts">${f1.format(pts)}/${max}</small></td>`;
     let h=`<thead><tr><th>#</th><th class="l">Quản lý</th><th class="l">Siêu thị</th><th>DT so T${P}</th><th>DT / giá vốn</th><th>Chỉ số hủy</th><th class="l">Tổng điểm</th><th class="l">Ghi chú</th></tr></thead><tbody>`;
-    rk.forEach((c,i)=>{h+=`<tr tabindex="0" data-s="${c.s}" class="${cur===c.s?'sel':''}"><td><span class="rk ${c.prize?'top top'+c.prize:(c.bot?'hot':'')}">${i+1}</span></td><td class="l">${mgrCell(c.s)}</td><td class="l"><div class="shopcell"><span>${esc(shopName(c.s))}</span><small>${c.s}</small></div></td>`+
+    if(VIEW_SHOP&&!SN)h+=`<tr><td colspan="8" class="l muted" style="white-space:normal">Bảng xếp hạng sẽ có sau lần cập nhật số liệu tới.</td></tr>`;
+    rk.forEach((c,i)=>{h+=`<tr${rowS(c.s)} class="${cur===c.s?'sel':''}"><td><span class="rk ${c.prize?'top top'+c.prize:(c.bot?'hot':'')}">${i+1}</span></td><td class="l">${mgrCell(c.s)}</td><td class="l"><div class="shopcell"><span>${esc(shopNameR(c.s))}</span><small>${c.s}</small></div></td>`+
       cell(sgn(c.ch),c.p1,W1,c.ch>=0?'pos':'neg')+cell(pct(c.ratio),c.p2,W2,c.ratio>=1?'pos':'neg')+cell(c.li==null?'—':f2.format(c.li),c.p3,W3,c.li==null?'':(c.li<=1?'pos':'neg'))+
       `<td class="l"><span class="cbar"><i style="width:${c.tot}%"></i></span><b>${f1.format(c.tot)}</b></td><td class="l">${c.prize?`<span class="pill up">Top ${c.prize}</span>`:(c.bot?`<span class="pill down">Bottom ${c.bot}</span>`:'')}${c.ok?'':`<span class="pill down" title="${c.lr!=null&&c.lr>LOSS_MAX?'Tỷ lệ hủy '+pct(c.lr)+' trên 25%':'DT/giá vốn '+pct(c.ratio)+' dưới 95%'}">Không xét giải</span>`}</td></tr>`});
-    cs.filter(c=>c.isNew||c.ratio==null).forEach(c=>{h+=`<tr tabindex="0" data-s="${c.s}" class="muted-row ${cur===c.s?'sel':''}"><td><span class="rk">–</span></td><td class="l">${mgrCell(c.s)}</td><td class="l"><div class="shopcell"><span>${esc(shopName(c.s))}</span><small>${c.s}</small></div></td><td>${sgn(c.ch)}</td><td>${c.ratio==null?'—':pct(c.ratio)}</td><td>${c.li==null?'—':f2.format(c.li)}</td><td class="l">—</td><td class="l"><span class="pill warn">${c.isNew?'Shop mới, chưa đủ tháng '+P:'Thiếu dữ liệu Fresh'}</span></td></tr>`});
+    cs.filter(c=>c.isNew||c.ratio==null).forEach(c=>{h+=`<tr${rowS(c.s)} class="muted-row ${cur===c.s?'sel':''}"><td><span class="rk">–</span></td><td class="l">${mgrCell(c.s)}</td><td class="l"><div class="shopcell"><span>${esc(shopNameR(c.s))}</span><small>${c.s}</small></div></td><td>${sgn(c.ch)}</td><td>${c.ratio==null?'—':pct(c.ratio)}</td><td>${c.li==null?'—':f2.format(c.li)}</td><td class="l">—</td><td class="l"><span class="pill warn">${c.isNew?'Shop mới, chưa đủ tháng '+P:'Thiếu dữ liệu Fresh'}</span></td></tr>`});
     document.getElementById('compTbl').innerHTML=h+'</tbody>';}
 
   // fresh
@@ -1364,7 +1375,7 @@ $('pvCancel').addEventListener('click',()=>{PREVIEW_D=null;bar.hidden=true;docum
 saveBtn.addEventListener('click',async()=>{
   if(!PREVIEW_D)return;saveBtn.disabled=true;pvMsg.textContent='Đang lưu…';
   const post=body=>window.__api('/api/data',{method:'POST',body});
-  try{const sm=window.__areaSummary?window.__areaSummary():null;const extra={notice:sm?sm.short:''};
+  try{const sm=window.__areaSummary?window.__areaSummary():null;const extra={notice:sm?sm.short:'',rank:window.__RANK||null};
     let r=await post({data:PREVIEW_D,baseUpdatedAt:(window.__META||{}).updatedAt||null,...extra});
     if(r.status===409){const m=r.j.meta||{};
       if(confirm(`Số liệu vừa được ${m.byName||m.by||'người khác'} lưu lúc ${new Date(m.updatedAt).toLocaleString('vi-VN')}.\nBấm OK để vẫn lưu số liệu của bạn (ghi đè), Cancel để hủy rồi tải lại trang xem số mới.`))r=await post({data:PREVIEW_D,force:true,...extra});
@@ -1568,17 +1579,22 @@ $('passForm').onsubmit=async e=>{e.preventDefault();const m=$('passMsg');m.class
 // ---- quản lý tài khoản
 const ROLE_OPTS=[['admin','Quản trị'],['editor','Cập nhật dữ liệu'],['viewer','Chỉ xem']];
 function uMsg(t,ok){const m=$('usersMsg');m.className=ok?'msg-ok':'msg-err';m.textContent=t||''}
-async function loadUsers(){const r=await api('/api/users');if(!r.ok){uMsg(r.j.error||'Không tải được danh sách.');return}renderUsers(r.j)}
+async function loadUsers(){if(!$('nuS').options.length)$('nuS').innerHTML=shopOpts('');$('nuR').onchange=()=>{$('nuSWrap').hidden=$('nuR').value!=='viewer'};$('nuSWrap').hidden=$('nuR').value!=='viewer';const r=await api('/api/users');if(!r.ok){uMsg(r.j.error||'Không tải được danh sách.');return}renderUsers(r.j)}
+const allShops=()=>{const d=(window.__DOC||{}).data||{};const sh=d.shops||{};return Object.keys(sh).sort((a,b)=>(sh[a].name||'').localeCompare(sh[b].name||'','vi')).map(s=>[s,sh[s].name||s])};
+const shopOpts=v=>`<option value=""${!v?' selected':''}>— Chưa gán —</option><option value="all"${v==='all'?' selected':''}>Toàn khu vực</option>`+allShops().map(([s,n])=>`<option value="${esc(s)}"${v===s?' selected':''}>${esc(n)} (${esc(s)})</option>`).join('');
+const autoShop=u=>{const sh=((window.__DOC||{}).data||{}).shops||{};const k=Object.keys(sh).find(s=>sh[s].ql&&String(sh[s].ql)===u);return k?sh[k].name:''};
 function renderUsers(j){
   const me=window.__ME||{};
-  const rows=(j.envAdmin?[`<tr><td class="l"><b>${esc(j.envAdmin.u)}</b></td><td class="l">${esc(j.envAdmin.name)}</td><td class="l">Quản trị chính</td><td class="l muted note" colspan="2">Cài trong Vercel, không sửa ở đây</td></tr>`]:[])
+  const rows=(j.envAdmin?[`<tr><td class="l"><b>${esc(j.envAdmin.u)}</b></td><td class="l">${esc(j.envAdmin.name)}</td><td class="l">Quản trị chính</td><td class="l muted">Tất cả</td><td class="l muted note" colspan="2">Cài trong Vercel, không sửa ở đây</td></tr>`]:[])
     .concat((j.users||[]).map(u=>`<tr data-u="${esc(u.u)}"><td class="l"><b>${esc(u.u)}</b>${u.disabled?'<span class="tag-off">đã khóa</span>':''}</td><td class="l">${esc(u.name)}</td>
       <td class="l"><select data-act="role" aria-label="Quyền của ${esc(u.u)}">${ROLE_OPTS.map(([v,t])=>`<option value="${v}"${u.role===v?' selected':''}>${t}</option>`).join('')}</select></td>
+      <td class="l">${u.role==='viewer'?`<select data-act="shop" aria-label="Siêu thị của ${esc(u.u)}">${shopOpts(u.shop)}</select>${!u.shop&&autoShop(u.u)?`<br><small class="muted">Tự khớp: ${esc(autoShop(u.u))}</small>`:''}`:'<span class="muted">Tất cả</span>'}</td>
       <td class="l muted">${u.created?fmtTime(u.created):''}</td>
       <td><div class="acts"><button class="btn" type="button" data-act="reset">Đặt lại mật khẩu</button><button class="btn" type="button" data-act="toggle">${u.disabled?'Mở khóa':'Khóa'}</button>${u.u===me.u?'':'<button class="btn" type="button" data-act="delete">Xóa</button>'}</div></td></tr>`));
-  $('usersTbl').innerHTML=`<thead><tr><th class="l">Tên đăng nhập</th><th class="l">Tên hiển thị</th><th class="l">Quyền</th><th class="l">Ngày tạo</th><th></th></tr></thead><tbody>${rows.join('')||'<tr><td colspan="5" class="l muted">Chưa có tài khoản nào.</td></tr>'}</tbody>`;
+  $('usersTbl').innerHTML=`<thead><tr><th class="l">Tên đăng nhập</th><th class="l">Tên hiển thị</th><th class="l">Quyền</th><th class="l">Siêu thị được xem</th><th class="l">Ngày tạo</th><th></th></tr></thead><tbody>${rows.join('')||'<tr><td colspan="6" class="l muted">Chưa có tài khoản nào.</td></tr>'}</tbody>`;
   $('usersTbl').querySelectorAll('tr[data-u]').forEach(tr=>{const u=tr.dataset.u;
     tr.querySelector('[data-act="role"]').onchange=e=>act({action:'update',u,role:e.target.value},'Đã đổi quyền.');
+    const sh=tr.querySelector('[data-act="shop"]');if(sh)sh.onchange=e=>act({action:'update',u,shop:e.target.value},'Đã gán siêu thị.');
     tr.querySelector('[data-act="reset"]').onclick=()=>{const p=prompt(`Mật khẩu mới cho ${u} (ít nhất 6 ký tự):`);if(p)act({action:'reset',u,password:p},'Đã đặt lại mật khẩu. Gửi mật khẩu mới cho người dùng.')};
     tr.querySelector('[data-act="toggle"]').onclick=e=>act({action:'update',u,disabled:e.target.textContent==='Khóa'},'Đã cập nhật.');
     const d=tr.querySelector('[data-act="delete"]');if(d)d.onclick=()=>{if(confirm(`Xóa tài khoản ${u}?`))act({action:'delete',u},'Đã xóa.')};
@@ -1586,7 +1602,7 @@ function renderUsers(j){
 }
 async function act(body,okMsg){const r=await api('/api/users',{method:'POST',body});if(r.ok){uMsg(okMsg,true);loadUsers()}else{uMsg(r.j.error||'Không thực hiện được.');loadUsers()}}
 $('addUser').onsubmit=async e=>{e.preventDefault();
-  const r=await api('/api/users',{method:'POST',body:{action:'create',u:$('nuU').value,name:$('nuN').value,role:$('nuR').value,password:$('nuP').value}});
+  const r=await api('/api/users',{method:'POST',body:{action:'create',u:$('nuU').value,name:$('nuN').value,role:$('nuR').value,password:$('nuP').value,shop:$('nuR').value==='viewer'?$('nuS').value:''}});
   if(r.ok){uMsg(`Đã thêm ${$('nuU').value.trim().toLowerCase()}. Gửi tên đăng nhập và mật khẩu cho người dùng.`,true);e.target.reset();loadUsers()}else uMsg(r.j.error||'Không thêm được.')};
 
 // ---- chưa có dữ liệu: quản trị nạp file dữ liệu ban đầu
@@ -1622,7 +1638,12 @@ function bootApp(me,doc){
   const s=document.createElement('script');s.type='application/json';s.id='data';s.textContent=JSON.stringify(doc.data);document.body.appendChild(s);
   $('bootMsg').hidden=true;$('appRoot').hidden=false;
   const m=document.createElement('script');m.textContent=$('mainsrc').textContent;document.body.appendChild(m);savedToast();showShellNew();
+  setTimeout(syncRank,1500);
 }
+// số liệu hiện tại chưa có bảng xếp hạng tính sẵn (vd. vừa khôi phục bản sao lưu) thì gửi lên để tài khoản chỉ xem dùng
+async function syncRank(){const me=window.__ME||{},doc=window.__DOC;if(!(me.role==='admin'||me.role==='editor')||!doc||!doc.meta||!window.__RANK)return;
+  if(typeof PREVIEW_D!=='undefined'&&PREVIEW_D)return;const at=doc.meta.updatedAt;if(!at||doc.rankAt===at)return;
+  try{const r=await api('/api/rank',{method:'POST',body:{at,rank:window.__RANK}});if(r.ok||r.status===409){doc.rankAt=at;cPut('doc',doc)}}catch(e){}}
 // đã mở từ bản lưu trên máy: kiểm tra phiên đăng nhập và số liệu mới ở nền
 let revBusy=false;
 async function revalidate(){if(revBusy)return;revBusy=true;
@@ -1631,7 +1652,7 @@ async function revalidate(){if(revBusy)return;revBusy=true;
     if(!me.ok){if(me.status>=500)setOffline(true);return}
     setOffline(false);
     const old=window.__ME||{};await cPut('me',me.j);
-    if(old.role!==me.j.role||old.u!==me.j.u){location.reload();return}
+    if(old.role!==me.j.role||old.u!==me.j.u||(old.shop||'')!==(me.j.shop||'')){await cDrop('doc');location.reload();return}
     recordView();pushInit();
     let v=null;try{v=await api('/api/version')}catch(e){}
     if(v&&v.ok&&v.j.updatedAt&&new Date(v.j.updatedAt)>new Date((window.__META||{}).updatedAt||0)){

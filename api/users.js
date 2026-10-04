@@ -2,7 +2,8 @@
 import { json, fail, currentUser, sameOriginWrite, readBody, loadUsers, saveUsers, hashPassword, normUser, validUser, envAdmin, ROLES } from './_lib/auth.js';
 import { useRequest } from './_lib/store.js';
 
-const pub = (x) => ({ u: x.u, name: x.name || x.u, role: x.role, disabled: !!x.disabled, created: x.created, updated: x.updated });
+const pub = (x) => ({ u: x.u, name: x.name || x.u, role: x.role, shop: x.shop || '', disabled: !!x.disabled, created: x.created, updated: x.updated });
+const shopOk = (v) => v === '' || v === 'all' || /^[A-Za-z0-9_-]{1,20}$/.test(v);
 
 export default {
   async fetch(req) {
@@ -33,7 +34,9 @@ export default {
           if (rec) return fail('Tên đăng nhập này đã có.');
           if (!roleOk(b.role)) return fail('Quyền không hợp lệ.');
           if (!b.password || String(b.password).length < 6) return fail('Mật khẩu cần ít nhất 6 ký tự.');
-          db.users.push({ u, name: String(b.name || u).slice(0, 60), role: b.role, hash: await hashPassword(b.password), pwVer: 0, created: now, updated: now });
+          const shop = String(b.shop || '');
+          if (!shopOk(shop)) return fail('Siêu thị không hợp lệ.');
+          db.users.push({ u, name: String(b.name || u).slice(0, 60), role: b.role, shop, hash: await hashPassword(b.password), pwVer: 0, created: now, updated: now });
           break;
         }
         case 'update': {
@@ -41,6 +44,7 @@ export default {
           if (b.role !== undefined) { if (!roleOk(b.role)) return fail('Quyền không hợp lệ.'); rec.role = b.role; }
           if (b.name !== undefined) rec.name = String(b.name || u).slice(0, 60);
           if (b.disabled !== undefined) rec.disabled = !!b.disabled;
+          if (b.shop !== undefined) { const shop = String(b.shop || ''); if (!shopOk(shop)) return fail('Siêu thị không hợp lệ.'); rec.shop = shop; }
           rec.updated = now;
           break;
         }
