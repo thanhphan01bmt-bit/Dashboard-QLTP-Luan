@@ -257,6 +257,7 @@ tr.ldet>td{padding:0 0 10px;background:var(--accent-soft);white-space:normal}
 .ldet-h{font-size:12px;color:var(--ink2);margin-bottom:6px}
 table.ltop{min-width:0}table.ltop th{background:transparent}table.ltop td,table.ltop th{padding:6px 8px}
 table.ltop tr:last-child td{border-bottom:0}
+@media (max-width:760px){table.fxd .fx-n,table.fxd .fx-gv{display:none}table.fxd td.ltop-nm{min-width:96px}.ldet-in{margin:0 4px;padding:8px}}
 .ltop-nm{white-space:normal!important;max-width:360px}.ltop-nm small{display:block;color:var(--muted);font-size:10.5px}
 .lbar{display:inline-block;width:90px;height:8px;background:var(--grid);border-radius:0 4px 4px 0;position:relative;vertical-align:middle;margin-right:8px}
 .lbar i{position:absolute;left:0;top:0;bottom:0;background:var(--bad);opacity:.8;border-radius:0 4px 4px 0}
@@ -776,7 +777,7 @@ sel.innerHTML=(VIEW_SHOP?'':'<option value="all">Toàn khu vực ('+SHOPS.length
 document.getElementById('meta').innerHTML=
   `<span class="chip">Doanh thu ngành hàng đến <b>${d9}/${MM}/${Y}</b></span><span class="chip m-hide">So sánh: tháng ${P}/${PY} (${PDIM} ngày)</span>`;
 
-let cur='all';let lossOpen=null;const LOSS_MIN=10;
+let cur='all';let lossOpen=null;let freshOpen=null;const LOSS_MIN=10;
 try{const v=localStorage.getItem('qltp-shop');if(v&&(v==='all'||D.shops[v]))cur=v}catch(e){}
 if(VIEW_SHOP){document.body.classList.add('viewer-shop');cur=VIEW_SHOP;sel.value=VIEW_SHOP;sel.disabled=true;sel.title='Tài khoản của bạn chỉ xem được siêu thị này'}
 sel.value=cur;
@@ -1123,8 +1124,16 @@ function render(){
     `<div class="fk"><span class="lbl">Lợi nhuận lũy kế</span><span class="val num ${fLN>=0?'pos':'neg'}">${moneyS(fLN)}</span></div>`;
   const byCat={};fr.forEach(r=>{const o=byCat[r[1]]||(byCat[r[1]]={dt:0,gv:0,ln:0,l3:0,has3:false});o.dt+=r[2];o.gv+=r[3];o.ln+=r[4];if(r[5]!=null){o.l3+=r[5];o.has3=true}});
   let ft='<thead><tr><th class="l">Ngành hàng Fresh</th><th>DT tính giá vốn</th><th>Giá vốn CB lũy kế</th><th>DT / giá vốn</th><th>LN lũy kế</th><th>LN TB 3 tháng trước</th><th>Chênh lệch</th></tr></thead><tbody>';
-  Object.entries(byCat).sort((a,b)=>a[1].ln-b[1].ln).forEach(([n,o])=>{const r=o.dt/o.gv;const d=o.ln-o.l3;
-    ft+=`<tr><td class="l">${esc(n)}</td><td>${tr(o.dt)} tr</td><td>${tr(o.gv)} tr</td><td class="${r>=1?'pos':'neg'}"><b>${pct(r)}</b></td><td class="${o.ln>=0?'pos':'neg'}">${tr1(o.ln)} tr</td><td>${o.has3?tr1(o.l3)+' tr':'—'}</td><td class="${o.has3?(d>=0?'pos':'neg'):''}">${o.has3?(d>=0?'+':'')+tr1(d)+' tr':'—'}</td></tr>`});
+  // quản trị / cập nhật dữ liệu xem toàn khu vực: bấm 1 ngành hàng để xem ngành đó ở từng siêu thị
+  const fxOK=CAN_EDIT&&cur==='all'&&!VIEW_SHOP;if(!fxOK||(freshOpen&&!byCat[freshOpen]))freshOpen=null;
+  const fdet=n=>{const m={};D.fresh.filter(r=>r[1]===n).forEach(r=>{const o=m[r[0]]||(m[r[0]]={dt:0,gv:0,ln:0,l3:0,has3:false});o.dt+=r[2];o.gv+=r[3];o.ln+=r[4];if(r[5]!=null){o.l3+=r[5];o.has3=true}});
+    const rows=Object.entries(m).sort((a,b)=>a[1].ln-b[1].ln);
+    return `<tr class="ldet"><td colspan="7"><div class="ldet-in"><div class="ldet-h">${esc(n)} theo siêu thị · ${rows.length} siêu thị · LN lũy kế thấp nhất ở trên · bấm tên siêu thị để xem riêng</div>
+      <table class="ltop fxd"><thead><tr><th class="l fx-n">#</th><th class="l">Siêu thị</th><th>DT tính giá vốn</th><th class="fx-gv">Giá vốn CB</th><th>DT / giá vốn</th><th>LN lũy kế</th><th>LN TB 3 tháng trước</th><th>Chênh lệch</th></tr></thead><tbody>`+
+      rows.map(([sh,o],i)=>{const r=o.gv?o.dt/o.gv:null,d=o.ln-o.l3;return `<tr tabindex="0" data-fs="${sh}" style="cursor:pointer"><td class="l fx-n">${i+1}</td><td class="l ltop-nm">${esc(shopName(sh))}<small>${sh}</small></td><td>${tr(o.dt)} tr</td><td class="fx-gv">${tr(o.gv)} tr</td><td>${r==null?'—':`<span class="pill ${r>=1?'up':'down'}">${pct(r)}</span>`}</td><td class="${o.ln>=0?'pos':'neg'}"><b>${tr1(o.ln)} tr</b></td><td>${o.has3?tr1(o.l3)+' tr':'—'}</td><td class="${o.has3?(d>=0?'pos':'neg'):''}">${o.has3?(d>=0?'+':'')+tr1(d)+' tr':'—'}</td></tr>`}).join('')+
+      `</tbody></table></div></td></tr>`};
+  Object.entries(byCat).sort((a,b)=>a[1].ln-b[1].ln).forEach(([n,o])=>{const r=o.dt/o.gv;const d=o.ln-o.l3;const open=freshOpen===n;
+    ft+=`<tr${fxOK?` class="lrow${open?' open':''}" tabindex="0" data-fcat="${esc(n)}" aria-expanded="${open}"`:''}><td class="l">${fxOK?'<span class="chev" aria-hidden="true"></span>':''}${esc(n)}</td><td>${tr(o.dt)} tr</td><td>${tr(o.gv)} tr</td><td class="${r>=1?'pos':'neg'}"><b>${pct(r)}</b></td><td class="${o.ln>=0?'pos':'neg'}">${tr1(o.ln)} tr</td><td>${o.has3?tr1(o.l3)+' tr':'—'}</td><td class="${o.has3?(d>=0?'pos':'neg'):''}">${o.has3?(d>=0?'+':'')+tr1(d)+' tr':'—'}</td></tr>`;if(open)ft+=fdet(n)});
   ft+=`</tbody><tfoot><tr><th class="l">Tổng</th><th>${tr(fDT)} tr</th><th>${tr(fGV)} tr</th><th>${pct(ratio)}</th><th>${tr1(fLN)} tr</th><th>${fL3rows.length?tr1(fL3)+' tr':'—'}</th><th></th></tr></tfoot>`;
   document.getElementById('freshCatTbl').innerHTML=ft;
   const bs={};D.fresh.forEach(r=>{const o=bs[r[0]]||(bs[r[0]]={dt:0,gv:0,ln:0,l3:0,has3:false});o.dt+=r[2];o.gv+=r[3];o.ln+=r[4];if(r[5]!=null){o.l3+=r[5];o.has3=true}});
@@ -1170,6 +1179,9 @@ function render(){
   document.getElementById('freshNote').textContent=cur==='all'?`Lợi nhuận và tỷ lệ doanh thu / giá vốn cơ bản, lũy kế tháng ${M}`:'Đang xem: '+shopName(cur);
 }
 function rowClick(e){const tr=e.target.closest('tr[data-s]');if(!tr)return;setShop(cur===tr.dataset.s?'all':tr.dataset.s)}
+{const ft0=document.getElementById('freshCatTbl');const tog=e=>{const sr=e.target.closest('tr[data-fs]');if(sr){setShop(sr.dataset.fs);return}
+  const tr=e.target.closest('tr[data-fcat]');if(!tr)return;const c=tr.dataset.fcat;freshOpen=freshOpen===c?null:c;render();const n=document.querySelector(`#freshCatTbl tr[data-fcat="${CSS.escape(c)}"]`);n&&n.focus()};
+  ft0.addEventListener('click',tog);ft0.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog(e)}})}
 {const lt0=document.getElementById('lossTbl');const tog=e=>{const tr=e.target.closest('tr.lrow');if(!tr)return;const c=tr.dataset.cat;lossOpen=lossOpen===c?null:c;render();const n=document.querySelector(`#lossTbl tr.lrow[data-cat="${CSS.escape(c)}"]`);n&&n.focus()};
   lt0.addEventListener('click',tog);lt0.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog(e)}})}
 {const ct=document.getElementById('compTbl');const go=e=>{const tr=e.target.closest('tr[data-s]');if(!tr)return;setShop(tr.dataset.s);setView('dash')};
