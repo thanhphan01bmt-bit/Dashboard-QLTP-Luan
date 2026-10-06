@@ -198,6 +198,8 @@ td.dt-big b{font-size:15px}
 .wb-list{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}.wb-list li{background:var(--surface);border-radius:9px;padding:7px 10px;border-left:4px solid #e0a100;line-height:1.5}
 .wb-list li.lv2{border-left-color:var(--bad)}.wb-list li b.sh{cursor:pointer}.wb-list li b.sh:hover{text-decoration:underline}.wb-list .wi{display:block;color:var(--ink2)}.wb-list .wi::before{content:"• "}
 .wb-note{margin:8px 0 0;font-size:11.5px;color:var(--ink2)}
+.ap-job{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px}.ap-row{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap}.ap-row label{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:14px;cursor:pointer;flex:1;min-width:200px}.ap-row input{width:18px;height:18px;accent-color:var(--accent)}
+.ap-row .btn{padding:4px 10px;font-size:12.5px}.ap-last{font-size:12px;color:var(--ink2);margin-top:4px}.ap-pv{margin-top:8px;background:var(--surface2);border-radius:8px;padding:8px 10px;font-size:13px;line-height:1.5;white-space:pre-wrap}.ap-pv b{display:block}.ap-pv select{margin:6px 0;font:inherit;font-size:12.5px;max-width:100%}
 .bk-cur{background:var(--accent-soft);border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:10px;line-height:1.55}.bk-undo{background:var(--warn-bg);border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.bk-undo span{flex:1;min-width:200px}
 .bktbl td .btn{padding:3px 10px;font-size:12px}.bktbl td:last-child{white-space:nowrap}
 .zimg{margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:10px}.zimg-h{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px;font-size:13px}.zimg-h .btn{padding:4px 10px;font-size:12.5px}
@@ -417,6 +419,7 @@ body.pv .wrap{padding-bottom:120px}
   <button class="btn" type="button" id="ubZalo" hidden>Tin nhắn nhóm</button>
   <button class="btn" type="button" id="ubStats" hidden>Thống kê lượt xem</button>
   <button class="btn" type="button" id="ubUsers" hidden>Quản lý tài khoản</button>
+  <button class="btn" type="button" id="ubAuto" hidden>Thông báo tự động</button>
   <button class="btn" type="button" id="ubBackup" hidden>Sao lưu &amp; khôi phục</button>
   <button class="btn" type="button" id="ubPass">Đổi mật khẩu</button>
   <button class="btn" type="button" id="ubOut">Đăng xuất</button>
@@ -471,6 +474,13 @@ body.pv .wrap{padding-bottom:120px}
   </div>
 </div>
 <div class="newdata" id="savedToast" hidden role="status"><span id="savedTxt"></span><button class="btn primary" type="button" id="savedZalo">Tin nhắn nhóm</button><button class="btn" type="button" id="savedX" aria-label="Đóng">Đóng</button></div>
+<div class="ov" id="autoPanel" hidden>
+  <div class="panel wide" role="dialog" aria-modal="true" aria-labelledby="apTitle" style="max-width:640px">
+    <div class="sec-title"><h2 id="apTitle">Thông báo tự động</h2><button class="btn" type="button" data-close>Đóng</button></div>
+    <div id="apBody"><p class="hint">Đang tải…</p></div>
+    <p class="msg-err" id="apMsg" role="status"></p>
+  </div>
+</div>
 <div class="ov" id="backupPanel" hidden>
   <div class="panel wide" role="dialog" aria-modal="true" aria-labelledby="bkTitle" style="max-width:640px">
     <div class="sec-title"><h2 id="bkTitle">Sao lưu &amp; khôi phục</h2><button class="btn" type="button" data-close>Đóng</button></div>
@@ -1456,7 +1466,7 @@ function showUbar(me){
     document.addEventListener('click',e=>{if(!e.target.closest('#ubMenu,#ubMenuBtn'))close()});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&mn.classList.contains('open')){close();mb.focus()}})}}
   $('ubUsers').onclick=()=>{openPanel('usersPanel');loadUsers()};
-  $('ubBackup').onclick=()=>{openPanel('backupPanel');loadBackups()};
+  $('ubBackup').onclick=()=>{openPanel('backupPanel');loadBackups()};$('ubAuto').hidden=me.role!=='admin';$('ubAuto').onclick=()=>{openPanel('autoPanel');loadAuto()};
 }
 function setUpd(meta){$('ubUpd').textContent=meta&&meta.updatedAt?`Số liệu lưu lúc ${fmtTime(meta.updatedAt)}${meta.byName||meta.by?' bởi '+(meta.byName||meta.by):''}${meta.restored?' (khôi phục '+meta.restored+')':''}`:''}
 
@@ -1575,10 +1585,28 @@ function savedToast(){let v=null;try{v=sessionStorage.getItem('kvSaved');session
   let p={};try{p=JSON.parse(v)||{}}catch(e){}
   $('savedTxt').textContent='Đã lưu số liệu mới.'+(p.ok?` Đã gửi thông báo tới ${p.ok} máy.`:'');$('savedToast').hidden=false;
   $('savedZalo').onclick=()=>{$('savedToast').hidden=true;openZalo()};$('savedX').onclick=()=>{$('savedToast').hidden=true}}
-document.querySelectorAll('#usersPanel,#passPanel,#statsPanel,#pushPanel,#zaloPanel,#backupPanel').forEach(p=>{
+document.querySelectorAll('#usersPanel,#passPanel,#statsPanel,#pushPanel,#zaloPanel,#backupPanel,#autoPanel').forEach(p=>{
   p.addEventListener('click',e=>{if(e.target===p||e.target.closest('[data-close]'))closePanel(p)});
   p.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel(p)});
 });
+
+// ---- thông báo tự động (quản trị)
+async function loadAuto(){const box=$('apBody'),m=$('apMsg');m.textContent='';m.className='msg-err';box.innerHTML='<p class="hint">Đang tải…</p>';
+  const r=await api('/api/autopush');if(!r.ok){box.innerHTML='';m.textContent=r.j.error||'Không tải được.';return}const j=r.j;
+  const last=l=>!l?'Chưa chạy lần nào.':`Lần chạy gần nhất: ${fmtTime(l.at)} · `+(l.skipped?esc(l.skipped):`đã gửi ${l.ok||0} máy${l.fail?`, lỗi ${l.fail}`:''}${l.skip?`, bỏ qua ${l.skip}`:''}`);
+  box.innerHTML=(j.cronSecret?'':`<p class="msg-err" style="margin:0 0 10px">Chưa cài biến <b>CRON_SECRET</b> trên Vercel nên lịch chưa chạy. Vào Vercel → Settings → Environment Variables, thêm CRON_SECRET (chuỗi ngẫu nhiên từ 16 ký tự) rồi Redeploy.</p>`)+
+    `<p class="hint">Gửi lên điện thoại các tài khoản đã bật thông báo. Quản trị và cập nhật dữ liệu nhận số liệu toàn khu vực; tài khoản chỉ xem nhận số liệu siêu thị của mình.</p>`+
+    Object.entries(j.jobs).map(([k,t])=>`<div class="ap-job"><div class="ap-row"><label><input type="checkbox" data-ap="${k}"${j.cfg[k]?' checked':''}>${esc(t)}</label><button class="btn" type="button" data-pv="${k}">Xem trước</button><button class="btn" type="button" data-ts="${k}">Gửi thử cho tôi</button></div><div class="ap-last">${last(j.log[k])}</div><div class="ap-pv" id="pv-${k}" hidden></div></div>`).join('');
+  box.querySelectorAll('[data-ap]').forEach(c=>c.onchange=async()=>{const r=await api('/api/autopush',{method:'POST',body:{cfg:{[c.dataset.ap]:c.checked}}});m.className=r.ok?'msg-ok':'msg-err';m.textContent=r.ok?(c.checked?'Đã bật.':'Đã tắt.'):(r.j.error||'Không lưu được.');if(!r.ok)c.checked=!c.checked});
+  box.querySelectorAll('[data-pv]').forEach(b=>b.onclick=async()=>{const k=b.dataset.pv,el=$('pv-'+k);if(!el.hidden){el.hidden=true;return}el.hidden=false;el.textContent='Đang tính…';
+    const r=await api('/api/cron/'+k+'?mode=preview');if(!r.ok){el.textContent=r.j.error||'Lỗi.';return}const p=r.j;
+    if(!p.area){el.textContent='Hiện chưa có số liệu phù hợp để gửi tin này (ví dụ: số liệu không phải tháng vừa qua).';return}
+    const ks=Object.keys(p.shops).sort((a,b)=>(p.names[a]||'').localeCompare(p.names[b]||'','vi'));
+    el.innerHTML=`<b>Toàn khu vực</b>${esc(p.area.title)}\n${esc(p.area.body)}\n\n<b>Tài khoản chỉ xem</b>${ks.length?`<select aria-label="Chọn siêu thị">${ks.map(s=>`<option value="${esc(s)}">${esc(p.names[s]||s)}</option>`).join('')}</select><span class="ap-shop"></span>`:'(không gửi cho tài khoản chỉ xem)'}`;if(!ks.length)return;
+    const sel=el.querySelector('select'),sp=el.querySelector('.ap-shop');const show=()=>{const x=p.shops[sel.value];sp.textContent=x?x.title+'\n'+x.body:'(không gửi cho tài khoản chỉ xem)'};sel.onchange=show;show()});
+  box.querySelectorAll('[data-ts]').forEach(b=>b.onclick=async()=>{b.disabled=true;m.className='msg-err';m.textContent='Đang gửi…';const r=await api('/api/cron/'+b.dataset.ts+'?mode=test');b.disabled=false;
+    if(r.ok&&r.j.ok>0){m.className='msg-ok';m.textContent=`Đã gửi thử tới ${r.j.ok} máy của bạn.`}else m.textContent=r.ok?(r.j.empty?'Chưa có số liệu phù hợp để gửi tin này.':'Máy của bạn chưa bật thông báo (Menu → Bật thông báo).'):(r.j.error||'Lỗi gửi.')});
+}
 
 // ---- sao lưu & khôi phục (quản trị)
 const dmy=iso=>{const [y,m,d]=iso.split('-');return `${+d}/${+m}/${y}`};
@@ -1714,7 +1742,7 @@ try{navigator.serviceWorker&&navigator.serviceWorker.startMessages()}catch(e){}
 start();
 // tự kiểm tra số liệu mới: khi quay lại app / tab và 5 phút một lần khi đang mở
 let lastChk=0,chkBusy=false;
-const busy=()=>!$('pvBar').hidden||!$('upPanel').hidden||['usersPanel','passPanel','statsPanel','pushPanel','zaloPanel','backupPanel'].some(i=>!$(i).hidden);
+const busy=()=>!$('pvBar').hidden||!$('upPanel').hidden||['usersPanel','passPanel','statsPanel','pushPanel','zaloPanel','backupPanel','autoPanel'].some(i=>!$(i).hidden);
 async function checkNew(auto){
   if(chkBusy||!window.__META||!window.__ME)return;const now=Date.now();if(now-lastChk<60000)return;lastChk=now;chkBusy=true;
   try{const r=await api('/api/version');if(!r.ok||!r.j.updatedAt)return;

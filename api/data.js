@@ -2,7 +2,9 @@
 import { json, fail, currentUser, sameOriginWrite, readBody } from './_lib/auth.js';
 import { useRequest } from './_lib/store.js';
 import { readJSON, writeJSON } from './_lib/store.js';
-import { sendAll } from './_lib/webpush.js';
+import { sendEach } from './_lib/webpush.js';
+import { audience } from './_lib/audience.js';
+import { shopNotice } from './_lib/summary.js';
 import { shopOf, filterShop } from './_lib/scope.js';
 
 const CURRENT = 'data/current.json';
@@ -65,10 +67,17 @@ export default {
         const pushJob = (async () => {
           try {
             const notice = String(body.notice || '').replace(/\s+/g, ' ').trim().slice(0, 180) || `Số liệu đã được cập nhật lúc ${hm}.`;
-            return await Promise.race([
-              sendAll({ title: 'DT KV Luân · số liệu mới', body: notice, url: '/#muctieu', tag: 'kv-update' }, new URL(req.url).origin, (s) => s.u !== me.u),
-              timeout(8000),
-            ]);
+            // cả khu vực: tóm tắt toàn khu vực; tài khoản chỉ xem 1 siêu thị: chỉ số liệu siêu thị đó
+            const who = await audience(data);
+            const per = {};
+            const pick = (sub) => {
+              if (sub.u === me.u) return null;
+              const sc = who(sub.u);
+              if (!sc) return null;
+              const body = sc === 'all' ? notice : (per[sc] ??= shopNotice(data, doc.meta, sc) || `Số liệu đã được cập nhật lúc ${hm}.`);
+              return { title: 'DT KV Luân · số liệu mới', body, url: '/#muctieu', tag: 'kv-update' };
+            };
+            return await Promise.race([sendEach(pick, new URL(req.url).origin), timeout(8000)]);
           } catch (e) { console.error('push failed', e); return null; }
         })();
         const push = await pushJob;

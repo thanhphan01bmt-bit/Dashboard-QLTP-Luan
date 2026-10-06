@@ -83,3 +83,21 @@ export async function sendAll(payload, subject, keep = () => true) {
   if (gone) { try { await writeJSON(SUBS_FILE, db); } catch (e) { console.error(e); } }
   return { ok, gone, fail, total: list.length };
 }
+
+// Gửi nội dung riêng cho từng máy: pick(sub) trả về payload hoặc null (bỏ qua máy đó).
+export async function sendEach(pick, subject) {
+  const db = (await readJSON(SUBS_FILE)) || { subs: {} };
+  let ok = 0, gone = 0, fail = 0, skip = 0;
+  await Promise.all(Object.entries(db.subs).map(async ([ep, s]) => {
+    const payload = pick(s);
+    if (!payload) { skip++; return; }
+    try {
+      const st = await sendOne(s, payload, subject);
+      if (st >= 200 && st < 300) ok++;
+      else if (st === 404 || st === 410) { delete db.subs[ep]; gone++; }
+      else { fail++; console.error('push status', st); }
+    } catch (e) { fail++; console.error('push error', e.message); }
+  }));
+  if (gone) { try { await writeJSON(SUBS_FILE, db); } catch (e) { console.error(e); } }
+  return { ok, gone, fail, skip };
+}

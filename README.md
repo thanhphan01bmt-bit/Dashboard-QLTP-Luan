@@ -80,3 +80,9 @@ Bấm **Quản lý tài khoản** ở góc trên → điền tên đăng nhập,
 - `api/data.js`: đọc / lưu số liệu.
 - `api/_lib/`: mã dùng chung (mã hóa mật khẩu scrypt, cookie phiên ký HMAC, đọc/ghi Blob).
 - `scripts/dev-server.mjs`: chạy thử trên máy, không dùng khi chạy trên Vercel.
+
+## Thông báo tự động (cần gói Pro)
+
+Lịch trong `vercel.json` (giờ UTC): 7h00 mục tiêu hôm nay · 22h00 tổng kết ngày · thứ Hai 8h00 tổng kết tuần · ngày 1 lúc 8h00 chốt tháng (giờ Việt Nam).
+Cần thêm biến môi trường `CRON_SECRET` (chuỗi ngẫu nhiên ≥ 16 ký tự) rồi Redeploy. Quản trị bật/tắt, xem trước và gửi thử trong Menu → Thông báo tự động.
+Quản trị / cập nhật dữ liệu nhận số liệu toàn khu vực; tài khoản chỉ xem nhận số liệu siêu thị của mình.
