@@ -1173,9 +1173,11 @@ function render(){
       return Object.entries(acc).filter(([p,a])=>a[0]>=LOSS_MIN&&a[1]>0).map(([p,a])=>({p,nm:L.prod[p][0],n:a[0],x:a[1],r:a[1]/a[0]})).sort((a,b)=>b.r-a.r||b.x-a.x).slice(0,5)};
     const nf2=v=>Math.abs(v-Math.round(v))<1e-9?f0.format(v):f1.format(v);
     // xem toàn khu vực: bấm 1 ngành hàng -> tỷ lệ của từng siêu thị; xem 1 siêu thị -> top 5 sản phẩm hủy cao
-    const shopDetail=(grp)=>{const rs=shops.map(s=>{const o=L.rows[s]||{};let n=0,h=0,x=0;for(const c0 in o){if(LGRP(c0)!==grp)continue;n+=o[c0][0];h+=o[c0][1]+o[c0][2];x+=o[c0][3]||0}return{s,n,h,x}}).filter(r=>r.n>0).sort((a,b)=>b.h/b.n-a.h/a.n);
+    const shopDetail=(grp)=>{const rs=shops.map(s=>{const o=L.rows[s]||{};let n=0,h=0,x=0;for(const c0 in o){if(LGRP(c0)!==grp)continue;n+=o[c0][0];h+=o[c0][1]+o[c0][2];x+=o[c0][3]||0}return{s,n,h,x}}).filter(r=>r.n>0);
+      // ngành trứng: xếp theo bán / nhập thấp → cao; ngành khác: hủy / nhập cao → thấp
+      const egg=HX&&/^tr[uứ]ng/i.test(grp.normalize('NFC'));rs.sort(egg?(a,b)=>a.x/a.n-b.x/b.n:(a,b)=>b.h/b.n-a.h/a.n);
       if(!rs.length)return `<tr class="ldet"><td colspan="6"><div class="ldet-in">Không có siêu thị nào nhập ngành hàng này.</div></td></tr>`;
-      return `<tr class="ldet"><td colspan="6"><div class="ldet-in"><div class="ldet-h">${esc(grp)} theo siêu thị · ${rs.length} siêu thị · hủy / nhập cao nhất ở trên · bấm tên siêu thị để xem top 5 sản phẩm hủy</div>
+      return `<tr class="ldet"><td colspan="6"><div class="ldet-in"><div class="ldet-h">${esc(grp)} theo siêu thị · ${rs.length} siêu thị · ${egg?'bán / nhập thấp nhất':'hủy / nhập cao nhất'} ở trên · bấm tên siêu thị để xem top 5 sản phẩm hủy</div>
         <table class="ltop fxd"><thead><tr><th class="l fx-n">#</th><th class="l">Siêu thị</th><th>SL nhập</th><th>SL bán</th><th>SL hủy</th><th>Bán / nhập</th><th>Hủy / nhập</th></tr></thead><tbody>`+
         rs.map((r,i)=>`<tr tabindex="0" data-ls2="${r.s}" style="cursor:pointer"><td class="l fx-n">${i+1}</td><td class="l ltop-nm">${esc(shopName(r.s))}<small>${r.s}</small></td><td>${f0.format(r.n)}</td><td>${HX?f0.format(r.x):'—'}</td><td>${f0.format(r.h)}</td><td>${HX?pct(r.x/r.n):'—'}</td><td class="neg"><b>${pct(r.h/r.n)}</b></td></tr>`).join('')+
         `</tbody></table></div></td></tr>`};
