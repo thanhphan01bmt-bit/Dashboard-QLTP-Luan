@@ -42,6 +42,14 @@ export default {
         if (me.role !== 'admin' && me.role !== 'editor') return fail('Tài khoản của bạn chỉ được xem.', 403);
         if (!sameOriginWrite(req)) return fail('Yêu cầu không hợp lệ.', 403);
         const body = await readBody(req);
+        // lưu bảng xếp hạng quản lý tính sẵn cho số liệu hiện tại (khi chưa có, vd. sau khôi phục bản sao lưu)
+        if (body && body.action === 'rank') {
+          if (!body.rank || !Array.isArray(body.rank.rk)) return fail('Dữ liệu không hợp lệ.');
+          const mt = await readJSON('data/meta.json');
+          if (!mt || mt.updatedAt !== body.at) return fail('Số liệu đã thay đổi, bỏ qua.', 409);
+          await writeJSON(RANK, { at: body.at, rk: body.rank.rk, ot: Array.isArray(body.rank.ot) ? body.rank.ot : [] });
+          return json({ ok: true });
+        }
         const data = body && body.data;
         if (!looksValid(data)) return fail('Dữ liệu không đúng định dạng dashboard.', 400);
         const prev = await readJSON(CURRENT);

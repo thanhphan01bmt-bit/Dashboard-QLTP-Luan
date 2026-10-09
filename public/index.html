@@ -1005,8 +1005,8 @@ function render(){
      if(cur!=='all')db.innerHTML='';else if(!DECL||!DECL.length){db.innerHTML=`<div class="dbox" style="background:var(--good-bg);border-color:transparent"><h3 style="margin:0">Không có siêu thị nào giảm doanh thu 2 tháng liên tiếp trở lên</h3></div>`}
      else db.innerHTML=`<div class="dbox"><h3><span class="ic" aria-hidden="true">!</span>Cảnh báo: ${DECL.length} siêu thị giảm doanh thu tháng liên tiếp</h3>
       <p class="lhint" style="margin:0 0 8px">So sánh doanh thu cả tháng với tháng liền trước (tháng ${M} dùng doanh thu dự kiến). Đỏ đậm = giảm từ 3 tháng trở lên. Bỏ qua tháng khai trương. Bấm một dòng để xem siêu thị đó.</p>
-      <div class="tbl-wrap"><table><thead><tr><th class="l">Siêu thị</th><th class="l">Quản lý</th><th>Số tháng giảm</th><th>Diễn biến từng tháng</th><th>Tổng giảm</th></tr></thead><tbody>${DECL.map(x=>{const o=D.shops[x.s];
-        return `<tr data-s="${x.s}" tabindex="0"${cur===x.s?' class="sel"':''}><td class="l"><div class="shopcell"><span>${esc(o.name)}</span><small>${x.s}</small></div></td><td class="l">${esc(o.qlName||'—')}</td>
+      <div class="tbl-wrap"><table><thead><tr><th class="l">Siêu thị</th><th>Số tháng giảm</th><th>Diễn biến từng tháng</th><th>Tổng giảm</th></tr></thead><tbody>${DECL.map(x=>{const o=D.shops[x.s];
+        return `<tr data-s="${x.s}" tabindex="0"${cur===x.s?' class="sel"':''}><td class="l"><div class="shopcell"><span>${esc(o.name)}</span><small>${x.s}</small></div></td>
         <td><span class="pill ${x.st>=3?'down':'warn'}">${x.st} tháng</span></td>
         <td><span class="chain">${x.ch.map(c=>`<span title="T${c.m}: ${moneyS(x.v[c.m])} vs T${c.m-1}: ${moneyS(x.v[c.m-1])}">T${c.m} ${sgn(c.c)}</span>`).join('')}</span></td>
         <td class="neg"><b>${sgn(x.drop)}</b><br><small class="muted">${moneyS(x.v[x.ms[0]])} → ${moneyS(x.v[D.cur.m])}</small></td></tr>`}).join('')}</tbody></table></div></div>`;
@@ -1458,7 +1458,7 @@ function showUbar(me){
   document.body.classList.toggle('is-admin',me.role==='admin');
   $('ubar').hidden=false;$('ubName').textContent=me.name||me.u;$('ubRole').textContent=me.roleName||me.role;
   $('ubUsers').hidden=me.role!=='admin';$('ubZalo').hidden=!(me.role==='admin'||me.role==='editor');$('ubZalo').onclick=openZalo;$('ubPush').onclick=()=>{openPanel('pushPanel');pushUI()};$('ubStats').hidden=me.role!=='admin';$('ubStats').onclick=()=>{openPanel('statsPanel');loadStats()};$('ubBackup').hidden=me.role!=='admin';$('ubPass').hidden=!!me.envAdmin;
-  $('ubOut').onclick=async()=>{try{await api('/api/logout',{method:'POST',body:{}})}catch(e){}await cClear();location.reload()};
+  $('ubOut').onclick=async()=>{try{await api('/api/login',{method:'POST',body:{logout:true}})}catch(e){}await cClear();location.reload()};
   $('ubPass').onclick=()=>openPanel('passPanel');
   {const mb=$('ubMenuBtn'),mn=$('ubMenu');const close=()=>{mn.classList.remove('open');mb.setAttribute('aria-expanded','false')};
    mb.onclick=e=>{e.stopPropagation();const o=!mn.classList.contains('open');mn.classList.toggle('open',o);mb.setAttribute('aria-expanded',String(o));if(o){const f=[...mn.querySelectorAll('.btn')].find(b=>!b.hidden);f&&f.focus()}};
@@ -1592,19 +1592,19 @@ document.querySelectorAll('#usersPanel,#passPanel,#statsPanel,#pushPanel,#zaloPa
 
 // ---- thông báo tự động (quản trị)
 async function loadAuto(){const box=$('apBody'),m=$('apMsg');m.textContent='';m.className='msg-err';box.innerHTML='<p class="hint">Đang tải…</p>';
-  const r=await api('/api/autopush');if(!r.ok){box.innerHTML='';m.textContent=r.j.error||'Không tải được.';return}const j=r.j;
+  const r=await api('/api/cron?settings=1');if(!r.ok){box.innerHTML='';m.textContent=r.j.error||'Không tải được.';return}const j=r.j;
   const last=l=>!l?'Chưa chạy lần nào.':`Lần chạy gần nhất: ${fmtTime(l.at)} · `+(l.skipped?esc(l.skipped):`đã gửi ${l.ok||0} máy${l.fail?`, lỗi ${l.fail}`:''}${l.skip?`, bỏ qua ${l.skip}`:''}`);
   box.innerHTML=(j.cronSecret?'':`<p class="msg-err" style="margin:0 0 10px">Chưa cài biến <b>CRON_SECRET</b> trên Vercel nên lịch chưa chạy. Vào Vercel → Settings → Environment Variables, thêm CRON_SECRET (chuỗi ngẫu nhiên từ 16 ký tự) rồi Redeploy.</p>`)+
     `<p class="hint">Gửi lên điện thoại các tài khoản đã bật thông báo. Quản trị và cập nhật dữ liệu nhận số liệu toàn khu vực; tài khoản chỉ xem nhận số liệu siêu thị của mình.</p>`+
     Object.entries(j.jobs).map(([k,t])=>`<div class="ap-job"><div class="ap-row"><label><input type="checkbox" data-ap="${k}"${j.cfg[k]?' checked':''}>${esc(t)}</label><button class="btn" type="button" data-pv="${k}">Xem trước</button><button class="btn" type="button" data-ts="${k}">Gửi thử cho tôi</button></div><div class="ap-last">${last(j.log[k])}</div><div class="ap-pv" id="pv-${k}" hidden></div></div>`).join('');
-  box.querySelectorAll('[data-ap]').forEach(c=>c.onchange=async()=>{const r=await api('/api/autopush',{method:'POST',body:{cfg:{[c.dataset.ap]:c.checked}}});m.className=r.ok?'msg-ok':'msg-err';m.textContent=r.ok?(c.checked?'Đã bật.':'Đã tắt.'):(r.j.error||'Không lưu được.');if(!r.ok)c.checked=!c.checked});
+  box.querySelectorAll('[data-ap]').forEach(c=>c.onchange=async()=>{const r=await api('/api/cron',{method:'POST',body:{cfg:{[c.dataset.ap]:c.checked}}});m.className=r.ok?'msg-ok':'msg-err';m.textContent=r.ok?(c.checked?'Đã bật.':'Đã tắt.'):(r.j.error||'Không lưu được.');if(!r.ok)c.checked=!c.checked});
   box.querySelectorAll('[data-pv]').forEach(b=>b.onclick=async()=>{const k=b.dataset.pv,el=$('pv-'+k);if(!el.hidden){el.hidden=true;return}el.hidden=false;el.textContent='Đang tính…';
-    const r=await api('/api/cron/'+k+'?mode=preview');if(!r.ok){el.textContent=r.j.error||'Lỗi.';return}const p=r.j;
+    const r=await api('/api/cron?job='+k+'&mode=preview');if(!r.ok){el.textContent=r.j.error||'Lỗi.';return}const p=r.j;
     if(!p.area){el.textContent='Hiện chưa có số liệu phù hợp để gửi tin này (ví dụ: số liệu không phải tháng vừa qua).';return}
     const ks=Object.keys(p.shops).sort((a,b)=>(p.names[a]||'').localeCompare(p.names[b]||'','vi'));
     el.innerHTML=`<b>Toàn khu vực</b>${esc(p.area.title)}\n${esc(p.area.body)}\n\n<b>Tài khoản chỉ xem</b>${ks.length?`<select aria-label="Chọn siêu thị">${ks.map(s=>`<option value="${esc(s)}">${esc(p.names[s]||s)}</option>`).join('')}</select><span class="ap-shop"></span>`:'(không gửi cho tài khoản chỉ xem)'}`;if(!ks.length)return;
     const sel=el.querySelector('select'),sp=el.querySelector('.ap-shop');const show=()=>{const x=p.shops[sel.value];sp.textContent=x?x.title+'\n'+x.body:'(không gửi cho tài khoản chỉ xem)'};sel.onchange=show;show()});
-  box.querySelectorAll('[data-ts]').forEach(b=>b.onclick=async()=>{b.disabled=true;m.className='msg-err';m.textContent='Đang gửi…';const r=await api('/api/cron/'+b.dataset.ts+'?mode=test');b.disabled=false;
+  box.querySelectorAll('[data-ts]').forEach(b=>b.onclick=async()=>{b.disabled=true;m.className='msg-err';m.textContent='Đang gửi…';const r=await api('/api/cron?job='+b.dataset.ts+'&mode=test');b.disabled=false;
     if(r.ok&&r.j.ok>0){m.className='msg-ok';m.textContent=`Đã gửi thử tới ${r.j.ok} máy của bạn.`}else m.textContent=r.ok?(r.j.empty?'Chưa có số liệu phù hợp để gửi tin này.':'Máy của bạn chưa bật thông báo (Menu → Bật thông báo).'):(r.j.error||'Lỗi gửi.')});
 }
 
@@ -1701,7 +1701,7 @@ function bootApp(me,doc){
 // số liệu hiện tại chưa có bảng xếp hạng tính sẵn (vd. vừa khôi phục bản sao lưu) thì gửi lên để tài khoản chỉ xem dùng
 async function syncRank(){const me=window.__ME||{},doc=window.__DOC;if(!(me.role==='admin'||me.role==='editor')||!doc||!doc.meta||!window.__RANK)return;
   if(typeof PREVIEW_D!=='undefined'&&PREVIEW_D)return;const at=doc.meta.updatedAt;if(!at||doc.rankAt===at)return;
-  try{const r=await api('/api/rank',{method:'POST',body:{at,rank:window.__RANK}});if(r.ok||r.status===409){doc.rankAt=at;cPut('doc',doc)}}catch(e){}}
+  try{const r=await api('/api/data',{method:'POST',body:{action:'rank',at,rank:window.__RANK}});if(r.ok||r.status===409){doc.rankAt=at;cPut('doc',doc)}}catch(e){}}
 // đã mở từ bản lưu trên máy: kiểm tra phiên đăng nhập và số liệu mới ở nền
 let revBusy=false;
 async function revalidate(){if(revBusy)return;revBusy=true;

@@ -85,4 +85,5 @@ Bấm **Quản lý tài khoản** ở góc trên → điền tên đăng nhập,
 
 Lịch trong `vercel.json` (giờ UTC): 7h00 mục tiêu hôm nay · 22h00 tổng kết ngày · thứ Hai 8h00 tổng kết tuần · ngày 1 lúc 8h00 chốt tháng (giờ Việt Nam).
 Cần thêm biến môi trường `CRON_SECRET` (chuỗi ngẫu nhiên ≥ 16 ký tự) rồi Redeploy. Quản trị bật/tắt, xem trước và gửi thử trong Menu → Thông báo tự động.
+Gói Hobby chỉ cho tối đa 12 hàm trong thư mục `api` (file bắt đầu bằng `_` không tính); hiện có 10.
 Quản trị / cập nhật dữ liệu nhận số liệu toàn khu vực; tài khoản chỉ xem nhận số liệu siêu thị của mình.
