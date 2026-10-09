@@ -191,6 +191,19 @@ td.dt-big b{font-size:15px}
 #goalBlk1,.goal2>div{border:1.5px solid var(--accent);border-radius:12px;padding:14px 14px 10px;background:var(--surface);box-shadow:0 2px 10px color-mix(in srgb,var(--accent) 14%,transparent);min-width:0}
 #goalBlk1 .gh,.goal2>div>.gh{margin:-14px -14px 10px;padding:10px 14px;background:var(--accent-soft);color:var(--accent);border-radius:10px 10px 0 0;border-bottom:1px solid color-mix(in srgb,var(--accent) 30%,transparent);font-size:15px}
 #goalBlk1 .gh small,.goal2>div>.gh small{color:var(--ink2)}
+.warnbox{border:1px solid color-mix(in srgb,var(--bad) 30%,transparent);background:var(--bad-bg);border-radius:12px;padding:10px 14px;margin:0 0 14px;font-size:13px}
+.warnbox.ok{background:var(--good-bg);border-color:transparent;color:var(--ink2)}
+.wb-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-weight:700;font-size:14px}.wb-h .ic{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--bad);color:#fff;font-size:13px;flex:none}
+.wb-h small{font-weight:400;color:var(--ink2)}.wb-h .btn{margin-left:auto;padding:3px 10px;font-size:12px;font-weight:600}
+.wb-list{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}.wb-list li{background:var(--surface);border-radius:9px;padding:7px 10px;border-left:4px solid #e0a100;line-height:1.5}
+.wb-list li.lv2{border-left-color:var(--bad)}.wb-list li b.sh{cursor:pointer}.wb-list li b.sh:hover{text-decoration:underline}.wb-list .wi{display:block;color:var(--ink2)}.wb-list .wi::before{content:"• "}
+.wb-note{margin:8px 0 0;font-size:11.5px;color:var(--ink2)}
+.ap-job{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px}.ap-row{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap}.ap-row label{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:14px;cursor:pointer;flex:1;min-width:200px}.ap-row input{width:18px;height:18px;accent-color:var(--accent)}
+.ap-row .btn{padding:4px 10px;font-size:12.5px}.ap-last{font-size:12px;color:var(--ink2);margin-top:4px}.ap-pv{margin-top:8px;background:var(--surface2);border-radius:8px;padding:8px 10px;font-size:13px;line-height:1.5;white-space:pre-wrap}.ap-pv b{display:block}.ap-pv select{margin:6px 0;font:inherit;font-size:12.5px;max-width:100%}
+.bk-cur{background:var(--accent-soft);border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:10px;line-height:1.55}.bk-undo{background:var(--warn-bg);border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.bk-undo span{flex:1;min-width:200px}
+.bktbl td .btn{padding:3px 10px;font-size:12px}.bktbl td:last-child{white-space:nowrap}
+.zimg{margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:10px}.zimg-h{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px;font-size:13px}.zimg-h .btn{padding:4px 10px;font-size:12.5px}
+#zaloImg{display:block;width:100%;max-height:260px;object-fit:contain;object-position:top;background:#fff;border-radius:6px;border:1px solid var(--line)}#zaloImg:not([src]){display:none}
 #goalPdf{padding:6px 12px}#goalPdf[disabled]{opacity:.6;cursor:progress}
 #goalTbl th.grp{text-align:center;border-bottom:1px solid var(--axis);background:var(--surface)}
 #goalTbl td.need{background:var(--accent-soft);font-weight:700;color:var(--ink)}
@@ -246,6 +259,7 @@ tr.ldet>td{padding:0 0 10px;background:var(--accent-soft);white-space:normal}
 .ldet-h{font-size:12px;color:var(--ink2);margin-bottom:6px}
 table.ltop{min-width:0}table.ltop th{background:transparent}table.ltop td,table.ltop th{padding:6px 8px}
 table.ltop tr:last-child td{border-bottom:0}
+@media (max-width:760px){table.fxd .fx-n,table.fxd .fx-gv{display:none}table.fxd td.ltop-nm{min-width:96px}.ldet-in{margin:0 4px;padding:8px}}
 .ltop-nm{white-space:normal!important;max-width:360px}.ltop-nm small{display:block;color:var(--muted);font-size:10.5px}
 .lbar{display:inline-block;width:90px;height:8px;background:var(--grid);border-radius:0 4px 4px 0;position:relative;vertical-align:middle;margin-right:8px}
 .lbar i{position:absolute;left:0;top:0;bottom:0;background:var(--bad);opacity:.8;border-radius:0 4px 4px 0}
@@ -324,6 +338,47 @@ body.pv .wrap{padding-bottom:120px}
 @media (max-width:760px){.stb span:not(.lb){visibility:hidden}}
 .newdata{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));z-index:45;display:flex;gap:12px;align-items:center;background:var(--ink);color:var(--surface);border-radius:12px;padding:10px 12px 10px 16px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:13px;width:max-content;max-width:calc(100% - 24px)}
 .newdata .btn.primary{padding:6px 12px;flex:none}
+.tab .ts{display:none}.ub-btn{display:none}#goalNote .sm{display:none}
+/* điện thoại: phần đầu trang gọn */
+@media (max-width:760px){
+ header.top{gap:8px}
+ header.top .eyebrow{display:none}
+ .wrap.v-goal #meta{display:none}
+ header.top h1{font-size:20px;margin:0 0 4px}
+ #meta .chip{font-size:11.5px;padding:2px 9px}
+ header.top .tools{width:100%;gap:8px}
+ header.top .filter{flex:1 1 100%}
+ .filter label{display:none}
+ #shopSel{padding:7px 32px 7px 10px;font-size:14px;width:100%}
+ body.viewer-shop header.top .filter{display:none}
+ #goalTitle{font-size:16px;line-height:1.3}
+ #goalSec .sec-title{gap:4px}
+ #goalNote .lg{display:none}#goalNote .sm{display:inline}
+ #goalSec .goalbar .view-only{display:none!important}
+ #goalSec .goalbar:not(:has(.ed-only:not([hidden]))){display:none}
+}
+@media (min-width:761px){.ub-menu{display:contents}}
+.offbar{position:sticky;top:0;z-index:44;background:var(--warn-bg);color:var(--ink);font-size:12.5px;text-align:center;padding:7px 14px;padding-top:calc(7px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--line)}
+/* điện thoại: thanh tab dưới đáy + menu tài khoản */
+@media (max-width:760px){
+ .tabs{position:fixed;left:0;right:0;bottom:0;z-index:38;margin:0;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:0 -4px 16px rgba(0,0,0,.08);padding:5px 6px calc(5px + env(safe-area-inset-bottom,0px));gap:4px;overflow:visible;background:var(--surface)}
+ .tab{flex:1 1 0;min-width:0;flex-direction:column;gap:3px;padding:6px 2px 5px;font-size:11px;font-weight:600;border:0;background:transparent;border-radius:10px;box-shadow:none}
+ .tab svg{width:21px;height:21px}
+ .tab:hover{background:transparent;color:var(--ink2)}
+ .tab.on,.tab.on:hover{background:var(--accent-soft);color:var(--accent);box-shadow:none}
+ .tab .tl{display:none}.tab .ts{display:inline}
+ body{padding-bottom:calc(66px + env(safe-area-inset-bottom,0px))}
+ .pv-bar{bottom:calc(62px + env(safe-area-inset-bottom,0px));padding-bottom:0}
+ .newdata{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+ .ubar{position:relative;flex-wrap:wrap;justify-content:flex-start;padding:10px 16px 0}
+ .ubar .who{flex:1;min-width:0}
+ .ubar .upd{order:3;width:100%;font-size:11.5px}
+ .ub-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px!important;font-size:13px!important;font-weight:600}
+ .ub-menu{display:none;position:absolute;right:16px;top:calc(100% + 4px);z-index:60;flex-direction:column;gap:2px;min-width:230px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.2);padding:6px}
+ .ub-menu.open{display:flex}
+ .ub-menu .btn{width:100%;justify-content:flex-start;text-align:left;border:0;background:transparent;padding:11px 12px!important;font-size:14px!important;border-radius:8px}
+ .ub-menu .btn:active,.ub-menu .btn:hover{background:var(--accent-soft)}
+}
 /* điện thoại: bảng gọn và tự co vừa màn hình */
 @media (max-width:760px){
  .wrap{padding-inline:10px!important;gap:14px}
@@ -353,23 +408,28 @@ body.pv .wrap{padding-bottom:120px}
   </form>
 </div>
 <div class="boot-msg" id="bootMsg">Đang tải…</div>
+<div class="offbar" id="offBar" hidden role="status"></div>
 <div class="newdata" id="newData" hidden role="status"><span id="newDataTxt"></span><button class="btn primary" type="button" id="newDataBtn">Tải lại</button></div>
 <div class="ubar" id="ubar" hidden>
   <span class="who">Xin chào, <b id="ubName"></b><span class="rtag" id="ubRole"></span></span>
   <span class="upd" id="ubUpd"></span>
+  <button class="btn ub-btn" type="button" id="ubMenuBtn" aria-haspopup="true" aria-expanded="false" aria-controls="ubMenu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Menu</button>
+  <div class="ub-menu" id="ubMenu">
   <button class="btn" type="button" id="ubPush" hidden><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:4px"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span id="ubPushTxt">Bật thông báo</span></button>
-  <button class="btn" type="button" id="ubZalo" hidden>Tin nhắn Zalo</button>
+  <button class="btn" type="button" id="ubZalo" hidden>Tin nhắn nhóm</button>
   <button class="btn" type="button" id="ubStats" hidden>Thống kê lượt xem</button>
   <button class="btn" type="button" id="ubUsers" hidden>Quản lý tài khoản</button>
-  <button class="btn" type="button" id="ubBackup" hidden>Tải bản sao lưu</button>
+  <button class="btn" type="button" id="ubAuto" hidden>Thông báo tự động</button>
+  <button class="btn" type="button" id="ubBackup" hidden>Sao lưu &amp; khôi phục</button>
   <button class="btn" type="button" id="ubPass">Đổi mật khẩu</button>
   <button class="btn" type="button" id="ubOut">Đăng xuất</button>
+  </div>
 </div>
 
 <div class="ov" id="usersPanel" hidden>
   <div class="panel wide" role="dialog" aria-modal="true" aria-labelledby="usersTitle">
     <div class="sec-title"><h2 id="usersTitle">Quản lý tài khoản</h2><button class="btn" type="button" data-close>Đóng</button></div>
-    <p class="hint"><b>Quản trị</b>: xem, cập nhật dữ liệu, đặt % mục tiêu và quản lý tài khoản. <b>Cập nhật dữ liệu</b>: xem và tải file lên. <b>Chỉ xem</b>: chỉ xem dashboard.</p>
+    <p class="hint"><b>Quản trị</b>: xem, cập nhật dữ liệu, đặt % mục tiêu và quản lý tài khoản. <b>Cập nhật dữ liệu</b>: xem và tải file lên. <b>Chỉ xem</b>: chỉ xem số liệu siêu thị được gán và Bảng thi đua Quản lý (gán "Toàn khu vực" để xem cả khu vực).</p>
     <div class="tbl-wrap"><table class="utbl" id="usersTbl"></table></div>
     <h3 class="gh" style="margin-top:18px">Thêm tài khoản</h3>
     <form id="addUser">
@@ -378,6 +438,7 @@ body.pv .wrap{padding-bottom:120px}
         <div class="fld"><label for="nuN">Tên hiển thị</label><input id="nuN" placeholder="vd: Nguyễn Văn A"></div>
         <div class="fld"><label for="nuR">Quyền</label><select id="nuR"><option value="viewer">Chỉ xem</option><option value="editor">Cập nhật dữ liệu</option><option value="admin">Quản trị</option></select></div>
         <div class="fld"><label for="nuP">Mật khẩu (ít nhất 6 ký tự)</label><input id="nuP" autocomplete="new-password" required></div>
+        <div class="fld" id="nuSWrap"><label for="nuS">Siêu thị được xem (quyền Chỉ xem)</label><select id="nuS"></select></div>
       </div>
       <div class="row" style="justify-content:space-between"><span class="msg-err" id="usersMsg" role="status"></span><button class="btn primary" type="submit">Thêm tài khoản</button></div>
     </form>
@@ -404,13 +465,29 @@ body.pv .wrap{padding-bottom:120px}
 </div>
 <div class="ov" id="zaloPanel" hidden>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="zaloTitle" style="max-width:560px">
-    <div class="sec-title"><h2 id="zaloTitle">Tin nhắn gửi nhóm Zalo</h2><button class="btn" type="button" data-close>Đóng</button></div>
-    <p class="hint">Tin nhắn soạn sẵn theo số liệu đang hiển thị. Sửa nếu cần, bấm <b>Sao chép</b> rồi dán vào nhóm Zalo.</p>
+    <div class="sec-title"><h2 id="zaloTitle">Tin nhắn gửi nhóm</h2><button class="btn" type="button" data-close>Đóng</button></div>
+    <p class="hint">Tin nhắn soạn sẵn theo số liệu đang hiển thị. Sửa nếu cần, bấm <b>Sao chép</b> rồi dán vào nhóm Zalo. Trên điện thoại, bấm <b>Chia sẻ ảnh + tin</b> rồi chọn Zalo để gửi kèm ảnh.</p>
     <textarea id="zaloTxt" rows="9" class="zalo-ta"></textarea>
-    <div class="row" style="justify-content:space-between;margin-top:10px"><span class="msg-ok" id="zaloMsg" role="status"></span><button class="btn primary" type="button" id="zaloCopy">Sao chép</button></div>
+    <div class="zimg"><div class="zimg-h"><b>Ảnh mục Doanh thu</b> <small class="muted">(toàn khu vực)</small><span class="row" style="gap:6px;margin-left:auto"><button class="btn" type="button" id="zaloShare" hidden>Chia sẻ ảnh + tin</button><button class="btn" type="button" id="zaloImgCopy" hidden>Sao chép ảnh</button><button class="btn" type="button" id="zaloImgDl">Tải ảnh</button></span></div>
+      <a id="zaloImgA" target="_blank" rel="noopener"><img id="zaloImg" alt="Ảnh bảng doanh thu mục tiêu ngày"></a><p class="muted" id="zaloImgMsg" style="font-size:12px;margin:4px 0 0">Đang tạo ảnh…</p></div>
+    <div class="row" style="justify-content:space-between;margin-top:10px"><span class="msg-ok" id="zaloMsg" role="status"></span><span class="row" style="gap:8px"><button class="btn primary" type="button" id="zaloCopy">Sao chép</button></span></div>
   </div>
 </div>
-<div class="newdata" id="savedToast" hidden role="status"><span id="savedTxt"></span><button class="btn primary" type="button" id="savedZalo">Tin nhắn Zalo</button><button class="btn" type="button" id="savedX" aria-label="Đóng">Đóng</button></div>
+<div class="newdata" id="savedToast" hidden role="status"><span id="savedTxt"></span><button class="btn primary" type="button" id="savedZalo">Tin nhắn nhóm</button><button class="btn" type="button" id="savedX" aria-label="Đóng">Đóng</button></div>
+<div class="ov" id="autoPanel" hidden>
+  <div class="panel wide" role="dialog" aria-modal="true" aria-labelledby="apTitle" style="max-width:640px">
+    <div class="sec-title"><h2 id="apTitle">Thông báo tự động</h2><button class="btn" type="button" data-close>Đóng</button></div>
+    <div id="apBody"><p class="hint">Đang tải…</p></div>
+    <p class="msg-err" id="apMsg" role="status"></p>
+  </div>
+</div>
+<div class="ov" id="backupPanel" hidden>
+  <div class="panel wide" role="dialog" aria-modal="true" aria-labelledby="bkTitle" style="max-width:640px">
+    <div class="sec-title"><h2 id="bkTitle">Sao lưu &amp; khôi phục</h2><button class="btn" type="button" data-close>Đóng</button></div>
+    <div id="bkBody"><p class="hint">Đang tải…</p></div>
+    <p class="msg-err" id="bkMsg" role="status"></p>
+  </div>
+</div>
 <div class="ov" id="passPanel" hidden>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="passTitle" style="max-width:420px">
     <div class="sec-title"><h2 id="passTitle">Đổi mật khẩu</h2><button class="btn" type="button" data-close>Đóng</button></div>
@@ -440,15 +517,16 @@ body.pv .wrap{padding-bottom:120px}
   </header>
 
   <nav class="tabs" role="tablist" aria-label="Chọn trang">
-    <button class="tab" role="tab" type="button" data-view="goal" id="tabGoal"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>Mục tiêu ngày</button>
-    <button class="tab" role="tab" type="button" data-view="dash" id="tabDash"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12l4-4 4 4 6-6 4 4M3 20h18"/></svg>Dashboard doanh thu</button>
-    <button class="tab" role="tab" type="button" data-view="comp" id="tabComp"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>Bảng thi đua Quản lý</button>
-    <button class="tab" role="tab" type="button" data-view="year" id="tabYear"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Doanh thu năm</button>
+    <button class="tab" role="tab" type="button" data-view="goal" id="tabGoal"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span class="tl">Mục tiêu ngày</span><span class="ts">Mục tiêu</span></button>
+    <button class="tab" role="tab" type="button" data-view="dash" id="tabDash"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12l4-4 4 4 6-6 4 4M3 20h18"/></svg><span class="tl">Dashboard doanh thu</span><span class="ts">Dashboard</span></button>
+    <button class="tab" role="tab" type="button" data-view="comp" id="tabComp"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg><span class="tl">Bảng thi đua Quản lý</span><span class="ts">Thi đua</span></button>
+    <button class="tab" role="tab" type="button" data-view="year" id="tabYear"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="tl">Doanh thu năm</span><span class="ts">Năm</span></button>
   </nav>
 
   <section class="card" id="goalSec">
     <div class="sec-title"><h2 id="goalTitle">Mục tiêu ngày</h2><div class="row"><span class="note" id="goalNote"></span><button class="btn primary no-cap" id="goalPdf" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 10l6 6 6-6M4 20h16"/></svg>Tải PDF</button></div></div>
     <div class="goalbar"><label for="goalPct" class="ed-only" hidden>Mục tiêu tăng trưởng so với tháng <span data-t="P"></span>: <input type="number" id="goalPct" step="1" min="-50" max="100" value="0"> %</label><span class="view-only" style="font-size:12.5px;color:var(--ink2)">Mục tiêu tăng trưởng so với tháng <span data-t="P"></span>: <b id="goalPctTxt"></b></span><span class="muted m-hide" style="font-size:12px" id="goalHint"></span></div>
+    <div class="warnbox" id="goalWarn" hidden></div>
     <div id="goalBlk1"><h3 class="gh" id="gh1">1. Doanh thu</h3>
     <div class="ghero" id="goalHero" hidden></div>
     <div class="tbl-wrap"><table id="goalTbl"></table></div></div>
@@ -590,7 +668,7 @@ function buildPdf(pages){ // pages: [{jpg:Uint8Array,w,h}] ; A4 portrait
   push(x+`trailer\n<< /Size ${n} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);
   return new Blob(parts,{type:'application/pdf'});
 }
-async function renderGoalPages(){
+async function renderGoalPages(opt={}){
   const PW=1240,PH=8000,MG=44,UW=PW-2*MG,OW=2480,OH=3508;const F='"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif';
   const C={ink:'#0f1a16',ink2:'#4a5752',muted:'#7d8984',grid:'#e4e9e6',head:'#f2f5f3',good:'#0a7a2f',goodBg:'#e3f4e7',bad:'#c02f2f',badBg:'#fbe7e6',acc:'#0d6b53',accSoft:'#e2f1ec'};
   const pages=[];let cv,ctx,y;
@@ -627,6 +705,10 @@ async function renderGoalPages(){
     rows.filter(r=>r.kind!=='THEAD').forEach(drawRow);
     y+=20};
   table(T('gh1'),document.getElementById('goalTbl'));
+  if(opt.image){// ảnh PNG chỉ gồm mục Doanh thu, để gửi kèm tin nhắn nhóm
+    const ch=y+MG-20,im=document.createElement('canvas');im.width=PW*2;im.height=ch*2;const g=im.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,im.width,im.height);
+    g.drawImage(cv,0,0,PW*2,ch*2,0,0,PW*2,ch*2);g.font=`400 22px ${F}`;g.fillStyle=C.muted;g.textAlign='right';g.textBaseline='middle';g.fillText('Doanh thu KV QLTP Luân · luan56605.app',PW*2-MG*2,ch*2-28);
+    return await new Promise(r=>im.toBlob(r,'image/png'))}
   table(T('gh2'),document.getElementById('goalFresh'));
   table(T('gh3'),document.getElementById('goalLoss'));
   // fit everything onto one A4 page
@@ -637,6 +719,7 @@ async function renderGoalPages(){
   const b=await new Promise(r=>out.toBlob(r,'image/jpeg',0.9));const out2=[{jpg:new Uint8Array(await b.arrayBuffer()),w:OW,h:OH}];
   return out2;
 }
+window.__goalImage=()=>renderGoalPages({image:true});
 async function exportGoalPdf(btn,filename){
   const old=btn.innerHTML;btn.disabled=true;btn.textContent='Đang tạo PDF…';
   try{
@@ -698,16 +781,18 @@ const ALL=SHOPS.map(shopStats);
 
 // ---- header
 const sel=document.getElementById('shopSel');
-sel.innerHTML='<option value="all">Toàn khu vực ('+SHOPS.length+' siêu thị)</option>'+
+const VIEW_SHOP=D.viewer&&D.viewer.shop&&D.shops[D.viewer.shop]?D.viewer.shop:null; // tài khoản chỉ xem 1 siêu thị
+sel.innerHTML=(VIEW_SHOP?'':'<option value="all">Toàn khu vực ('+SHOPS.length+' siêu thị)</option>')+
   [...SHOPS].sort((a,b)=>D.shops[a].name.localeCompare(D.shops[b].name,'vi')).map(s=>`<option value="${s}">${s} · ${esc(D.shops[s].name)}</option>`).join('');
 document.getElementById('meta').innerHTML=
   `<span class="chip">Doanh thu ngành hàng đến <b>${d9}/${MM}/${Y}</b></span><span class="chip m-hide">So sánh: tháng ${P}/${PY} (${PDIM} ngày)</span>`;
 
-let cur='all';let lossOpen=null;const LOSS_MIN=10;
+let cur='all';let lossOpen=null;let freshOpen=null;const LOSS_MIN=10;
 try{const v=localStorage.getItem('qltp-shop');if(v&&(v==='all'||D.shops[v]))cur=v}catch(e){}
+if(VIEW_SHOP){document.body.classList.add('viewer-shop');cur=VIEW_SHOP;sel.value=VIEW_SHOP;sel.disabled=true;sel.title='Tài khoản của bạn chỉ xem được siêu thị này'}
 sel.value=cur;
 sel.addEventListener('change',()=>setShop(sel.value));
-function setShop(v){cur=v;sel.value=v;try{localStorage.setItem('qltp-shop',v)}catch(e){}render()}
+function setShop(v){if(VIEW_SHOP&&v!==VIEW_SHOP)return;cur=v;sel.value=v;try{localStorage.setItem('qltp-shop',v)}catch(e){}render()}
 
 // ---- trend chart
 const tEl=document.getElementById('trend');let trendData=null;
@@ -803,13 +888,42 @@ function render(){
      return same?String(vn.getUTCHours()).padStart(2,'0')+':'+String(vn.getUTCMinutes()).padStart(2,'0'):null})();
    const dayLbl=upAt?`ngày ${d9}/${M} đến ${upAt}`:`ngày ${d9}/${M}`;
    document.getElementById('goalTitle').textContent=`Mục tiêu ngày ${d9}/${M}/${D.cur.y} · ${scopeName}`;
-   document.getElementById('goalNote').textContent=`Doanh thu ${upAt?`đến ${upAt} ngày ${d9}/${M}`:`đến hết ngày ${d9}/${M}`} · ${left>1?`còn ${left} ngày (tính cả ngày ${d9}/${M})`:'ngày cuối tháng'}`;
+   document.getElementById('goalNote').innerHTML=`<span class="lg">Doanh thu ${upAt?`đến ${upAt} ngày ${d9}/${M}`:`đến hết ngày ${d9}/${M}`} · ${left>1?`còn ${left} ngày (tính cả ngày ${d9}/${M})`:'ngày cuối tháng'}</span><span class="sm">${upAt?`Đến ${upAt}`:'Cả ngày'} · ${left>1?`còn ${left} ngày`:'ngày cuối tháng'} · MT ${g>0?'+':''}${nf(0).format(g*100)}% so T${P}</span>`;
    document.getElementById('goalHint').textContent=`Mục tiêu tháng ${M} = DT tháng ${P} × ${nf(0).format(100+g*100)}%`;
    // 1. revenue
    document.getElementById('gh1').innerHTML=`1. Doanh thu <small>ngày đổ báo cáo ${d9}/${M}${upAt?`, cập nhật đến ${upAt}`:''}</small>`;
    const rev=s=>{const st=shopStats(s);const day=(D.sep.daily[s]||{})[d9]||0;const goal=st.aug*(1+g);const avg=st.cum9/d9;const need=Math.max(0,(goal-(st.cum9-day))/left);return{s,day,goal,proj:st.proj,avg,need,cum:st.cum9,aug:st.aug}};
    const pctHT=r=>r.need>0?r.day/r.need:(r.day>0?9:0);const RR=scope.map(rev).sort((a,b)=>pctHT(b)-pctHT(a));
    const TT={aug:tot(RR.map(r=>r.aug)),day:tot(RR.map(r=>r.day)),goal:tot(RR.map(r=>r.goal)),proj:tot(RR.map(r=>r.proj)),avg:tot(RR.map(r=>r.avg)),cum:tot(RR.map(r=>r.cum))};TT.need=Math.max(0,(TT.goal-(TT.cum-TT.day))/left);
+   // Cảnh báo tự động (tính lại mỗi khi có số liệu mới)
+   {const WARN={need:.8,wow:.2,wow2:.3,lossMin:.03,lossX:2};
+    const box=document.getElementById('goalWarn');const fd=k=>`${k}/${M}`;const PM=D.prev.dim;
+    const dl=(s,k)=>k>=1?+((D.sep.daily[s]||{})[k]||0):+(((D.aug.daily||{})[s]||{})[PM+k]||0);
+    const lastFull=upAt&&upAt<'21:00'?d9-1:d9; // lưu từ 21h00 thì coi ngày đổ báo cáo là đủ ngày; trước 21h xét đến ngày hôm trước
+    const Lw=D.loss&&D.loss.daily&&D.loss.y===D.cur.y&&D.loss.m===D.cur.m?D.loss:null;let ldw=0;if(Lw)for(const x in Lw.daily)for(const k in Lw.daily[x])ldw=Math.max(ldw,+k);
+    const W=[];
+    scope.forEach(s=>{const st=shopStats(s);const goal=st.aug*(1+g);const it=[];
+     // 1. 3 ngày liền dưới mức cần/ngày
+     // (so với mức bình quân cần đạt = mục tiêu tháng ÷ số ngày trong tháng)
+     if(goal>0&&lastFull>=3){const base=goal/DIM9;const ks=[lastFull-2,lastFull-1,lastFull],rs=ks.map(k=>dl(s,k)/base);
+       if(rs.every(r=>r<WARN.need))it.push({lv:2,t:`3 ngày liền dưới ${WARN.need*100}% mức bình quân cần đạt (${tr(base)} tr/ngày): ${ks.map((k,i)=>`${fd(k)} đạt ${nf(0).format(rs[i]*100)}%`).join(', ')}`})}
+     // 2. DT giảm so với cùng thứ tuần trước
+     if(lastFull>=1){const a=dl(s,lastFull),b=dl(s,lastFull-7);if(a>0&&b>0){const c=a/b-1;if(c<=-WARN.wow)it.push({lv:c<=-WARN.wow2?2:1,t:`DT ngày ${fd(lastFull)} giảm ${nf(0).format(-c*100)}% so với cùng thứ tuần trước (${tr(a)} tr so với ${tr(b)} tr)`})}}
+     // 3. Hủy tăng đột biến
+     if(Lw&&ldw>=2){const o=Lw.daily[s]||{};const sm=k=>{let n=0,h=0;const x=o[k];if(x)for(const c in x){n+=x[c][0];h+=x[c][1]}return[n,h]};
+       const [n1,h1]=sm(ldw);let n0=0,h0=0;for(let k=Math.max(1,ldw-7);k<ldw;k++){const [a,b]=sm(k);n0+=a;h0+=b}
+       const r1=n1>0?h1/n1:0,r0=n0>0?h0/n0:0;
+       if(n1>0&&r1>=WARN.lossMin&&r1>=WARN.lossX*r0)it.push({lv:r1>=2*WARN.lossMin?2:1,t:`Tỷ lệ hủy ngày ${fd(ldw)} là ${pct(r1)}${r0>0?`, gấp ${nf(1).format(r1/r0)} lần TB 7 ngày trước (${pct(r0)})`:' (7 ngày trước gần như không hủy)'}`})}
+     if(it.length)W.push({s,it,lv:Math.max(...it.map(x=>x.lv))})});
+    W.sort((a,b)=>b.lv-a.lv||b.it.length-a.it.length);
+    const single=scope.length===1,LIM=5;
+    if(!W.length){box.hidden=false;box.className='warnbox ok';box.innerHTML=`✓ Không có cảnh báo${single?' cho '+esc(scopeName):''} (doanh thu xét đến ngày ${fd(lastFull)}).`}
+    else{box.hidden=false;box.className='warnbox';const open=box.dataset.open==='1';const show=open?W:W.slice(0,LIM);
+     box.innerHTML=`<div class="wb-h"><span class="ic" aria-hidden="true">!</span>Cảnh báo tự động <small>${single?esc(scopeName):`${W.length} siêu thị cần chú ý`}</small>${W.length>LIM?`<button class="btn" type="button" id="wbMore">${open?'Thu gọn':`Xem tất cả (${W.length})`}</button>`:''}</div>
+      <ul class="wb-list">${show.map(w=>`<li class="lv${w.lv}">${single?'':`<b class="sh" data-ws="${w.s}" tabindex="0" role="button">${esc(shopName(w.s))}</b>`}${w.it.map(x=>`<span class="wi">${x.t}</span>`).join('')}</li>`).join('')}</ul>
+      <p class="wb-note">Tự xét: 3 ngày liền dưới ${WARN.need*100}% mức bình quân cần đạt (mục tiêu tháng ÷ số ngày) · DT giảm từ ${WARN.wow*100}% so cùng thứ tuần trước · tỷ lệ hủy từ ${WARN.lossMin*100}% và gấp ${WARN.lossX} lần TB 7 ngày. Doanh thu xét đến ngày ${fd(lastFull)}${lastFull<d9?' (ngày '+fd(d9)+' sẽ được xét khi có số liệu lưu từ 21h00)':''}. Viền đỏ là mức nặng.</p>`;
+     const mb=document.getElementById('wbMore');if(mb)mb.onclick=()=>{box.dataset.open=open?'0':'1';render()};
+     box.querySelectorAll('[data-ws]').forEach(b=>{const go=()=>setShop(b.dataset.ws);b.onclick=go;b.onkeydown=e=>{if(e.key==='Enter')go()}})}}
    const note=r=>{if(left<=0)return r.proj>=r.goal?`<span class="pill up">Đạt mục tiêu tháng</span>`:`<span class="pill down">Không đạt</span>`;const d=r.day-r.need;return d>=0?`<span class="pill up">Đạt</span> <small class="pos">+${tr1(d)} tr</small>`:`<span class="pill down">Không đạt</span> <small class="neg">−${tr1(-d)} tr</small>`};
    let t=`<thead><tr><th class="l">Siêu thị</th><th>DT ${dayLbl}</th><th class="need">Cần/ngày</th><th>% hoàn thành</th><th>Mục tiêu T${M}</th><th>Lũy kế T${M}</th><th>Dự kiến T${M}</th><th>Tăng trưởng so T${P}</th></tr></thead><tbody>`;
    RR.forEach(r=>{const o=D.shops[r.s];t+=`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(o.name)}</td><td><b>${tr(r.day)} tr</b></td><td class="need">${left>0?tr(r.need)+' tr':'—'}</td><td class="${r.need>0?(r.day>=r.need?'pos':'neg'):''}"><b>${r.need>0?nf(1).format(r.day/r.need*100)+'%':'—'}</b></td><td>${tr(r.goal)} tr</td><td>${tr(r.cum)} tr</td><td class="${r.proj>=r.goal?'pos':'neg'}">${tr(r.proj)} tr</td><td class="${r.aug?(r.proj>=r.aug?'pos':'neg'):''}"><b>${r.aug?sgn(r.proj/r.aug-1):'—'}</b></td></tr>`});
@@ -994,13 +1108,21 @@ function render(){
     const sc=(k,v,hi)=>{const vs=rk.map(c=>c[k]).filter(x=>x!=null&&x>0);if(v==null||v<=0||!vs.length)return 0;return hi?v/Math.max(...vs):Math.min(...vs)/v};
     rk.forEach(c=>{c.gi=1+c.ch});rk.forEach(c=>{c.p1=W1*sc('gi',c.gi,true);c.p2=W2*sc('ratio',c.ratio,true);c.p3=L?W3*sc('li',c.li,false):0;c.tot=c.p1+c.p2+c.p3;c.ok=true});
     rk.sort((a,b)=>b.tot-a.tot);if(rk.length>6)rk.slice(-3).forEach((c,i)=>{c.bot=3-i});let prize=0;rk.forEach(c=>{if(c.ok&&prize<3){c.prize=++prize}});
-    const mgrCell=s=>{const i=D.shops[s]||{};return i.qlName?`<div class="shopcell"><span style="font-weight:600">${esc(i.qlName)}</span><small>User ${esc(i.ql||'')}</small></div>`:'<span class="muted">Chưa có tên QL</span>'};
+    // bảng tính sẵn: lưu kèm số liệu để tài khoản chỉ xem (chỉ có số liệu 1 siêu thị) vẫn xem được xếp hạng
+    const snapRow=c=>{const i=D.shops[c.s]||{};return{s:c.s,n:shopName(c.s),qn:i.qlName||'',ql:i.ql||'',ch:c.ch,ratio:c.ratio,li:c.li,lr:c.lr,isNew:!!c.isNew,p1:c.p1||0,p2:c.p2||0,p3:c.p3||0,tot:c.tot||0,prize:c.prize||0,bot:c.bot||0,ok:c.ok!==false}};
+    if(!VIEW_SHOP)window.__RANK={rk:rk.map(snapRow),ot:cs.filter(c=>c.isNew||c.ratio==null).map(snapRow)};
+    const SN=VIEW_SHOP?D.rankSnap:window.__RANK;const NM={};if(SN)[...SN.rk,...SN.ot].forEach(r=>NM[r.s]=r);
+    if(VIEW_SHOP){rk.length=0;cs.length=0;if(SN){SN.rk.forEach(r=>rk.push(r));SN.ot.forEach(r=>cs.push(r))}}
+    const shopName0=shopName,shopNameR=s=>(NM[s]&&NM[s].n)||shopName0(s);
+    const rowS=s=>!VIEW_SHOP||s===VIEW_SHOP?` tabindex="0" data-s="${s}"`:'';
+    const mgrCell=s=>{const i=NM[s]?{qlName:NM[s].qn,ql:NM[s].ql}:(D.shops[s]||{});return i.qlName?`<div class="shopcell"><span style="font-weight:600">${esc(i.qlName)}</span><small>User ${esc(i.ql||'')}</small></div>`:`<div class="shopcell"><span class="muted">Chưa có tên QL</span><small>${esc(shopNameR(s))}</small></div>`};
     const cell=(val,pts,max,cls)=>`<td><span class="${cls||''}">${val}</span><small class="pts">${f1.format(pts)}/${max}</small></td>`;
-    let h=`<thead><tr><th>#</th><th class="l">Quản lý</th><th class="l">Siêu thị</th><th>DT so T${P}</th><th>DT / giá vốn</th><th>Chỉ số hủy</th><th class="l">Tổng điểm</th><th class="l">Ghi chú</th></tr></thead><tbody>`;
-    rk.forEach((c,i)=>{h+=`<tr tabindex="0" data-s="${c.s}" class="${cur===c.s?'sel':''}"><td><span class="rk ${c.prize?'top top'+c.prize:(c.bot?'hot':'')}">${i+1}</span></td><td class="l">${mgrCell(c.s)}</td><td class="l"><div class="shopcell"><span>${esc(shopName(c.s))}</span><small>${c.s}</small></div></td>`+
+    let h=`<thead><tr><th>#</th><th class="l">Quản lý</th><th>DT so T${P}</th><th>DT / giá vốn</th><th>Chỉ số hủy</th><th class="l">Tổng điểm</th></tr></thead><tbody>`;
+    if(VIEW_SHOP&&!SN)h+=`<tr><td colspan="6" class="l muted" style="white-space:normal">Bảng xếp hạng sẽ có sau lần cập nhật số liệu tới.</td></tr>`;
+    rk.forEach((c,i)=>{h+=`<tr${rowS(c.s)} class="${cur===c.s?'sel':''}"><td><span class="rk ${c.prize?'top top'+c.prize:(c.bot?'hot':'')}">${i+1}</span></td><td class="l">${mgrCell(c.s)}</td>`+
       cell(sgn(c.ch),c.p1,W1,c.ch>=0?'pos':'neg')+cell(pct(c.ratio),c.p2,W2,c.ratio>=1?'pos':'neg')+cell(c.li==null?'—':f2.format(c.li),c.p3,W3,c.li==null?'':(c.li<=1?'pos':'neg'))+
-      `<td class="l"><span class="cbar"><i style="width:${c.tot}%"></i></span><b>${f1.format(c.tot)}</b></td><td class="l">${c.prize?`<span class="pill up">Top ${c.prize}</span>`:(c.bot?`<span class="pill down">Bottom ${c.bot}</span>`:'')}${c.ok?'':`<span class="pill down" title="${c.lr!=null&&c.lr>LOSS_MAX?'Tỷ lệ hủy '+pct(c.lr)+' trên 25%':'DT/giá vốn '+pct(c.ratio)+' dưới 95%'}">Không xét giải</span>`}</td></tr>`});
-    cs.filter(c=>c.isNew||c.ratio==null).forEach(c=>{h+=`<tr tabindex="0" data-s="${c.s}" class="muted-row ${cur===c.s?'sel':''}"><td><span class="rk">–</span></td><td class="l">${mgrCell(c.s)}</td><td class="l"><div class="shopcell"><span>${esc(shopName(c.s))}</span><small>${c.s}</small></div></td><td>${sgn(c.ch)}</td><td>${c.ratio==null?'—':pct(c.ratio)}</td><td>${c.li==null?'—':f2.format(c.li)}</td><td class="l">—</td><td class="l"><span class="pill warn">${c.isNew?'Shop mới, chưa đủ tháng '+P:'Thiếu dữ liệu Fresh'}</span></td></tr>`});
+      `<td class="l"><span class="cbar"><i style="width:${c.tot}%"></i></span><b>${f1.format(c.tot)}</b></td></tr>`});
+    cs.filter(c=>c.isNew||c.ratio==null).forEach(c=>{h+=`<tr${rowS(c.s)} class="muted-row ${cur===c.s?'sel':''}"><td><span class="rk">–</span></td><td class="l">${mgrCell(c.s)}</td><td>${sgn(c.ch)}</td><td>${c.ratio==null?'—':pct(c.ratio)}</td><td>${c.li==null?'—':f2.format(c.li)}</td><td class="l"><span class="pill warn">${c.isNew?'Shop mới, chưa đủ tháng '+P:'Thiếu dữ liệu Fresh'}</span></td></tr>`});
     document.getElementById('compTbl').innerHTML=h+'</tbody>';}
 
   // fresh
@@ -1012,8 +1134,16 @@ function render(){
     `<div class="fk"><span class="lbl">Lợi nhuận lũy kế</span><span class="val num ${fLN>=0?'pos':'neg'}">${moneyS(fLN)}</span></div>`;
   const byCat={};fr.forEach(r=>{const o=byCat[r[1]]||(byCat[r[1]]={dt:0,gv:0,ln:0,l3:0,has3:false});o.dt+=r[2];o.gv+=r[3];o.ln+=r[4];if(r[5]!=null){o.l3+=r[5];o.has3=true}});
   let ft='<thead><tr><th class="l">Ngành hàng Fresh</th><th>DT tính giá vốn</th><th>Giá vốn CB lũy kế</th><th>DT / giá vốn</th><th>LN lũy kế</th><th>LN TB 3 tháng trước</th><th>Chênh lệch</th></tr></thead><tbody>';
-  Object.entries(byCat).sort((a,b)=>a[1].ln-b[1].ln).forEach(([n,o])=>{const r=o.dt/o.gv;const d=o.ln-o.l3;
-    ft+=`<tr><td class="l">${esc(n)}</td><td>${tr(o.dt)} tr</td><td>${tr(o.gv)} tr</td><td class="${r>=1?'pos':'neg'}"><b>${pct(r)}</b></td><td class="${o.ln>=0?'pos':'neg'}">${tr1(o.ln)} tr</td><td>${o.has3?tr1(o.l3)+' tr':'—'}</td><td class="${o.has3?(d>=0?'pos':'neg'):''}">${o.has3?(d>=0?'+':'')+tr1(d)+' tr':'—'}</td></tr>`});
+  // quản trị / cập nhật dữ liệu xem toàn khu vực: bấm 1 ngành hàng để xem ngành đó ở từng siêu thị
+  const fxOK=CAN_EDIT&&cur==='all'&&!VIEW_SHOP;if(!fxOK||(freshOpen&&!byCat[freshOpen]))freshOpen=null;
+  const fdet=n=>{const m={};D.fresh.filter(r=>r[1]===n).forEach(r=>{const o=m[r[0]]||(m[r[0]]={dt:0,gv:0,ln:0,l3:0,has3:false});o.dt+=r[2];o.gv+=r[3];o.ln+=r[4];if(r[5]!=null){o.l3+=r[5];o.has3=true}});
+    const rows=Object.entries(m).sort((a,b)=>a[1].ln-b[1].ln);
+    return `<tr class="ldet"><td colspan="7"><div class="ldet-in"><div class="ldet-h">${esc(n)} theo siêu thị · ${rows.length} siêu thị · LN lũy kế thấp nhất ở trên · bấm tên siêu thị để xem riêng</div>
+      <table class="ltop fxd"><thead><tr><th class="l fx-n">#</th><th class="l">Siêu thị</th><th>DT tính giá vốn</th><th class="fx-gv">Giá vốn CB</th><th>DT / giá vốn</th><th>LN lũy kế</th><th>LN TB 3 tháng trước</th><th>Chênh lệch</th></tr></thead><tbody>`+
+      rows.map(([sh,o],i)=>{const r=o.gv?o.dt/o.gv:null,d=o.ln-o.l3;return `<tr tabindex="0" data-fs="${sh}" style="cursor:pointer"><td class="l fx-n">${i+1}</td><td class="l ltop-nm">${esc(shopName(sh))}<small>${sh}</small></td><td>${tr(o.dt)} tr</td><td class="fx-gv">${tr(o.gv)} tr</td><td>${r==null?'—':`<span class="pill ${r>=1?'up':'down'}">${pct(r)}</span>`}</td><td class="${o.ln>=0?'pos':'neg'}"><b>${tr1(o.ln)} tr</b></td><td>${o.has3?tr1(o.l3)+' tr':'—'}</td><td class="${o.has3?(d>=0?'pos':'neg'):''}">${o.has3?(d>=0?'+':'')+tr1(d)+' tr':'—'}</td></tr>`}).join('')+
+      `</tbody></table></div></td></tr>`};
+  Object.entries(byCat).sort((a,b)=>a[1].ln-b[1].ln).forEach(([n,o])=>{const r=o.dt/o.gv;const d=o.ln-o.l3;const open=freshOpen===n;
+    ft+=`<tr${fxOK?` class="lrow${open?' open':''}" tabindex="0" data-fcat="${esc(n)}" aria-expanded="${open}"`:''}><td class="l">${fxOK?'<span class="chev" aria-hidden="true"></span>':''}${esc(n)}</td><td>${tr(o.dt)} tr</td><td>${tr(o.gv)} tr</td><td class="${r>=1?'pos':'neg'}"><b>${pct(r)}</b></td><td class="${o.ln>=0?'pos':'neg'}">${tr1(o.ln)} tr</td><td>${o.has3?tr1(o.l3)+' tr':'—'}</td><td class="${o.has3?(d>=0?'pos':'neg'):''}">${o.has3?(d>=0?'+':'')+tr1(d)+' tr':'—'}</td></tr>`;if(open)ft+=fdet(n)});
   ft+=`</tbody><tfoot><tr><th class="l">Tổng</th><th>${tr(fDT)} tr</th><th>${tr(fGV)} tr</th><th>${pct(ratio)}</th><th>${tr1(fLN)} tr</th><th>${fL3rows.length?tr1(fL3)+' tr':'—'}</th><th></th></tr></tfoot>`;
   document.getElementById('freshCatTbl').innerHTML=ft;
   const bs={};D.fresh.forEach(r=>{const o=bs[r[0]]||(bs[r[0]]={dt:0,gv:0,ln:0,l3:0,has3:false});o.dt+=r[2];o.gv+=r[3];o.ln+=r[4];if(r[5]!=null){o.l3+=r[5];o.has3=true}});
@@ -1059,6 +1189,9 @@ function render(){
   document.getElementById('freshNote').textContent=cur==='all'?`Lợi nhuận và tỷ lệ doanh thu / giá vốn cơ bản, lũy kế tháng ${M}`:'Đang xem: '+shopName(cur);
 }
 function rowClick(e){const tr=e.target.closest('tr[data-s]');if(!tr)return;setShop(cur===tr.dataset.s?'all':tr.dataset.s)}
+{const ft0=document.getElementById('freshCatTbl');const tog=e=>{const sr=e.target.closest('tr[data-fs]');if(sr){setShop(sr.dataset.fs);return}
+  const tr=e.target.closest('tr[data-fcat]');if(!tr)return;const c=tr.dataset.fcat;freshOpen=freshOpen===c?null:c;render();const n=document.querySelector(`#freshCatTbl tr[data-fcat="${CSS.escape(c)}"]`);n&&n.focus()};
+  ft0.addEventListener('click',tog);ft0.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog(e)}})}
 {const lt0=document.getElementById('lossTbl');const tog=e=>{const tr=e.target.closest('tr.lrow');if(!tr)return;const c=tr.dataset.cat;lossOpen=lossOpen===c?null:c;render();const n=document.querySelector(`#lossTbl tr.lrow[data-cat="${CSS.escape(c)}"]`);n&&n.focus()};
   lt0.addEventListener('click',tog);lt0.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog(e)}})}
 {const ct=document.getElementById('compTbl');const go=e=>{const tr=e.target.closest('tr[data-s]');if(!tr)return;setShop(tr.dataset.s);setView('dash')};
@@ -1282,11 +1415,12 @@ $('pvCancel').addEventListener('click',()=>{PREVIEW_D=null;bar.hidden=true;docum
 saveBtn.addEventListener('click',async()=>{
   if(!PREVIEW_D)return;saveBtn.disabled=true;pvMsg.textContent='Đang lưu…';
   const post=body=>window.__api('/api/data',{method:'POST',body});
-  try{const notice=window.__goalSummary?window.__goalSummary().short:'';let r=await post({data:PREVIEW_D,baseUpdatedAt:(window.__META||{}).updatedAt||null,notice});
+  try{const sm=window.__areaSummary?window.__areaSummary():null;const extra={notice:sm?sm.short:'',rank:window.__RANK||null};
+    let r=await post({data:PREVIEW_D,baseUpdatedAt:(window.__META||{}).updatedAt||null,...extra});
     if(r.status===409){const m=r.j.meta||{};
-      if(confirm(`Số liệu vừa được ${m.byName||m.by||'người khác'} lưu lúc ${new Date(m.updatedAt).toLocaleString('vi-VN')}.\nBấm OK để vẫn lưu số liệu của bạn (ghi đè), Cancel để hủy rồi tải lại trang xem số mới.`))r=await post({data:PREVIEW_D,force:true,notice});
+      if(confirm(`Số liệu vừa được ${m.byName||m.by||'người khác'} lưu lúc ${new Date(m.updatedAt).toLocaleString('vi-VN')}.\nBấm OK để vẫn lưu số liệu của bạn (ghi đè), Cancel để hủy rồi tải lại trang xem số mới.`))r=await post({data:PREVIEW_D,force:true,...extra});
       else{pvMsg.textContent='Đã hủy lưu. Tải lại trang để xem số liệu mới nhất.';saveBtn.disabled=false;return}}
-    if(r.ok){pvMsg.textContent='Đã lưu. Đang tải lại…';try{sessionStorage.setItem('kvSaved',JSON.stringify(r.j.push||{}))}catch(e){}setTimeout(()=>location.reload(),400);return}
+    if(r.ok){pvMsg.textContent='Đã lưu. Đang tải lại…';try{sessionStorage.setItem('kvSaved',JSON.stringify(r.j.push||{}))}catch(e){}window.__dropDoc&&await window.__dropDoc();setTimeout(()=>location.reload(),400);return}
     if(r.status===401){pvMsg.textContent='Phiên đăng nhập đã hết. Tải lại trang, đăng nhập rồi tải file lên lại.';return}
     pvMsg.textContent=r.j.error||('Lưu chưa thành công ('+r.status+').');saveBtn.disabled=false}
   catch(e){pvMsg.textContent='Lưu chưa thành công do lỗi kết nối. Bấm lưu lại sau ít giây.';saveBtn.disabled=false}
@@ -1324,13 +1458,17 @@ function showUbar(me){
   document.body.classList.toggle('is-admin',me.role==='admin');
   $('ubar').hidden=false;$('ubName').textContent=me.name||me.u;$('ubRole').textContent=me.roleName||me.role;
   $('ubUsers').hidden=me.role!=='admin';$('ubZalo').hidden=!(me.role==='admin'||me.role==='editor');$('ubZalo').onclick=openZalo;$('ubPush').onclick=()=>{openPanel('pushPanel');pushUI()};$('ubStats').hidden=me.role!=='admin';$('ubStats').onclick=()=>{openPanel('statsPanel');loadStats()};$('ubBackup').hidden=me.role!=='admin';$('ubPass').hidden=!!me.envAdmin;
-  $('ubOut').onclick=async()=>{try{await api('/api/logout',{method:'POST',body:{}})}catch(e){}location.reload()};
+  $('ubOut').onclick=async()=>{try{await api('/api/logout',{method:'POST',body:{}})}catch(e){}await cClear();location.reload()};
   $('ubPass').onclick=()=>openPanel('passPanel');
+  {const mb=$('ubMenuBtn'),mn=$('ubMenu');const close=()=>{mn.classList.remove('open');mb.setAttribute('aria-expanded','false')};
+   mb.onclick=e=>{e.stopPropagation();const o=!mn.classList.contains('open');mn.classList.toggle('open',o);mb.setAttribute('aria-expanded',String(o));if(o){const f=[...mn.querySelectorAll('.btn')].find(b=>!b.hidden);f&&f.focus()}};
+   if(!mn.dataset.bound){mn.dataset.bound=1;mn.addEventListener('click',e=>{if(e.target.closest('.btn'))close()});
+    document.addEventListener('click',e=>{if(!e.target.closest('#ubMenu,#ubMenuBtn'))close()});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&mn.classList.contains('open')){close();mb.focus()}})}}
   $('ubUsers').onclick=()=>{openPanel('usersPanel');loadUsers()};
-  $('ubBackup').onclick=()=>{if(!window.__DOC)return;const d=new Date();const name=`Sao_luu_KV_QLTP_${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}.json`;
-    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(window.__DOC)],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000)};
+  $('ubBackup').onclick=()=>{openPanel('backupPanel');loadBackups()};$('ubAuto').hidden=me.role!=='admin';$('ubAuto').onclick=()=>{openPanel('autoPanel');loadAuto()};
 }
-function setUpd(meta){$('ubUpd').textContent=meta&&meta.updatedAt?`Số liệu lưu lúc ${fmtTime(meta.updatedAt)}${meta.byName||meta.by?' bởi '+(meta.byName||meta.by):''}`:''}
+function setUpd(meta){$('ubUpd').textContent=meta&&meta.updatedAt?`Số liệu lưu lúc ${fmtTime(meta.updatedAt)}${meta.byName||meta.by?' bởi '+(meta.byName||meta.by):''}${meta.restored?' (khôi phục '+meta.restored+')':''}`:''}
 
 // ---- hộp thoại
 let lastFocus=null;
@@ -1371,14 +1509,41 @@ function goalSummary(){
   const short=`${scope}: DT ${dLbl} ${cell(tot,iD)}, đạt ${cell(tot,iP)} cần/ngày (${cell(tot,iN)}).`;
   const nm=r=>cell(r,0);
   const top=rows.slice(0,3);
-  const lines=[`DT KV QLTP Luân – ${title.replace(' · ',' – ')}:`,'',
-    `- DT ${dLbl}: ${cell(tot,iD)} / cần ${cell(tot,iN)} mỗi ngày → đạt ${cell(tot,iP)}`];
-  if(rows.length>1){lines.push('- Top 3 siêu thị đạt doanh thu ngày:');top.forEach((r,i)=>lines.push(`Top ${i+1}: ${nm(r)} – ${cell(r,iD)} (đạt ${cell(r,iP)})`))}
-  lines.push('',`Xem chi tiết: https://luan56605.app/`);
+  const pv=parseFloat(cell(tot,iP).replace(/\./g,'').replace(',','.'));const ok=isFinite(pv)&&pv>=100;
+  const lines=[`📊 DT KV QLTP Luân – ${title.replace(' · ',' – ')}`,'',
+    `💰 DT ${dLbl}: ${cell(tot,iD)}`,
+    `🎯 Cần mỗi ngày: ${cell(tot,iN)} → ${ok?'✅':'⚠️'} đạt ${cell(tot,iP)}`];
+  if(rows.length>1){lines.push('','🏆 Top 3 siêu thị bán tốt:');const md=['🥇','🥈','🥉'];top.forEach((r,i)=>lines.push(`${md[i]} ${nm(r)} – ${cell(r,iD)} (đạt ${cell(r,iP)})`))}
+  lines.push('',`👉 Xem chi tiết: https://luan56605.app/`);
   return{short,text:lines.join('\n')};
 }
 window.__goalSummary=goalSummary;
-function openZalo(){const s=goalSummary();$('zaloTxt').value=s?s.text:`DT KV QLTP Luân đã cập nhật số liệu.\n\nXem chi tiết: https://luan56605.app/`;$('zaloMsg').textContent='';openPanel('zaloPanel');$('zaloTxt').focus()}
+// Tóm tắt toàn khu vực (dùng cho thông báo đẩy) dù đang xem 1 siêu thị.
+function withAll(fn){const s=$('shopSel');if(!s||s.value==='all')return fn();
+  let ls=null;try{ls=localStorage.getItem('qltp-shop')}catch(e){}const old=s.value;
+  s.value='all';s.dispatchEvent(new Event('change'));let r;try{r=fn()}finally{
+  s.value=old;s.dispatchEvent(new Event('change'));try{if(ls!=null)localStorage.setItem('qltp-shop',ls)}catch(e){}}return r}
+const areaSummary=()=>withAll(goalSummary);
+// Ảnh mục Doanh thu toàn khu vực (vẽ xong đồng bộ rồi mới trả lại phạm vi đang xem).
+async function areaImage(){if(document.fonts&&document.fonts.ready)await document.fonts.ready;if(!window.__goalImage)return null;return withAll(()=>window.__goalImage())}
+window.__areaSummary=areaSummary;
+let ZIMG=null,ZURL=null;
+const zImgName=()=>{const t=($('goalTitle')||{}).textContent||'';const m=t.match(/(\d+)\/(\d+)\/(\d+)/);return `DT_KV_QLTP_Luan_${m?`${m[1]}-${m[2]}-${m[3]}`:vnToday()}.png`};
+async function makeZaloImg(){const im=$('zaloImg'),msg=$('zaloImgMsg');ZIMG=null;im.removeAttribute('src');msg.textContent='Đang tạo ảnh…';
+  ['zaloShare','zaloImgCopy'].forEach(i=>$(i).hidden=true);$('zaloImgDl').disabled=true;
+  try{const b=await areaImage();if(!b)throw new Error('no image');ZIMG=new File([b],zImgName(),{type:'image/png'});
+    if(ZURL)URL.revokeObjectURL(ZURL);ZURL=URL.createObjectURL(b);im.src=ZURL;$('zaloImgA').href=ZURL;msg.textContent='';$('zaloImgDl').disabled=false;
+    try{$('zaloShare').hidden=!(navigator.canShare&&navigator.canShare({files:[ZIMG]}))}catch(e){}
+    $('zaloImgCopy').hidden=!(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write)||/android|iphone|ipad/i.test(navigator.userAgent)}
+  catch(e){console.error(e);msg.textContent='Không tạo được ảnh. Hãy chụp màn hình thủ công.'}}
+function openZalo(){const s=goalSummary();$('zaloTxt').value=s?s.text:`DT KV QLTP Luân đã cập nhật số liệu.\n\nXem chi tiết: https://luan56605.app/`;$('zaloMsg').textContent='';openPanel('zaloPanel');$('zaloTxt').focus();makeZaloImg()}
+const zMsg=(t,ok)=>{const m=$('zaloMsg');m.className=ok?'msg-ok':'msg-err';m.textContent=t};
+$('zaloShare').onclick=async()=>{if(!ZIMG)return;const text=$('zaloTxt').value;
+  try{navigator.clipboard.writeText(text).catch(()=>{})}catch(e){}
+  try{await navigator.share({files:[ZIMG],text});zMsg('Đã mở chia sẻ. Nếu Zalo chỉ gửi ảnh, dán tin nhắn (đã sao chép sẵn) vào ô chat.',true)}
+  catch(e){if(e&&e.name!=='AbortError')zMsg('Không chia sẻ được, hãy dùng nút Tải ảnh.')}};
+$('zaloImgCopy').onclick=async()=>{if(!ZIMG)return;try{await navigator.clipboard.write([new ClipboardItem({'image/png':ZIMG})]);zMsg('Đã sao chép ảnh. Dán (Ctrl+V) vào Zalo, rồi sao chép và dán tin nhắn.',true)}catch(e){zMsg('Không sao chép ảnh được, hãy dùng nút Tải ảnh.')}};
+$('zaloImgDl').onclick=()=>{if(!ZIMG)return;const a=document.createElement('a');a.href=ZURL;a.download=ZIMG.name;document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),1000)};
 $('zaloCopy').onclick=async()=>{const ta=$('zaloTxt');let ok=false;try{await navigator.clipboard.writeText(ta.value);ok=true}catch(e){try{ta.select();ok=document.execCommand('copy')}catch(_){}}
   $('zaloMsg').className=ok?'msg-ok':'msg-err';$('zaloMsg').textContent=ok?'Đã sao chép. Mở Zalo và dán vào nhóm.':'Không sao chép tự động được, hãy bôi đen rồi sao chép thủ công.'};
 
@@ -1420,10 +1585,47 @@ function savedToast(){let v=null;try{v=sessionStorage.getItem('kvSaved');session
   let p={};try{p=JSON.parse(v)||{}}catch(e){}
   $('savedTxt').textContent='Đã lưu số liệu mới.'+(p.ok?` Đã gửi thông báo tới ${p.ok} máy.`:'');$('savedToast').hidden=false;
   $('savedZalo').onclick=()=>{$('savedToast').hidden=true;openZalo()};$('savedX').onclick=()=>{$('savedToast').hidden=true}}
-document.querySelectorAll('#usersPanel,#passPanel,#statsPanel,#pushPanel,#zaloPanel').forEach(p=>{
+document.querySelectorAll('#usersPanel,#passPanel,#statsPanel,#pushPanel,#zaloPanel,#backupPanel,#autoPanel').forEach(p=>{
   p.addEventListener('click',e=>{if(e.target===p||e.target.closest('[data-close]'))closePanel(p)});
   p.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel(p)});
 });
+
+// ---- thông báo tự động (quản trị)
+async function loadAuto(){const box=$('apBody'),m=$('apMsg');m.textContent='';m.className='msg-err';box.innerHTML='<p class="hint">Đang tải…</p>';
+  const r=await api('/api/autopush');if(!r.ok){box.innerHTML='';m.textContent=r.j.error||'Không tải được.';return}const j=r.j;
+  const last=l=>!l?'Chưa chạy lần nào.':`Lần chạy gần nhất: ${fmtTime(l.at)} · `+(l.skipped?esc(l.skipped):`đã gửi ${l.ok||0} máy${l.fail?`, lỗi ${l.fail}`:''}${l.skip?`, bỏ qua ${l.skip}`:''}`);
+  box.innerHTML=(j.cronSecret?'':`<p class="msg-err" style="margin:0 0 10px">Chưa cài biến <b>CRON_SECRET</b> trên Vercel nên lịch chưa chạy. Vào Vercel → Settings → Environment Variables, thêm CRON_SECRET (chuỗi ngẫu nhiên từ 16 ký tự) rồi Redeploy.</p>`)+
+    `<p class="hint">Gửi lên điện thoại các tài khoản đã bật thông báo. Quản trị và cập nhật dữ liệu nhận số liệu toàn khu vực; tài khoản chỉ xem nhận số liệu siêu thị của mình.</p>`+
+    Object.entries(j.jobs).map(([k,t])=>`<div class="ap-job"><div class="ap-row"><label><input type="checkbox" data-ap="${k}"${j.cfg[k]?' checked':''}>${esc(t)}</label><button class="btn" type="button" data-pv="${k}">Xem trước</button><button class="btn" type="button" data-ts="${k}">Gửi thử cho tôi</button></div><div class="ap-last">${last(j.log[k])}</div><div class="ap-pv" id="pv-${k}" hidden></div></div>`).join('');
+  box.querySelectorAll('[data-ap]').forEach(c=>c.onchange=async()=>{const r=await api('/api/autopush',{method:'POST',body:{cfg:{[c.dataset.ap]:c.checked}}});m.className=r.ok?'msg-ok':'msg-err';m.textContent=r.ok?(c.checked?'Đã bật.':'Đã tắt.'):(r.j.error||'Không lưu được.');if(!r.ok)c.checked=!c.checked});
+  box.querySelectorAll('[data-pv]').forEach(b=>b.onclick=async()=>{const k=b.dataset.pv,el=$('pv-'+k);if(!el.hidden){el.hidden=true;return}el.hidden=false;el.textContent='Đang tính…';
+    const r=await api('/api/cron/'+k+'?mode=preview');if(!r.ok){el.textContent=r.j.error||'Lỗi.';return}const p=r.j;
+    if(!p.area){el.textContent='Hiện chưa có số liệu phù hợp để gửi tin này (ví dụ: số liệu không phải tháng vừa qua).';return}
+    const ks=Object.keys(p.shops).sort((a,b)=>(p.names[a]||'').localeCompare(p.names[b]||'','vi'));
+    el.innerHTML=`<b>Toàn khu vực</b>${esc(p.area.title)}\n${esc(p.area.body)}\n\n<b>Tài khoản chỉ xem</b>${ks.length?`<select aria-label="Chọn siêu thị">${ks.map(s=>`<option value="${esc(s)}">${esc(p.names[s]||s)}</option>`).join('')}</select><span class="ap-shop"></span>`:'(không gửi cho tài khoản chỉ xem)'}`;if(!ks.length)return;
+    const sel=el.querySelector('select'),sp=el.querySelector('.ap-shop');const show=()=>{const x=p.shops[sel.value];sp.textContent=x?x.title+'\n'+x.body:'(không gửi cho tài khoản chỉ xem)'};sel.onchange=show;show()});
+  box.querySelectorAll('[data-ts]').forEach(b=>b.onclick=async()=>{b.disabled=true;m.className='msg-err';m.textContent='Đang gửi…';const r=await api('/api/cron/'+b.dataset.ts+'?mode=test');b.disabled=false;
+    if(r.ok&&r.j.ok>0){m.className='msg-ok';m.textContent=`Đã gửi thử tới ${r.j.ok} máy của bạn.`}else m.textContent=r.ok?(r.j.empty?'Chưa có số liệu phù hợp để gửi tin này.':'Máy của bạn chưa bật thông báo (Menu → Bật thông báo).'):(r.j.error||'Lỗi gửi.')});
+}
+
+// ---- sao lưu & khôi phục (quản trị)
+const dmy=iso=>{const [y,m,d]=iso.split('-');return `${+d}/${+m}/${y}`};
+const dataThru=b=>b&&b.day?`${b.day}/${b.m}/${b.y}`:'—';
+function dlJSON(obj,name){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(obj)],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000)}
+async function loadBackups(){const box=$('bkBody'),m=$('bkMsg');m.textContent='';m.className='msg-err';box.innerHTML='<p class="hint">Đang tải…</p>';
+  const r=await api('/api/backup');if(!r.ok){box.innerHTML='';m.textContent=r.j.error||'Không tải được danh sách sao lưu.';return}const j=r.j,c=j.current;
+  box.innerHTML=`<div class="bk-cur">Đang dùng: số liệu đến ngày <b>${dataThru(c)}</b>${c&&c.updatedAt?`, lưu lúc ${fmtTime(c.updatedAt)}${c.byName?' bởi '+esc(c.byName):''}`:''}${c&&c.restored?` <span class="muted">(khôi phục từ ${esc(c.restored)})</span>`:''}
+      <button class="btn" type="button" id="bkNow" style="margin-left:6px;padding:3px 10px;font-size:12px">Tải bản hiện tại</button></div>
+    ${j.undo?`<div class="bk-undo"><span>Số liệu trước lần khôi phục gần nhất: đến ngày <b>${dataThru(j.undo)}</b>${j.undo.updatedAt?`, lưu lúc ${fmtTime(j.undo.updatedAt)}`:''}.</span><button class="btn" type="button" id="bkUndo">Hoàn tác khôi phục</button></div>`:''}
+    <p class="hint">Mỗi ngày giữ 1 bản sao lưu là lần lưu cuối cùng trong ngày (giờ Việt Nam), giữ ${j.keepDays} ngày. Khôi phục sẽ thay số liệu đang dùng cho mọi người; số liệu hiện tại được giữ lại để hoàn tác.</p>
+    ${j.days.length?`<div class="tbl-wrap"><table class="utbl bktbl"><thead><tr><th class="l">Ngày lưu</th><th class="l">Lần lưu cuối</th><th>Dung lượng</th><th></th></tr></thead><tbody>${j.days.map((d,i)=>`<tr><td class="l"><b>${dmy(d.date)}</b>${i===0?' <small class="muted">(mới nhất)</small>':''}</td><td class="l">${new Date(d.savedAt).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Ho_Chi_Minh'})}</td><td>${(d.size/1024).toLocaleString('vi-VN',{maximumFractionDigits:0})} KB</td><td><button class="btn" type="button" data-dl="${d.date}">Tải về</button> <button class="btn primary" type="button" data-rs="${d.date}">Khôi phục</button></td></tr>`).join('')}</tbody></table></div>`:'<p class="hint">Chưa có bản sao lưu nào.</p>'}`;
+  $('bkNow').onclick=()=>{if(!window.__DOC)return;const d=new Date();dlJSON(window.__DOC,`Sao_luu_KV_QLTP_${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}.json`)};
+  box.querySelectorAll('[data-dl]').forEach(b=>b.onclick=async()=>{b.disabled=true;const r=await api('/api/backup?d='+b.dataset.dl);b.disabled=false;if(r.ok)dlJSON(r.j,`Sao_luu_KV_QLTP_${b.dataset.dl}.json`);else m.textContent=r.j.error||'Không tải được.'});
+  const act=async(body,ask,btn)=>{if(!confirm(ask))return;btn.disabled=true;m.className='msg-err';m.textContent='Đang khôi phục…';
+    const r=await api('/api/backup',{method:'POST',body});if(r.ok){m.className='msg-ok';m.textContent='Đã khôi phục. Đang tải lại…';await cDrop('doc');setTimeout(()=>location.reload(),600)}else{btn.disabled=false;m.textContent=r.j.error||'Khôi phục chưa thành công.'}};
+  box.querySelectorAll('[data-rs]').forEach(b=>b.onclick=()=>act({action:'restore',date:b.dataset.rs},`Khôi phục số liệu về bản sao lưu ngày ${dmy(b.dataset.rs)}?\nMọi người sẽ thấy số liệu của bản này. Có thể hoàn tác ngay sau đó.`,b));
+  const u=$('bkUndo');if(u)u.onclick=()=>act({action:'undo'},'Hoàn tác: quay lại số liệu trước lần khôi phục gần nhất?',u);
+}
 
 // ---- đổi mật khẩu
 $('passForm').onsubmit=async e=>{e.preventDefault();const m=$('passMsg');m.className='msg-err';m.textContent='';
@@ -1435,17 +1637,22 @@ $('passForm').onsubmit=async e=>{e.preventDefault();const m=$('passMsg');m.class
 // ---- quản lý tài khoản
 const ROLE_OPTS=[['admin','Quản trị'],['editor','Cập nhật dữ liệu'],['viewer','Chỉ xem']];
 function uMsg(t,ok){const m=$('usersMsg');m.className=ok?'msg-ok':'msg-err';m.textContent=t||''}
-async function loadUsers(){const r=await api('/api/users');if(!r.ok){uMsg(r.j.error||'Không tải được danh sách.');return}renderUsers(r.j)}
+async function loadUsers(){if(!$('nuS').options.length)$('nuS').innerHTML=shopOpts('');$('nuR').onchange=()=>{$('nuSWrap').hidden=$('nuR').value!=='viewer'};$('nuSWrap').hidden=$('nuR').value!=='viewer';const r=await api('/api/users');if(!r.ok){uMsg(r.j.error||'Không tải được danh sách.');return}renderUsers(r.j)}
+const allShops=()=>{const d=(window.__DOC||{}).data||{};const sh=d.shops||{};return Object.keys(sh).sort((a,b)=>(sh[a].name||'').localeCompare(sh[b].name||'','vi')).map(s=>[s,sh[s].name||s])};
+const shopOpts=v=>`<option value=""${!v?' selected':''}>— Chưa gán —</option><option value="all"${v==='all'?' selected':''}>Toàn khu vực</option>`+allShops().map(([s,n])=>`<option value="${esc(s)}"${v===s?' selected':''}>${esc(n)} (${esc(s)})</option>`).join('');
+const autoShop=u=>{const sh=((window.__DOC||{}).data||{}).shops||{};const k=Object.keys(sh).find(s=>sh[s].ql&&String(sh[s].ql)===u);return k?sh[k].name:''};
 function renderUsers(j){
   const me=window.__ME||{};
-  const rows=(j.envAdmin?[`<tr><td class="l"><b>${esc(j.envAdmin.u)}</b></td><td class="l">${esc(j.envAdmin.name)}</td><td class="l">Quản trị chính</td><td class="l muted note" colspan="2">Cài trong Vercel, không sửa ở đây</td></tr>`]:[])
+  const rows=(j.envAdmin?[`<tr><td class="l"><b>${esc(j.envAdmin.u)}</b></td><td class="l">${esc(j.envAdmin.name)}</td><td class="l">Quản trị chính</td><td class="l muted">Tất cả</td><td class="l muted note" colspan="2">Cài trong Vercel, không sửa ở đây</td></tr>`]:[])
     .concat((j.users||[]).map(u=>`<tr data-u="${esc(u.u)}"><td class="l"><b>${esc(u.u)}</b>${u.disabled?'<span class="tag-off">đã khóa</span>':''}</td><td class="l">${esc(u.name)}</td>
       <td class="l"><select data-act="role" aria-label="Quyền của ${esc(u.u)}">${ROLE_OPTS.map(([v,t])=>`<option value="${v}"${u.role===v?' selected':''}>${t}</option>`).join('')}</select></td>
+      <td class="l">${u.role==='viewer'?`<select data-act="shop" aria-label="Siêu thị của ${esc(u.u)}">${shopOpts(u.shop)}</select>${!u.shop&&autoShop(u.u)?`<br><small class="muted">Tự khớp: ${esc(autoShop(u.u))}</small>`:''}`:'<span class="muted">Tất cả</span>'}</td>
       <td class="l muted">${u.created?fmtTime(u.created):''}</td>
       <td><div class="acts"><button class="btn" type="button" data-act="reset">Đặt lại mật khẩu</button><button class="btn" type="button" data-act="toggle">${u.disabled?'Mở khóa':'Khóa'}</button>${u.u===me.u?'':'<button class="btn" type="button" data-act="delete">Xóa</button>'}</div></td></tr>`));
-  $('usersTbl').innerHTML=`<thead><tr><th class="l">Tên đăng nhập</th><th class="l">Tên hiển thị</th><th class="l">Quyền</th><th class="l">Ngày tạo</th><th></th></tr></thead><tbody>${rows.join('')||'<tr><td colspan="5" class="l muted">Chưa có tài khoản nào.</td></tr>'}</tbody>`;
+  $('usersTbl').innerHTML=`<thead><tr><th class="l">Tên đăng nhập</th><th class="l">Tên hiển thị</th><th class="l">Quyền</th><th class="l">Siêu thị được xem</th><th class="l">Ngày tạo</th><th></th></tr></thead><tbody>${rows.join('')||'<tr><td colspan="6" class="l muted">Chưa có tài khoản nào.</td></tr>'}</tbody>`;
   $('usersTbl').querySelectorAll('tr[data-u]').forEach(tr=>{const u=tr.dataset.u;
     tr.querySelector('[data-act="role"]').onchange=e=>act({action:'update',u,role:e.target.value},'Đã đổi quyền.');
+    const sh=tr.querySelector('[data-act="shop"]');if(sh)sh.onchange=e=>act({action:'update',u,shop:e.target.value},'Đã gán siêu thị.');
     tr.querySelector('[data-act="reset"]').onclick=()=>{const p=prompt(`Mật khẩu mới cho ${u} (ít nhất 6 ký tự):`);if(p)act({action:'reset',u,password:p},'Đã đặt lại mật khẩu. Gửi mật khẩu mới cho người dùng.')};
     tr.querySelector('[data-act="toggle"]').onclick=e=>act({action:'update',u,disabled:e.target.textContent==='Khóa'},'Đã cập nhật.');
     const d=tr.querySelector('[data-act="delete"]');if(d)d.onclick=()=>{if(confirm(`Xóa tài khoản ${u}?`))act({action:'delete',u},'Đã xóa.')};
@@ -1453,7 +1660,7 @@ function renderUsers(j){
 }
 async function act(body,okMsg){const r=await api('/api/users',{method:'POST',body});if(r.ok){uMsg(okMsg,true);loadUsers()}else{uMsg(r.j.error||'Không thực hiện được.');loadUsers()}}
 $('addUser').onsubmit=async e=>{e.preventDefault();
-  const r=await api('/api/users',{method:'POST',body:{action:'create',u:$('nuU').value,name:$('nuN').value,role:$('nuR').value,password:$('nuP').value}});
+  const r=await api('/api/users',{method:'POST',body:{action:'create',u:$('nuU').value,name:$('nuN').value,role:$('nuR').value,password:$('nuP').value,shop:$('nuR').value==='viewer'?$('nuS').value:''}});
   if(r.ok){uMsg(`Đã thêm ${$('nuU').value.trim().toLowerCase()}. Gửi tên đăng nhập và mật khẩu cho người dùng.`,true);e.target.reset();loadUsers()}else uMsg(r.j.error||'Không thêm được.')};
 
 // ---- chưa có dữ liệu: quản trị nạp file dữ liệu ban đầu
@@ -1468,32 +1675,82 @@ function showEmpty(me){
     catch(err){m.textContent=err.message}};
 }
 
+// ---- lưu sẵn trên máy (mở nhanh, xem được khi mất mạng). Đăng xuất / hết phiên thì xóa.
+const DC='kv-data-v1';
+async function cGet(){try{if(!('caches' in window))return null;const c=await caches.open(DC);const [m,d]=await Promise.all([c.match('/__me'),c.match('/__doc')]);if(!m||!d)return null;return{me:await m.json(),doc:await d.json()}}catch(e){return null}}
+async function cPut(k,obj){try{if(!('caches' in window))return;const c=await caches.open(DC);await c.put('/__'+k,new Response(JSON.stringify(obj),{headers:{'Content-Type':'application/json'}}))}catch(e){}}
+async function cDrop(k){try{if('caches' in window)await (await caches.open(DC)).delete('/__'+k)}catch(e){}}
+async function cClear(){try{if('caches' in window)await caches.delete(DC)}catch(e){}}
+window.__dropDoc=()=>cDrop('doc');
+function setOffline(on){const b=$('offBar');if(!on){b.hidden=true;return}const m=window.__META;
+  b.textContent=`Chưa kết nối mạng · đang xem số liệu lưu lúc ${m&&m.updatedAt?fmtTime(m.updatedAt):'trước đó'}. Có mạng lại sẽ tự cập nhật.`;b.hidden=false}
+// tải số liệu mới nhất, lưu sẵn rồi mở lại trang
+async function refreshData(){try{const d=await api('/api/data');if(d.ok){await cPut('doc',d.j);
+  const same=(d.j.meta||{}).updatedAt===(window.__META||{}).updatedAt;
+  // chống tải lại liên tục: tối đa 3 lần tự tải lại trong 1 phút
+  let n=[];try{n=JSON.parse(sessionStorage.getItem('kvRl')||'[]').filter(t=>Date.now()-t<60000)}catch(e){}
+  if(!same&&n.length<3){n.push(Date.now());try{sessionStorage.setItem('kvRl',JSON.stringify(n))}catch(e){}location.reload()}
+  return true}}catch(e){}return false}
+function bootApp(me,doc){
+  window.__ME=me;showUbar(me);window.__DOC=doc;window.__META=doc.meta||null;setUpd(window.__META);
+  const s=document.createElement('script');s.type='application/json';s.id='data';s.textContent=JSON.stringify(doc.data);document.body.appendChild(s);
+  $('bootMsg').hidden=true;$('appRoot').hidden=false;
+  const m=document.createElement('script');m.textContent=$('mainsrc').textContent;document.body.appendChild(m);savedToast();showShellNew();
+  setTimeout(syncRank,1500);
+}
+// số liệu hiện tại chưa có bảng xếp hạng tính sẵn (vd. vừa khôi phục bản sao lưu) thì gửi lên để tài khoản chỉ xem dùng
+async function syncRank(){const me=window.__ME||{},doc=window.__DOC;if(!(me.role==='admin'||me.role==='editor')||!doc||!doc.meta||!window.__RANK)return;
+  if(typeof PREVIEW_D!=='undefined'&&PREVIEW_D)return;const at=doc.meta.updatedAt;if(!at||doc.rankAt===at)return;
+  try{const r=await api('/api/rank',{method:'POST',body:{at,rank:window.__RANK}});if(r.ok||r.status===409){doc.rankAt=at;cPut('doc',doc)}}catch(e){}}
+// đã mở từ bản lưu trên máy: kiểm tra phiên đăng nhập và số liệu mới ở nền
+let revBusy=false;
+async function revalidate(){if(revBusy)return;revBusy=true;
+  try{let me;try{me=await api('/api/me')}catch(e){setOffline(true);return}
+    if(me.status===401){await cClear();location.reload();return}
+    if(!me.ok){if(me.status>=500)setOffline(true);return}
+    setOffline(false);
+    const old=window.__ME||{};await cPut('me',me.j);
+    if(old.role!==me.j.role||old.u!==me.j.u||(old.shop||'')!==(me.j.shop||'')){await cDrop('doc');location.reload();return}
+    recordView();pushInit();
+    let v=null;try{v=await api('/api/version')}catch(e){}
+    if(v&&v.ok&&v.j.updatedAt&&new Date(v.j.updatedAt)>new Date((window.__META||{}).updatedAt||0)){
+      if(!busy())await refreshData();
+      else{$('newDataTxt').textContent=`Đã có số liệu mới lưu lúc ${fmtTime(v.j.updatedAt)}.`;$('newData').hidden=false}}}
+  finally{revBusy=false}}
 // ---- khởi động
 async function start(){
+  if('serviceWorker' in navigator)swReady().catch(()=>{});
+  const c=await cGet();
+  if(c&&c.me&&c.doc&&c.doc.data){bootApp(c.me,c.doc);lastChk=Date.now();revalidate();return}
   let me;try{me=await api('/api/me')}catch(e){msg('Không kết nối được máy chủ. Kiểm tra mạng rồi tải lại trang.');return}
-  if(me.status===401){showLogin();return}
+  if(me.status===401){await cClear();showLogin();return}
   if(!me.ok){msg(esc(me.j.error||('Lỗi máy chủ ('+me.status+').')));return}
   window.__ME=me.j;showUbar(me.j);
   const d=await api('/api/data');
   if(d.status===404){showEmpty(me.j);return}
   if(!d.ok){msg(esc(d.j.error||('Không tải được số liệu ('+d.status+').')));return}
-  window.__DOC=d.j;window.__META=d.j.meta||null;setUpd(window.__META);recordView();pushInit();
-  const s=document.createElement('script');s.type='application/json';s.id='data';s.textContent=JSON.stringify(d.j.data);document.body.appendChild(s);
-  $('bootMsg').hidden=true;$('appRoot').hidden=false;
-  const m=document.createElement('script');m.textContent=$('mainsrc').textContent;document.body.appendChild(m);savedToast();
+  cPut('me',me.j);cPut('doc',d.j);
+  bootApp(me.j,d.j);recordView();pushInit();
 }
+addEventListener('online',()=>{if(window.__ME)revalidate()});
+addEventListener('offline',()=>{if(window.__ME)setOffline(true)});
+// có phiên bản dashboard mới (service worker báo sau khi tải ngầm)
+let SHELL_NEW=false;
+function showShellNew(){if(!SHELL_NEW||!window.__ME)return;$('newDataTxt').textContent='Đã có phiên bản dashboard mới.';$('newData').hidden=false;$('newDataBtn').onclick=()=>location.reload()}
+if('serviceWorker' in navigator)navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.type==='shell-updated'){SHELL_NEW=true;showShellNew()}});
+try{navigator.serviceWorker&&navigator.serviceWorker.startMessages()}catch(e){}
 start();
 // tự kiểm tra số liệu mới: khi quay lại app / tab và 5 phút một lần khi đang mở
 let lastChk=0,chkBusy=false;
-const busy=()=>!$('pvBar').hidden||!$('upPanel').hidden||['usersPanel','passPanel','statsPanel','pushPanel','zaloPanel'].some(i=>!$(i).hidden);
+const busy=()=>!$('pvBar').hidden||!$('upPanel').hidden||['usersPanel','passPanel','statsPanel','pushPanel','zaloPanel','backupPanel','autoPanel'].some(i=>!$(i).hidden);
 async function checkNew(auto){
   if(chkBusy||!window.__META||!window.__ME)return;const now=Date.now();if(now-lastChk<60000)return;lastChk=now;chkBusy=true;
   try{const r=await api('/api/version');if(!r.ok||!r.j.updatedAt)return;
     if(r.j.updatedAt!==window.__META.updatedAt&&new Date(r.j.updatedAt)>new Date(window.__META.updatedAt||0)){
-      if(auto&&!busy()){location.reload();return}
+      if(auto&&!busy()){if(!(await refreshData()))location.reload();return}
       const b=$('newData');$('newDataTxt').textContent=`Đã có số liệu mới lưu lúc ${fmtTime(r.j.updatedAt)}${r.j.byName||r.j.by?' bởi '+(r.j.byName||r.j.by):''}.`;b.hidden=false}}
   catch(e){}finally{chkBusy=false}}
-$('newDataBtn').onclick=()=>location.reload();
+$('newDataBtn').onclick=async()=>{$('newDataBtn').disabled=true;if(!(await refreshData()))location.reload()};
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){checkNew(true);recordView()}});
 addEventListener('pageshow',e=>{if(e.persisted)checkNew(true)});
 addEventListener('focus',()=>checkNew(true));
