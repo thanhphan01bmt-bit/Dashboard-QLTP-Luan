@@ -1157,32 +1157,33 @@ function render(){
   if(!L){lk.innerHTML='';lt.innerHTML='';ln.textContent='Chưa có dữ liệu. Tải file báo cáo nhập xuất Fresh lên để xem.'}
   else{
     const LGRP=c=>{const k=c.normalize('NFC').toLowerCase();if(/^th[uủ]y h[aả]i s[aả]n (nh[aậ]p kh[aẩ]u|t[aậ]p trung)$/.test(k))return 'Thủy Hải Sản Các Loại';if(/^th[iị]t (đ[iị]a ph[uư][oơ]ng|nh[aậ]p kh[aẩ]u)$/.test(k))return 'Thịt gia cầm gia súc các loại';return c};
-    const agg={};shops.forEach(s=>{const o=L.rows[s]||{};for(const c0 in o){const c=LGRP(c0);const a=agg[c]||(agg[c]=[0,0,0]);a[0]+=o[c0][0];a[1]+=o[c0][1];a[2]+=o[c0][2]}});
-    const cr=Object.entries(agg).filter(([c,a])=>a[0]>0).map(([c,a])=>({c,n:a[0],h:a[1],m:a[2],x:a[1]+a[2],r:(a[1]+a[2])/a[0]})).sort((a,b)=>b.r-a.r);
-    const TN=tot(cr.map(r=>r.n)),TH=tot(cr.map(r=>r.h)),TM=tot(cr.map(r=>r.m)),TX=TH+TM;const top=cr[0];
-    ln.textContent=`Tháng ${L.m}/${L.y}, lũy kế 1–${L.days}/${L.m} · SL hủy = SL hủy tồn + SL mất mát kiểm kê`;
+    const agg={};shops.forEach(s=>{const o=L.rows[s]||{};for(const c0 in o){const c=LGRP(c0);const a=agg[c]||(agg[c]=[0,0,0,0]);a[0]+=o[c0][0];a[1]+=o[c0][1];a[2]+=o[c0][2];a[3]+=o[c0][3]||0}});
+    const cr=Object.entries(agg).filter(([c,a])=>a[0]>0).map(([c,a])=>({c,n:a[0],h:a[1],m:a[2],x:a[1]+a[2],r:(a[1]+a[2])/a[0],b:a[3],rb:a[3]/a[0]})).sort((a,b)=>b.r-a.r);
+    const TN=tot(cr.map(r=>r.n)),TH=tot(cr.map(r=>r.h)),TM=tot(cr.map(r=>r.m)),TX=TH+TM,TB=tot(cr.map(r=>r.b));const top=cr[0];const HX=!!L.hasX;
+    const rbCell=(v,tag)=>HX?`<${tag}>${pct(v)}</${tag}>`:`<${tag} class="muted">—</${tag}>`;
+    ln.textContent=`Tháng ${L.m}/${L.y}, lũy kế 1–${L.days}/${L.m} · SL hủy = SL hủy tồn + SL mất mát kiểm kê · Bán / nhập = SL thực xuất ÷ SL thực nhập${HX?'':' (tải lại file nhập xuất Fresh để có tỷ lệ bán)'}`;
     lk.innerHTML=`<div class="fk"><span class="lbl">SL nhập</span><span class="val num">${f0.format(TN)}</span></div>`+
       `<div class="fk"><span class="lbl">SL hủy</span><span class="val num">${f0.format(TX)}</span></div>`+
       `<div class="fk"><span class="lbl">Tỷ lệ hủy / nhập</span><span class="val num">${TN?pct(TX/TN):'—'}</span></div>`+
       `<div class="fk"><span class="lbl">Ngành hủy cao nhất</span><span class="val" style="font-size:15px;line-height:1.35">${top?esc(top.c)+' · '+pct(top.r):'—'}</span></div>`;
     const rmax=Math.max(0.0001,...cr.map(r=>r.r));
-    let h='<thead><tr><th class="l">Ngành hàng</th><th>SL nhập</th><th>SL hủy</th><th class="l">Hủy / nhập</th></tr></thead><tbody>';
+    let h='<thead><tr><th class="l">Ngành hàng</th><th>SL nhập</th><th>SL hủy</th><th class="l">Hủy / nhập</th><th>Bán / nhập</th></tr></thead><tbody>';
     const topProducts=(grp)=>{if(!L.pr||!L.prod)return null;const acc={};
       shops.forEach(s=>{(L.pr[s]||[]).forEach(([p,n,x])=>{const info=L.prod[p];if(!info||LGRP(info[1])!==grp)return;const a=acc[p]||(acc[p]=[0,0]);a[0]+=n;a[1]+=x})});
       return Object.entries(acc).filter(([p,a])=>a[0]>=LOSS_MIN&&a[1]>0).map(([p,a])=>({p,nm:L.prod[p][0],n:a[0],x:a[1],r:a[1]/a[0]})).sort((a,b)=>b.r-a.r||b.x-a.x).slice(0,5)};
     const nf2=v=>Math.abs(v-Math.round(v))<1e-9?f0.format(v):f1.format(v);
     const detail=(grp)=>{const tp=topProducts(grp);
-      if(tp===null)return `<tr class="ldet"><td colspan="4"><div class="ldet-in">Chưa có dữ liệu theo sản phẩm. Tải lại file báo cáo nhập xuất Fresh để xem top sản phẩm.</div></td></tr>`;
-      if(!tp.length)return `<tr class="ldet"><td colspan="4"><div class="ldet-in">Không có sản phẩm nào có hủy (với SL nhập từ ${LOSS_MIN} trở lên).</div></td></tr>`;
-      return `<tr class="ldet"><td colspan="4"><div class="ldet-in"><div class="ldet-h">Top ${tp.length} sản phẩm hủy / nhập cao nhất · chỉ tính sản phẩm có SL nhập từ ${LOSS_MIN} trở lên</div>
+      if(tp===null)return `<tr class="ldet"><td colspan="5"><div class="ldet-in">Chưa có dữ liệu theo sản phẩm. Tải lại file báo cáo nhập xuất Fresh để xem top sản phẩm.</div></td></tr>`;
+      if(!tp.length)return `<tr class="ldet"><td colspan="5"><div class="ldet-in">Không có sản phẩm nào có hủy (với SL nhập từ ${LOSS_MIN} trở lên).</div></td></tr>`;
+      return `<tr class="ldet"><td colspan="5"><div class="ldet-in"><div class="ldet-h">Top ${tp.length} sản phẩm hủy / nhập cao nhất · chỉ tính sản phẩm có SL nhập từ ${LOSS_MIN} trở lên</div>
         <table class="ltop"><thead><tr><th class="l">#</th><th class="l">Sản phẩm</th><th>SL nhập</th><th>SL hủy</th><th>Hủy / nhập</th></tr></thead><tbody>`+
         tp.map((q,i)=>`<tr><td class="l">${i+1}</td><td class="l ltop-nm">${esc(q.nm)}<small>${esc(q.p)}</small></td><td>${nf2(q.n)}</td><td>${nf2(q.x)}</td><td class="neg"><b>${pct(q.r)}</b></td></tr>`).join('')+
         `</tbody></table></div></td></tr>`};
     if(lossOpen&&!cr.some(r=>r.c===lossOpen))lossOpen=null;
     cr.forEach(r=>{const w=Math.max(0,r.r)/rmax*100;const open=lossOpen===r.c;
       h+=`<tr class="lrow${open?' open':''}" tabindex="0" data-cat="${esc(r.c)}" aria-expanded="${open}"><td class="l"><span class="chev" aria-hidden="true"></span>${esc(r.c)}</td><td>${f0.format(r.n)}</td><td>${f0.format(r.x)}</td>
-      <td class="l"><span class="lbar"><i style="width:${w}%"></i></span><b>${pct(r.r)}</b></td></tr>`;if(open)h+=detail(r.c)});
-    h+=`</tbody><tfoot><tr><th class="l">Tổng</th><th>${f0.format(TN)}</th><th>${f0.format(TX)}</th><th class="l">${TN?pct(TX/TN):'—'}</th></tr></tfoot>`;
+      <td class="l"><span class="lbar"><i style="width:${w}%"></i></span><b>${pct(r.r)}</b></td>${rbCell(r.rb,'td')}</tr>`;if(open)h+=detail(r.c)});
+    h+=`</tbody><tfoot><tr><th class="l">Tổng</th><th>${f0.format(TN)}</th><th>${f0.format(TX)}</th><th class="l">${TN?pct(TX/TN):'—'}</th>${rbCell(TN?TB/TN:0,'th')}</tr></tfoot>`;
     lt.innerHTML=h;
   }
   const one=cur!=='all';['rankSec','freshShopHead','freshShopWrap'].forEach(id=>document.getElementById(id).hidden=one);
@@ -1273,12 +1274,12 @@ async function readFile(f){
   const need=(...ns)=>{const miss=ns.filter(n=>ix(n)<0);if(miss.length)throw new Error('Thiếu cột: '+miss.join(', '));return ns.map(ix)};
   if(ix('SL hủy tồn')>=0){
     const [cD,cS,cC,cN,cH,cM]=need('Ngày','Mã siêu thị','Ngành hàng - Phân tích','SL thực nhập','SL hủy tồn','SL mất mát kiểm kê');
-    const cP=ix('Mã sản phẩm'),cPN=ix('Tên sản phẩm');
+    const cP=ix('Mã sản phẩm'),cPN=ix('Tên sản phẩm'),cX=ix('SL thực xuất');
     let rowsL={},prA={},prod={},dl={},pdA={};let days=0,y=0,m=0,n=0;
     rows.forEach(r=>{const d=toYMD(r[cD]);if(!d)return;const code=nz(r[cS]).split(' - ')[0].trim();if(!code)return;const cat=nz(r[cC]);
       const k=d.y*100+d.m;if(k>y*100+m){y=d.y;m=d.m;days=0;rowsL={};prA={};prod={};dl={};pdA={};n=0}if(k<y*100+m)return;if(d.d>days)days=d.d;
-      const vn=numU(r[cN]),vh=numU(r[cH]),vm=numU(r[cM]);
-      const o=rowsL[code]||(rowsL[code]={});const a=o[cat]||(o[cat]=[0,0,0]);a[0]+=vn;a[1]+=vh;a[2]+=vm;n++;const ds=dl[code]||(dl[code]={});const dd=ds[d.d]||(ds[d.d]={});const dc=dd[cat]||(dd[cat]=[0,0]);dc[0]+=vn;dc[1]+=vh+vm;
+      const vn=numU(r[cN]),vh=numU(r[cH]),vm=numU(r[cM]),vx=cX>=0?numU(r[cX]):0;
+      const o=rowsL[code]||(rowsL[code]={});const a=o[cat]||(o[cat]=cX>=0?[0,0,0,0]:[0,0,0]);a[0]+=vn;a[1]+=vh;a[2]+=vm;if(cX>=0)a[3]+=vx;n++;const ds=dl[code]||(dl[code]={});const dd=ds[d.d]||(ds[d.d]={});const dc=dd[cat]||(dd[cat]=[0,0]);dc[0]+=vn;dc[1]+=vh+vm;
       if(cP>=0){const pc=nz(r[cP]);if(pc){if(!prod[pc])prod[pc]=[cPN>=0?nz(r[cPN]):pc,cat];const sp=prA[code]||(prA[code]={});const b=sp[pc]||(sp[pc]=[0,0]);b[0]+=vn;b[1]+=vh+vm;const pd=(pdA[code]||(pdA[code]={}));const pdd=pd[d.d]||(pd[d.d]={});const q=pdd[pc]||(pdd[pc]=[0,0]);q[0]+=vn;q[1]+=vh+vm}}});
     if(!n)throw new Error('Không đọc được ngày trong cột "Ngày".');
     const r3=v=>Math.round(v*1000)/1000;
@@ -1287,7 +1288,8 @@ async function readFile(f){
     const pr={};for(const s in prA){pr[s]=Object.entries(prA[s]).filter(([p,b])=>b[0]||b[1]).map(([p,b])=>[p,r3(b[0]),r3(b[1])])}
     // SP hủy nhiều nhất trong ngày cuối của file (mỗi siêu thị giữ 40 SP)
     const prd={day:days,s:{}};for(const s in pdA){const o=pdA[s][days];if(!o)continue;prd.s[s]=Object.entries(o).filter(([p,b])=>b[1]>0).sort((a,b)=>b[1][1]-a[1][1]).slice(0,40).map(([p,b])=>[p,r3(b[0]),r3(b[1])])}
-    return{kind:'loss',loss:cP>=0?{y,m,days,rows:rowsL,prod,pr,prd,daily:dl}:{y,m,days,rows:rowsL,daily:dl},label:'Nhập xuất Fresh (hủy)',desc:`tháng ${m}/${y}, đến ngày ${days}, ${fmtN.format(n)} dòng`}}
+    const LO=cP>=0?{y,m,days,rows:rowsL,prod,pr,prd,daily:dl}:{y,m,days,rows:rowsL,daily:dl};if(cX>=0)LO.hasX=true;
+    return{kind:'loss',loss:LO,label:'Nhập xuất Fresh (hủy)',desc:`tháng ${m}/${y}, đến ngày ${days}, ${fmtN.format(n)} dòng`}}
   const FRESH_CATS=new Set(['Thịt','Cá (Hải sản)','Rau Củ Quả CL','Trái cây','Trứng']);
   if(ix('Ngành hàng BHX')>=0){
     const [cD,cS,cC,cV]=need('Ngày xuất','Mã siêu thị','Ngành hàng BHX','Doanh thu');
