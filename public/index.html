@@ -1167,30 +1167,30 @@ function render(){
       `<div class="fk"><span class="lbl">Tỷ lệ hủy / nhập</span><span class="val num">${TN?pct(TX/TN):'—'}</span></div>`+
       `<div class="fk"><span class="lbl">Ngành hủy cao nhất</span><span class="val" style="font-size:15px;line-height:1.35">${top?esc(top.c)+' · '+pct(top.r):'—'}</span></div>`;
     const rmax=Math.max(0.0001,...cr.map(r=>r.r));
-    let h='<thead><tr><th class="l">Ngành hàng</th><th>SL nhập</th><th>SL hủy</th><th class="l">Hủy / nhập</th><th>Bán / nhập</th></tr></thead><tbody>';
+    let h='<thead><tr><th class="l">Ngành hàng</th><th>SL nhập</th><th>SL bán</th><th>SL hủy</th><th>Bán / nhập</th><th class="l">Hủy / nhập</th></tr></thead><tbody>';
     const topProducts=(grp)=>{if(!L.pr||!L.prod)return null;const acc={};
       shops.forEach(s=>{(L.pr[s]||[]).forEach(([p,n,x])=>{const info=L.prod[p];if(!info||LGRP(info[1])!==grp)return;const a=acc[p]||(acc[p]=[0,0]);a[0]+=n;a[1]+=x})});
       return Object.entries(acc).filter(([p,a])=>a[0]>=LOSS_MIN&&a[1]>0).map(([p,a])=>({p,nm:L.prod[p][0],n:a[0],x:a[1],r:a[1]/a[0]})).sort((a,b)=>b.r-a.r||b.x-a.x).slice(0,5)};
     const nf2=v=>Math.abs(v-Math.round(v))<1e-9?f0.format(v):f1.format(v);
     // xem toàn khu vực: bấm 1 ngành hàng -> tỷ lệ của từng siêu thị; xem 1 siêu thị -> top 5 sản phẩm hủy cao
     const shopDetail=(grp)=>{const rs=shops.map(s=>{const o=L.rows[s]||{};let n=0,h=0,x=0;for(const c0 in o){if(LGRP(c0)!==grp)continue;n+=o[c0][0];h+=o[c0][1]+o[c0][2];x+=o[c0][3]||0}return{s,n,h,x}}).filter(r=>r.n>0).sort((a,b)=>b.h/b.n-a.h/a.n);
-      if(!rs.length)return `<tr class="ldet"><td colspan="5"><div class="ldet-in">Không có siêu thị nào nhập ngành hàng này.</div></td></tr>`;
-      return `<tr class="ldet"><td colspan="5"><div class="ldet-in"><div class="ldet-h">${esc(grp)} theo siêu thị · ${rs.length} siêu thị · hủy / nhập cao nhất ở trên · bấm tên siêu thị để xem top 5 sản phẩm hủy</div>
-        <table class="ltop fxd"><thead><tr><th class="l fx-n">#</th><th class="l">Siêu thị</th><th>SL nhập</th><th>SL hủy</th><th>Hủy / nhập</th><th>Bán / nhập</th></tr></thead><tbody>`+
-        rs.map((r,i)=>`<tr tabindex="0" data-ls2="${r.s}" style="cursor:pointer"><td class="l fx-n">${i+1}</td><td class="l ltop-nm">${esc(shopName(r.s))}<small>${r.s}</small></td><td>${f0.format(r.n)}</td><td>${f0.format(r.h)}</td><td class="neg"><b>${pct(r.h/r.n)}</b></td><td>${HX?pct(r.x/r.n):'—'}</td></tr>`).join('')+
+      if(!rs.length)return `<tr class="ldet"><td colspan="6"><div class="ldet-in">Không có siêu thị nào nhập ngành hàng này.</div></td></tr>`;
+      return `<tr class="ldet"><td colspan="6"><div class="ldet-in"><div class="ldet-h">${esc(grp)} theo siêu thị · ${rs.length} siêu thị · hủy / nhập cao nhất ở trên · bấm tên siêu thị để xem top 5 sản phẩm hủy</div>
+        <table class="ltop fxd"><thead><tr><th class="l fx-n">#</th><th class="l">Siêu thị</th><th>SL nhập</th><th>SL bán</th><th>SL hủy</th><th>Bán / nhập</th><th>Hủy / nhập</th></tr></thead><tbody>`+
+        rs.map((r,i)=>`<tr tabindex="0" data-ls2="${r.s}" style="cursor:pointer"><td class="l fx-n">${i+1}</td><td class="l ltop-nm">${esc(shopName(r.s))}<small>${r.s}</small></td><td>${f0.format(r.n)}</td><td>${HX?f0.format(r.x):'—'}</td><td>${f0.format(r.h)}</td><td>${HX?pct(r.x/r.n):'—'}</td><td class="neg"><b>${pct(r.h/r.n)}</b></td></tr>`).join('')+
         `</tbody></table></div></td></tr>`};
     const detail=(grp)=>{if(shops.length>1)return shopDetail(grp);const tp=topProducts(grp);
-      if(tp===null)return `<tr class="ldet"><td colspan="5"><div class="ldet-in">Chưa có dữ liệu theo sản phẩm. Tải lại file báo cáo nhập xuất Fresh để xem top sản phẩm.</div></td></tr>`;
-      if(!tp.length)return `<tr class="ldet"><td colspan="5"><div class="ldet-in">Không có sản phẩm nào có hủy (với SL nhập từ ${LOSS_MIN} trở lên).</div></td></tr>`;
-      return `<tr class="ldet"><td colspan="5"><div class="ldet-in"><div class="ldet-h">Top ${tp.length} sản phẩm hủy / nhập cao nhất · chỉ tính sản phẩm có SL nhập từ ${LOSS_MIN} trở lên</div>
+      if(tp===null)return `<tr class="ldet"><td colspan="6"><div class="ldet-in">Chưa có dữ liệu theo sản phẩm. Tải lại file báo cáo nhập xuất Fresh để xem top sản phẩm.</div></td></tr>`;
+      if(!tp.length)return `<tr class="ldet"><td colspan="6"><div class="ldet-in">Không có sản phẩm nào có hủy (với SL nhập từ ${LOSS_MIN} trở lên).</div></td></tr>`;
+      return `<tr class="ldet"><td colspan="6"><div class="ldet-in"><div class="ldet-h">Top ${tp.length} sản phẩm hủy / nhập cao nhất · chỉ tính sản phẩm có SL nhập từ ${LOSS_MIN} trở lên</div>
         <table class="ltop"><thead><tr><th class="l">#</th><th class="l">Sản phẩm</th><th>SL nhập</th><th>SL hủy</th><th>Hủy / nhập</th></tr></thead><tbody>`+
         tp.map((q,i)=>`<tr><td class="l">${i+1}</td><td class="l ltop-nm">${esc(q.nm)}<small>${esc(q.p)}</small></td><td>${nf2(q.n)}</td><td>${nf2(q.x)}</td><td class="neg"><b>${pct(q.r)}</b></td></tr>`).join('')+
         `</tbody></table></div></td></tr>`};
     if(lossOpen&&!cr.some(r=>r.c===lossOpen))lossOpen=null;
     cr.forEach(r=>{const w=Math.max(0,r.r)/rmax*100;const open=lossOpen===r.c;
-      h+=`<tr class="lrow${open?' open':''}" tabindex="0" data-cat="${esc(r.c)}" aria-expanded="${open}"><td class="l"><span class="chev" aria-hidden="true"></span>${esc(r.c)}</td><td>${f0.format(r.n)}</td><td>${f0.format(r.x)}</td>
-      <td class="l"><span class="lbar"><i style="width:${w}%"></i></span><b>${pct(r.r)}</b></td>${rbCell(r.rb,'td')}</tr>`;if(open)h+=detail(r.c)});
-    h+=`</tbody><tfoot><tr><th class="l">Tổng</th><th>${f0.format(TN)}</th><th>${f0.format(TX)}</th><th class="l">${TN?pct(TX/TN):'—'}</th>${rbCell(TN?TB/TN:0,'th')}</tr></tfoot>`;
+      h+=`<tr class="lrow${open?' open':''}" tabindex="0" data-cat="${esc(r.c)}" aria-expanded="${open}"><td class="l"><span class="chev" aria-hidden="true"></span>${esc(r.c)}</td><td>${f0.format(r.n)}</td><td>${HX?f0.format(r.b):'—'}</td><td>${f0.format(r.x)}</td>${rbCell(r.rb,'td')}
+      <td class="l"><span class="lbar"><i style="width:${w}%"></i></span><b>${pct(r.r)}</b></td></tr>`;if(open)h+=detail(r.c)});
+    h+=`</tbody><tfoot><tr><th class="l">Tổng</th><th>${f0.format(TN)}</th><th>${HX?f0.format(TB):'—'}</th><th>${f0.format(TX)}</th>${rbCell(TN?TB/TN:0,'th')}<th class="l">${TN?pct(TX/TN):'—'}</th></tr></tfoot>`;
     lt.innerHTML=h;
   }
   const one=cur!=='all';['rankSec','freshShopHead','freshShopWrap'].forEach(id=>document.getElementById(id).hidden=one);
