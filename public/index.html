@@ -604,7 +604,7 @@ body.pv .wrap{padding-bottom:120px}
 
   <section class="card" id="lossSec">
     <div class="sec-title"><h2>Tỷ lệ hủy / nhập theo ngành hàng Fresh</h2><span class="note" id="lossNote"></span></div>
-    <p class="lhint">Bấm vào một ngành hàng để xem top 5 sản phẩm có tỷ lệ hủy cao nhất.</p>
+    <p class="lhint">Bấm vào một ngành hàng: khi xem toàn khu vực sẽ hiện tỷ lệ hủy / nhập của từng siêu thị; khi xem 1 siêu thị sẽ hiện top 5 sản phẩm có tỷ lệ hủy cao nhất.</p>
     <div class="fresh-kpis" id="lossKpis"></div>
     <div class="tbl-wrap"><table id="lossTbl"></table></div>
   </section>
@@ -1172,7 +1172,14 @@ function render(){
       shops.forEach(s=>{(L.pr[s]||[]).forEach(([p,n,x])=>{const info=L.prod[p];if(!info||LGRP(info[1])!==grp)return;const a=acc[p]||(acc[p]=[0,0]);a[0]+=n;a[1]+=x})});
       return Object.entries(acc).filter(([p,a])=>a[0]>=LOSS_MIN&&a[1]>0).map(([p,a])=>({p,nm:L.prod[p][0],n:a[0],x:a[1],r:a[1]/a[0]})).sort((a,b)=>b.r-a.r||b.x-a.x).slice(0,5)};
     const nf2=v=>Math.abs(v-Math.round(v))<1e-9?f0.format(v):f1.format(v);
-    const detail=(grp)=>{const tp=topProducts(grp);
+    // xem toàn khu vực: bấm 1 ngành hàng -> tỷ lệ của từng siêu thị; xem 1 siêu thị -> top 5 sản phẩm hủy cao
+    const shopDetail=(grp)=>{const rs=shops.map(s=>{const o=L.rows[s]||{};let n=0,h=0,x=0;for(const c0 in o){if(LGRP(c0)!==grp)continue;n+=o[c0][0];h+=o[c0][1]+o[c0][2];x+=o[c0][3]||0}return{s,n,h,x}}).filter(r=>r.n>0).sort((a,b)=>b.h/b.n-a.h/a.n);
+      if(!rs.length)return `<tr class="ldet"><td colspan="5"><div class="ldet-in">Không có siêu thị nào nhập ngành hàng này.</div></td></tr>`;
+      return `<tr class="ldet"><td colspan="5"><div class="ldet-in"><div class="ldet-h">${esc(grp)} theo siêu thị · ${rs.length} siêu thị · hủy / nhập cao nhất ở trên · bấm tên siêu thị để xem top 5 sản phẩm hủy</div>
+        <table class="ltop fxd"><thead><tr><th class="l fx-n">#</th><th class="l">Siêu thị</th><th>SL nhập</th><th>SL hủy</th><th>Hủy / nhập</th><th>Bán / nhập</th></tr></thead><tbody>`+
+        rs.map((r,i)=>`<tr tabindex="0" data-ls2="${r.s}" style="cursor:pointer"><td class="l fx-n">${i+1}</td><td class="l ltop-nm">${esc(shopName(r.s))}<small>${r.s}</small></td><td>${f0.format(r.n)}</td><td>${f0.format(r.h)}</td><td class="neg"><b>${pct(r.h/r.n)}</b></td><td>${HX?pct(r.x/r.n):'—'}</td></tr>`).join('')+
+        `</tbody></table></div></td></tr>`};
+    const detail=(grp)=>{if(shops.length>1)return shopDetail(grp);const tp=topProducts(grp);
       if(tp===null)return `<tr class="ldet"><td colspan="5"><div class="ldet-in">Chưa có dữ liệu theo sản phẩm. Tải lại file báo cáo nhập xuất Fresh để xem top sản phẩm.</div></td></tr>`;
       if(!tp.length)return `<tr class="ldet"><td colspan="5"><div class="ldet-in">Không có sản phẩm nào có hủy (với SL nhập từ ${LOSS_MIN} trở lên).</div></td></tr>`;
       return `<tr class="ldet"><td colspan="5"><div class="ldet-in"><div class="ldet-h">Top ${tp.length} sản phẩm hủy / nhập cao nhất · chỉ tính sản phẩm có SL nhập từ ${LOSS_MIN} trở lên</div>
@@ -1193,7 +1200,7 @@ function rowClick(e){const tr=e.target.closest('tr[data-s]');if(!tr)return;setSh
 {const ft0=document.getElementById('freshCatTbl');const tog=e=>{const sr=e.target.closest('tr[data-fs]');if(sr){setShop(sr.dataset.fs);return}
   const tr=e.target.closest('tr[data-fcat]');if(!tr)return;const c=tr.dataset.fcat;freshOpen=freshOpen===c?null:c;render();const n=document.querySelector(`#freshCatTbl tr[data-fcat="${CSS.escape(c)}"]`);n&&n.focus()};
   ft0.addEventListener('click',tog);ft0.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog(e)}})}
-{const lt0=document.getElementById('lossTbl');const tog=e=>{const tr=e.target.closest('tr.lrow');if(!tr)return;const c=tr.dataset.cat;lossOpen=lossOpen===c?null:c;render();const n=document.querySelector(`#lossTbl tr.lrow[data-cat="${CSS.escape(c)}"]`);n&&n.focus()};
+{const lt0=document.getElementById('lossTbl');const tog=e=>{const sr=e.target.closest('tr[data-ls2]');if(sr){setShop(sr.dataset.ls2);return}const tr=e.target.closest('tr.lrow');if(!tr)return;const c=tr.dataset.cat;lossOpen=lossOpen===c?null:c;render();const n=document.querySelector(`#lossTbl tr.lrow[data-cat="${CSS.escape(c)}"]`);n&&n.focus()};
   lt0.addEventListener('click',tog);lt0.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog(e)}})}
 {const ct=document.getElementById('compTbl');const go=e=>{const tr=e.target.closest('tr[data-s]');if(!tr)return;setShop(tr.dataset.s);setView('dash')};
   ct.addEventListener('click',go);ct.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go(e)}})}
