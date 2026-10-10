@@ -203,7 +203,8 @@ td.dt-big b{font-size:15px}
 .bk-cur{background:var(--accent-soft);border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:10px;line-height:1.55}.bk-undo{background:var(--warn-bg);border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.bk-undo span{flex:1;min-width:200px}
 .bktbl td .btn{padding:3px 10px;font-size:12px}.bktbl td:last-child{white-space:nowrap}
 .zimg{margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:10px}.zimg-h{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px;font-size:13px}.zimg-h .btn{padding:4px 10px;font-size:12.5px}
-#zaloImg{display:block;width:100%;max-height:260px;object-fit:contain;object-position:top;background:#fff;border-radius:6px;border:1px solid var(--line)}#zaloImg:not([src]){display:none}
+.zimg-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:12px;font-size:13px}.zimg-top .btn{margin-left:auto;padding:4px 10px;font-size:12.5px}
+.zimg img{display:block;width:100%;max-height:220px;object-fit:contain;object-position:top;background:#fff;border-radius:6px;border:1px solid var(--line)}.zimg img:not([src]){display:none}
 #goalPdf{padding:6px 12px}#goalPdf[disabled]{opacity:.6;cursor:progress}
 #goalTbl th.grp{text-align:center;border-bottom:1px solid var(--axis);background:var(--surface)}
 #goalTbl td.need{background:var(--accent-soft);font-weight:700;color:var(--ink)}
@@ -466,10 +467,10 @@ body.pv .wrap{padding-bottom:120px}
 <div class="ov" id="zaloPanel" hidden>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="zaloTitle" style="max-width:560px">
     <div class="sec-title"><h2 id="zaloTitle">Tin nhắn gửi nhóm</h2><button class="btn" type="button" data-close>Đóng</button></div>
-    <p class="hint">Tin nhắn soạn sẵn theo số liệu đang hiển thị. Sửa nếu cần, bấm <b>Sao chép</b> rồi dán vào nhóm Zalo. Trên điện thoại, bấm <b>Chia sẻ ảnh + tin</b> rồi chọn Zalo để gửi kèm ảnh.</p>
+    <p class="hint">Tin nhắn soạn sẵn theo số liệu đang hiển thị. Sửa nếu cần, bấm <b>Sao chép</b> rồi dán vào nhóm Zalo. Trên điện thoại, bấm <b>Chia sẻ ảnh + tin</b> rồi chọn Zalo để gửi kèm cả 3 ảnh.</p>
     <textarea id="zaloTxt" rows="9" class="zalo-ta"></textarea>
-    <div class="zimg"><div class="zimg-h"><b>Ảnh mục Doanh thu</b> <small class="muted">(toàn khu vực)</small><span class="row" style="gap:6px;margin-left:auto"><button class="btn" type="button" id="zaloShare" hidden>Chia sẻ ảnh + tin</button><button class="btn" type="button" id="zaloImgCopy" hidden>Sao chép ảnh</button><button class="btn" type="button" id="zaloImgDl">Tải ảnh</button></span></div>
-      <a id="zaloImgA" target="_blank" rel="noopener"><img id="zaloImg" alt="Ảnh bảng doanh thu mục tiêu ngày"></a><p class="muted" id="zaloImgMsg" style="font-size:12px;margin:4px 0 0">Đang tạo ảnh…</p></div>
+    <div class="zimg-top"><b>Ảnh gửi kèm</b> <small class="muted">(toàn khu vực)</small><button class="btn" type="button" id="zaloShare" hidden>Chia sẻ ảnh + tin</button></div>
+    <div id="zImgs"></div>
     <div class="row" style="justify-content:space-between;margin-top:10px"><span class="msg-ok" id="zaloMsg" role="status"></span><span class="row" style="gap:8px"><button class="btn primary" type="button" id="zaloCopy">Sao chép</button></span></div>
   </div>
 </div>
@@ -678,11 +679,12 @@ async function renderGoalPages(opt={}){
   const txt=(t,x,yy,font,col,align='left')=>{ctx.font=font;ctx.fillStyle=col;ctx.textAlign=align;ctx.fillText(t,x,yy)};
   const T=id=>(document.getElementById(id)||{}).textContent||'';
   txt(T('goalTitle'),MG,y+14,`700 26px ${F}`,C.ink);y+=40;
-  const sub=[T('goalNote'),(document.querySelector('.view-only')||{}).textContent||'',T('goalHint')].filter(Boolean).join('  ·  ');
-  txt(sub,MG,y+8,`400 15px ${F}`,C.ink2);y+=34;
+  const noteEl=document.querySelector('#goalNote .lg')||document.getElementById('goalNote');
+  const sub=[(noteEl||{}).textContent||'',(document.querySelector('.view-only')||{}).textContent||'',T('goalHint')].filter(Boolean).join('  ·  ');
+  if(!opt.secs){txt(sub,MG,y+8,`400 15px ${F}`,C.ink2);y+=34}else y+=6;
   const wrapLines=(t,font,maxW)=>{ctx.font=font;const words=t.split(' ');const out=[];let line='';for(const w of words){const tt=line?line+' '+w:w;if(ctx.measureText(tt).width>maxW&&line){out.push(line);line=w}else line=tt}if(line)out.push(line);return out};
   const table=(title,tbl)=>{
-    const rows=[...tbl.querySelectorAll('tr')].map(tr=>({kind:tr.parentElement.tagName,cells:[...tr.children].map(td=>{const pill=td.querySelector('.pill');const small=td.querySelector('small');
+    const rows=[...tbl.querySelectorAll('tr')].filter(tr=>!tr.classList.contains('lxd')).map(tr=>({kind:tr.parentElement.tagName,cells:[...tr.children].map(td=>{const pill=td.querySelector('.pill');const small=td.querySelector('small');
       return{t:(pill?pill.textContent+(small?'  '+small.textContent:''):td.textContent).replace(/\s+/g,' ').trim(),left:td.classList.contains('l')||td===tr.children[0],
         col:td.classList.contains('pos')||td.querySelector('.pos')?'pos':td.classList.contains('neg')||td.querySelector('.neg')?'neg':'',pill:pill?(pill.classList.contains('up')?'up':'down'):null,need:td.classList.contains('need'),bold:!!td.querySelector('b')||td.tagName==='TH'}})}));
     if(!rows.length)return;
@@ -705,8 +707,8 @@ async function renderGoalPages(opt={}){
     head.forEach(drawRow);
     rows.filter(r=>r.kind!=='THEAD').forEach(drawRow);
     y+=20};
-  table(T('gh1'),document.getElementById('goalTbl'));
-  if(opt.image){// ảnh PNG chỉ gồm mục Doanh thu, để gửi kèm tin nhắn nhóm
+  if(opt.secs)opt.secs.forEach(([g,t])=>table(T(g),document.getElementById(t)));else table(T('gh1'),document.getElementById('goalTbl'));
+  if(opt.image){// ảnh PNG của 1 hoặc vài mục, để gửi kèm tin nhắn nhóm
     const ch=y+MG-20,im=document.createElement('canvas');im.width=PW*2;im.height=ch*2;const g=im.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,im.width,im.height);
     g.drawImage(cv,0,0,PW*2,ch*2,0,0,PW*2,ch*2);g.font=`400 22px ${F}`;g.fillStyle=C.muted;g.textAlign='right';g.textBaseline='middle';g.fillText('Doanh thu KV QLTP Luân · luan56605.app',PW*2-MG*2,ch*2-28);
     return await new Promise(r=>im.toBlob(r,'image/png'))}
@@ -721,7 +723,7 @@ async function renderGoalPages(opt={}){
   const b=await new Promise(r=>out.toBlob(r,'image/jpeg',0.9));const out2=[{jpg:new Uint8Array(await b.arrayBuffer()),w:OW,h:OH}];
   return out2;
 }
-window.__goalImage=()=>renderGoalPages({image:true});
+window.__goalImage=secs=>renderGoalPages({image:true,secs});
 async function exportGoalPdf(btn,filename){
   const old=btn.innerHTML;btn.disabled=true;btn.textContent='Đang tạo PDF…';
   try{
@@ -977,9 +979,9 @@ function render(){
     h+=R3.length>1?`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th>${q1(N)}</th><th>${HX?q1(X):'—'}</th><th>${q1(H)}</th><th>${HX?rp(X,N):'—'}</th><th>${rp(H,N)}</th></tr></tfoot>`:'</tbody>';le.innerHTML=h;
     const R4=scope.map(s=>({s,...sumC(s,EGG)})).filter(r=>r.n||r.x).sort((a,b)=>(a.n?a.x/a.n:9)-(b.n?b.x/b.n:9));
     let N4=0,X4=0;let e=`<thead><tr><th class="l">Siêu thị</th><th>SL nhập</th><th>SL bán</th><th>Bán / nhập</th></tr></thead><tbody>${HX?'':noX.replace('colspan="6"','colspan="4"')}`;
-    R4.forEach(r=>{N4+=r.n;X4+=r.x;e+=`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(shopName(r.s))}</td><td>${q0(r.n)}</td><td>${HX?q0(r.x):'—'}</td><td><b>${HX?rp(r.x,r.n):'—'}</b></td></tr>`});
+    R4.forEach(r=>{N4+=r.n;X4+=r.x;e+=`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(shopName(r.s))}</td><td>${q0(r.n)}</td><td>${HX?q0(r.x):'—'}</td><td class="${HX&&r.n>0&&r.x/r.n<1?'neg':''}"><b>${HX?rp(r.x,r.n):'—'}</b></td></tr>`});
     if(!R4.length)e+=`<tr><td colspan="4" class="l muted">Không có nhập / bán trứng ${dayLb}.</td></tr>`;
-    e+=R4.length>1?`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th>${q0(N4)}</th><th>${HX?q0(X4):'—'}</th><th>${HX?rp(X4,N4):'—'}</th></tr></tfoot>`:'</tbody>';ee.innerHTML=e}
+    e+=R4.length>1?`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th>${q0(N4)}</th><th>${HX?q0(X4):'—'}</th><th class="${HX&&N4>0&&X4/N4<1?'neg':''}">${HX?rp(X4,N4):'—'}</th></tr></tfoot>`:'</tbody>';ee.innerHTML=e}
    // bấm 1 siêu thị ở mục Hủy: hiện / ẩn 3 SP thủy hải sản hủy nhiều nhất
    if(ld){
     const topLoss=s=>{let arr=null,lbl='';const P=L.prd&&L.prd.day===ld&&L.prd.s?L.prd.s[s]:null;
@@ -1550,25 +1552,28 @@ function withAll(fn){const s=$('shopSel');if(!s||s.value==='all')return fn();
   s.value=old;s.dispatchEvent(new Event('change'));try{if(ls!=null)localStorage.setItem('qltp-shop',ls)}catch(e){}}return r}
 const areaSummary=()=>withAll(goalSummary);
 // Ảnh mục Doanh thu toàn khu vực (vẽ xong đồng bộ rồi mới trả lại phạm vi đang xem).
-async function areaImage(){if(document.fonts&&document.fonts.ready)await document.fonts.ready;if(!window.__goalImage)return null;return withAll(()=>window.__goalImage())}
+async function areaImage(secs){if(document.fonts&&document.fonts.ready)await document.fonts.ready;if(!window.__goalImage)return null;return withAll(()=>window.__goalImage(secs))}
 window.__areaSummary=areaSummary;
-let ZIMG=null,ZURL=null;
-const zImgName=()=>{const t=($('goalTitle')||{}).textContent||'';const m=t.match(/(\d+)\/(\d+)\/(\d+)/);return `DT_KV_QLTP_Luan_${m?`${m[1]}-${m[2]}-${m[3]}`:vnToday()}.png`};
-async function makeZaloImg(){const im=$('zaloImg'),msg=$('zaloImgMsg');ZIMG=null;im.removeAttribute('src');msg.textContent='Đang tạo ảnh…';
-  ['zaloShare','zaloImgCopy'].forEach(i=>$(i).hidden=true);$('zaloImgDl').disabled=true;
-  try{const b=await areaImage();if(!b)throw new Error('no image');ZIMG=new File([b],zImgName(),{type:'image/png'});
-    if(ZURL)URL.revokeObjectURL(ZURL);ZURL=URL.createObjectURL(b);im.src=ZURL;$('zaloImgA').href=ZURL;msg.textContent='';$('zaloImgDl').disabled=false;
-    try{$('zaloShare').hidden=!(navigator.canShare&&navigator.canShare({files:[ZIMG]}))}catch(e){}
-    $('zaloImgCopy').hidden=!(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write)||/android|iphone|ipad/i.test(navigator.userAgent)}
-  catch(e){console.error(e);msg.textContent='Không tạo được ảnh. Hãy chụp màn hình thủ công.'}}
+const ZSECS=[{k:'dt',t:'Doanh thu',secs:[['gh1','goalTbl']]},{k:'ths',t:'Hủy thủy hải sản',secs:[['gh3','goalLoss']]},{k:'egg',t:'Tỷ lệ bán trứng',secs:[['gh4','goalEgg']]}];
+let ZIMGS=[];
+const zDate=()=>{const t=($('goalTitle')||{}).textContent||'';const m=t.match(/(\d+)\/(\d+)\/(\d+)/);return m?`${m[1]}-${m[2]}-${m[3]}`:vnToday()};
+async function makeZaloImg(){const box=$('zImgs');ZIMGS.forEach(z=>z.url&&URL.revokeObjectURL(z.url));ZIMGS=[];$('zaloShare').hidden=true;
+  const canCopy=!!(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write)&&!/android|iphone|ipad/i.test(navigator.userAgent);
+  box.innerHTML=ZSECS.map(z=>`<div class="zimg" id="zi-${z.k}"><div class="zimg-h"><b>${z.t}</b><span class="row" style="gap:6px;margin-left:auto">${canCopy?`<button class="btn" type="button" data-zc="${z.k}" disabled>Sao chép ảnh</button>`:''}<button class="btn" type="button" data-zd="${z.k}" disabled>Tải ảnh</button></span></div><a target="_blank" rel="noopener"><img alt="Ảnh ${z.t}"></a><p class="muted" style="font-size:12px;margin:4px 0 0">Đang tạo ảnh…</p></div>`).join('');
+  for(const z of ZSECS){const el=$('zi-'+z.k),msg=el.querySelector('p');
+    try{const b=await areaImage(z.secs);if(!b)throw new Error('no image');const file=new File([b],`${z.t.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/gi,'d').replace(/\s+/g,'_')}_${zDate()}.png`,{type:'image/png'});const url=URL.createObjectURL(b);
+      ZIMGS.push({...z,file,url});el.querySelector('img').src=url;el.querySelector('a').href=url;msg.textContent='';el.querySelectorAll('button').forEach(x=>x.disabled=false)}
+    catch(e){console.error(e);msg.textContent='Không tạo được ảnh. Hãy chụp màn hình thủ công.'}}
+  try{const fs=ZIMGS.map(z=>z.file);$('zaloShare').hidden=!(fs.length&&navigator.canShare&&navigator.canShare({files:fs}))}catch(e){}}
 function openZalo(){const s=goalSummary();$('zaloTxt').value=s?s.text:`DT KV QLTP Luân đã cập nhật số liệu.\n\nXem chi tiết: https://luan56605.app/`;$('zaloMsg').textContent='';openPanel('zaloPanel');$('zaloTxt').focus();makeZaloImg()}
 const zMsg=(t,ok)=>{const m=$('zaloMsg');m.className=ok?'msg-ok':'msg-err';m.textContent=t};
-$('zaloShare').onclick=async()=>{if(!ZIMG)return;const text=$('zaloTxt').value;
+$('zaloShare').onclick=async()=>{if(!ZIMGS.length)return;const text=$('zaloTxt').value;
   try{navigator.clipboard.writeText(text).catch(()=>{})}catch(e){}
-  try{await navigator.share({files:[ZIMG],text});zMsg('Đã mở chia sẻ. Nếu Zalo chỉ gửi ảnh, dán tin nhắn (đã sao chép sẵn) vào ô chat.',true)}
+  try{await navigator.share({files:ZIMGS.map(z=>z.file),text});zMsg('Đã mở chia sẻ. Nếu Zalo chỉ gửi ảnh, dán tin nhắn (đã sao chép sẵn) vào ô chat.',true)}
   catch(e){if(e&&e.name!=='AbortError')zMsg('Không chia sẻ được, hãy dùng nút Tải ảnh.')}};
-$('zaloImgCopy').onclick=async()=>{if(!ZIMG)return;try{await navigator.clipboard.write([new ClipboardItem({'image/png':ZIMG})]);zMsg('Đã sao chép ảnh. Dán (Ctrl+V) vào Zalo, rồi sao chép và dán tin nhắn.',true)}catch(e){zMsg('Không sao chép ảnh được, hãy dùng nút Tải ảnh.')}};
-$('zaloImgDl').onclick=()=>{if(!ZIMG)return;const a=document.createElement('a');a.href=ZURL;a.download=ZIMG.name;document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),1000)};
+$('zImgs').onclick=async e=>{const c=e.target.closest('[data-zc]'),d=e.target.closest('[data-zd]');const z=ZIMGS.find(x=>x.k===(c||d||{}).dataset?.[c?'zc':'zd']);if(!z)return;
+  if(c){try{await navigator.clipboard.write([new ClipboardItem({'image/png':z.file})]);zMsg(`Đã sao chép ảnh ${z.t}. Dán (Ctrl+V) vào Zalo.`,true)}catch(err){zMsg('Không sao chép ảnh được, hãy dùng nút Tải ảnh.')}}
+  else{const a=document.createElement('a');a.href=z.url;a.download=z.file.name;document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),1000)}};
 $('zaloCopy').onclick=async()=>{const ta=$('zaloTxt');let ok=false;try{await navigator.clipboard.writeText(ta.value);ok=true}catch(e){try{ta.select();ok=document.execCommand('copy')}catch(_){}}
   $('zaloMsg').className=ok?'msg-ok':'msg-err';$('zaloMsg').textContent=ok?'Đã sao chép. Mở Zalo và dán vào nhóm.':'Không sao chép tự động được, hãy bôi đen rồi sao chép thủ công.'};
 
