@@ -1001,10 +1001,14 @@ function render(){
    if(!ld){const msg=`<tbody><tr><td class="l muted" style="white-space:normal">Chưa có dữ liệu theo ngày. Tải lại file nhập xuất Fresh để cập nhật.</td></tr></tbody>`;le.innerHTML=msg;ee.innerHTML=msg}
    else{
     const R3=scope.map(s=>({s,...sumC(s,THS)})).filter(r=>r.n||r.h).sort((a,b)=>(b.n?b.h/b.n:-9)-(a.n?a.h/a.n:-9));
-    let N=0,H=0,X=0;let h=`<thead><tr><th class="l">Siêu thị</th><th>SL nhập</th><th>SL hủy</th><th>Hủy / nhập</th></tr></thead><tbody>`;
-    R3.forEach(r=>{N+=r.n;H+=r.h;X+=r.x;h+=`<tr class="lx" tabindex="0" data-ls="${r.s}"><td class="l"><span class="chev"></span>${esc(shopName(r.s))}</td><td>${q1(r.n)}</td><td><b>${q1(r.h)}</b></td><td class="neg"><b>${rp(r.h,r.n)}</b></td></tr>`});
-    if(!R3.length)h+=`<tr><td colspan="4" class="l muted">Không có nhập / hủy thủy hải sản ${dayLb}.</td></tr>`;
-    h+=R3.length>1?`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th>${q1(N)}</th><th>${q1(H)}</th><th>${rp(H,N)}</th></tr></tfoot>`:'</tbody>';le.innerHTML=h;
+    // trung bình 7 ngày trước; hôm nay cao bất thường (≥ 1,5 lần TB và cao hơn ít nhất 3 điểm %) thì tô đỏ
+    const avg7=ss=>{let n=0,h=0;for(let k=Math.max(1,ld-7);k<ld;k++)ss.forEach(s=>{const v=sumC2(s,THS,k);n+=v.n;h+=v.h});return n>0?h/n:null};
+    const odd=(r,a)=>r!=null&&a!=null&&r>=a*1.5&&r-a>=.03;
+    const nowCell=(r,a,tag='td')=>r==null?`<${tag}>—</${tag}>`:`<${tag} class="${odd(r,a)?'neg':''}">${odd(r,a)?'▲ ':''}<b>${pct(r)}</b></${tag}>`;
+    let N=0,H=0,X=0;let h=`<thead><tr><th class="l">Siêu thị</th><th>SL nhập</th><th>SL hủy</th><th>Hủy / nhập</th><th title="Hủy / nhập thủy hải sản trung bình 7 ngày trước ${dayLb}">TB 7 ngày trước</th></tr></thead><tbody>`;
+    R3.forEach(r=>{N+=r.n;H+=r.h;X+=r.x;h+=`<tr class="lx" tabindex="0" data-ls="${r.s}"><td class="l"><span class="chev"></span>${esc(shopName(r.s))}</td><td>${q1(r.n)}</td><td><b>${q1(r.h)}</b></td>${(()=>{const a=avg7([r.s]);return nowCell(r.n>0?r.h/r.n:null,a)+`<td class="muted">${a==null?'—':pct(a)}</td>`})()}</tr>`});
+    if(!R3.length)h+=`<tr><td colspan="5" class="l muted">Không có nhập / hủy thủy hải sản ${dayLb}.</td></tr>`;
+    h+=R3.length>1?`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th>${q1(N)}</th><th>${q1(H)}</th>${(()=>{const a=avg7(R3.map(r=>r.s));return nowCell(N>0?H/N:null,a,'th')+`<th>${a==null?'—':pct(a)}</th>`})()}</tr></tfoot>`:'</tbody>';le.innerHTML=h;
     const R4=scope.map(s=>({s,...sumC(s,EGG)})).filter(r=>r.n||r.x).sort((a,b)=>(a.n?a.x/a.n:9)-(b.n?b.x/b.n:9));
     const eggLow=s=>{if(!HX)return null;let n=0;for(let k=ld;k>=1;k--){const v=sumC2(s,EGG,k);if(!(v.n>0))break;if(v.x/v.n<1)n++;else break}return n};
     let N4=0,X4=0;let e=`<thead><tr><th class="l">Siêu thị</th><th>SL nhập</th><th>SL bán</th><th>Bán / nhập</th><th title="Số ngày liên tiếp (tính đến ${dayLb}) bán dưới 100% lượng nhập">Ngày liền &lt;100%</th></tr></thead><tbody>${HX?'':noX.replace('colspan="6"','colspan="5"')}`;
@@ -1020,7 +1024,7 @@ function render(){
     le.querySelectorAll('tr.lx').forEach(trEl=>{const tog=()=>{const nx=trEl.nextElementSibling;
         if(nx&&nx.classList.contains('lxd')){nx.remove();trEl.classList.remove('open');return}
         const t=topLoss(trEl.dataset.ls);const d=document.createElement('tr');d.className='lxd';
-        d.innerHTML=`<td colspan="4">${!t||!t.items.length?'<span class="muted">Không có sản phẩm thủy hải sản bị hủy.</span>':`<div class="lxh">Top ${t.items.length} SP thủy hải sản hủy nhiều nhất · ${t.lbl}</div><ol class="lxl">${t.items.map(i=>`<li><span>${esc(i.nm)}</span><b>${nf(1).format(i.x)}</b><small>/ nhập ${nf(1).format(i.n)}</small></li>`).join('')}</ol>`}</td>`;
+        d.innerHTML=`<td colspan="5">${!t||!t.items.length?'<span class="muted">Không có sản phẩm thủy hải sản bị hủy.</span>':`<div class="lxh">Top ${t.items.length} SP thủy hải sản hủy nhiều nhất · ${t.lbl}</div><ol class="lxl">${t.items.map(i=>`<li><span>${esc(i.nm)}</span><b>${nf(1).format(i.x)}</b><small>/ nhập ${nf(1).format(i.n)}</small></li>`).join('')}</ol>`}</td>`;
         trEl.after(d);trEl.classList.add('open')};
       trEl.onclick=tog;trEl.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog()}}});}
    // 5. Lượt khách & giá trị bill (ngày cuối có số bill)
