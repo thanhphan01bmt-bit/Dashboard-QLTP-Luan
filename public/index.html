@@ -199,7 +199,7 @@ tr.muted-row td{color:var(--muted)}
 .ghero{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
 td.dt-big b{font-size:15px}
 @media (max-width:620px){.ghero{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)!important;gap:10px;padding:10px 12px}.gh-l{font-size:11.5px}.gh-v{font-size:30px;margin:0 0 6px}.gh-v small{font-size:13px}.gh-bar{height:7px}.gh-s{font-size:11px;margin-top:4px}.gh-one div{padding:8px 10px;gap:2px}.gh-one span{font-size:11px}.gh-one b{font-size:20px}}
-#goalEgg tr[data-s]{cursor:pointer}#goalLoss tr.lx{cursor:pointer}#goalLoss tr.lx.open td{background:var(--accent-soft)}
+#goalEgg tr[data-s],#goalBill tr[data-s]{cursor:pointer}#goalLoss tr.lx{cursor:pointer}#goalLoss tr.lx.open td{background:var(--accent-soft)}
 #goalLoss tr.lxd td{background:var(--surface2);white-space:normal;padding:8px 12px 10px}
 .lxh{font-size:12px;color:var(--ink2);margin-bottom:4px;font-weight:600}
 .lxl{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:3px;font-size:12.5px}
@@ -551,6 +551,7 @@ body.pv .wrap{padding-bottom:120px}
       <div><h3 class="gh" id="gh2">2. Hiệu quả Fresh</h3><div class="tbl-wrap"><table id="goalFresh"></table></div></div>
       <div><h3 class="gh" id="gh3">3. Hủy Thủy hải sản</h3><div class="tbl-wrap"><table id="goalLoss"></table></div></div>
       <div><h3 class="gh" id="gh4">4. Tỷ lệ bán Trứng</h3><div class="tbl-wrap"><table id="goalEgg"></table></div></div>
+      <div><h3 class="gh" id="gh5">5. Lượt khách &amp; giá trị bill</h3><div class="tbl-wrap"><table id="goalBill"></table></div></div>
     </div>
     <p id="goalFoot" hidden></p>
   </section>
@@ -731,6 +732,7 @@ async function renderGoalPages(opt={}){
   table(T('gh2'),document.getElementById('goalFresh'));
   table(T('gh3'),document.getElementById('goalLoss'));
   table(T('gh4'),document.getElementById('goalEgg'));
+  table(T('gh5'),document.getElementById('goalBill'));
   // fit everything onto one A4 page
   const ch=y+MG-10,out=document.createElement('canvas');out.width=OW;out.height=OH;const o=out.getContext('2d');o.fillStyle='#fff';o.fillRect(0,0,OW,OH);
   const FOOT=60,k=Math.min(OW/(PW*2),(OH-FOOT)/(ch*2)),dw=PW*2*k,dh=ch*2*k;o.imageSmoothingQuality='high';
@@ -914,6 +916,15 @@ function render(){
    document.getElementById('gh1').innerHTML=`1. Doanh thu <small>ngày đổ báo cáo ${d9}/${M}${upAt?`, cập nhật đến ${upAt}`:''}</small>`;
    const rev=s=>{const st=shopStats(s);const day=(D.sep.daily[s]||{})[d9]||0;const goal=st.aug*(1+g);const avg=st.cum9/d9;const need=Math.max(0,(goal-(st.cum9-day))/left);return{s,day,goal,proj:st.proj,avg,need,cum:st.cum9,aug:st.aug}};
    const pctHT=r=>r.need>0?r.day/r.need:(r.day>0?9:0);const RR=scope.map(rev).sort((a,b)=>pctHT(b)-pctHT(a));
+   // so cùng thứ tuần trước + chuỗi ngày đạt / hụt (chỉ xét ngày đã đủ: lưu từ 21h00)
+   const PDIM0=D.prev.dim||new Date(D.prev.y,D.prev.m,0).getDate();
+   const dv=(s,k)=>k>=1?+((D.sep.daily[s]||{})[k]||0):+(((D.aug.daily||{})[s]||{})[PDIM0+k]||0);
+   const fullDay=!(upAt&&upAt<'21:00');const lastFull=fullDay?d9:d9-1;
+   const wowOf=ss=>{if(!fullDay)return null;const a=ss.reduce((t,s)=>t+dv(s,d9),0),b=ss.reduce((t,s)=>t+dv(s,d9-7),0);return a>0&&b>0?a/b-1:null};
+   const streakOf=s=>{const G=rev(s).goal;if(!(G>0)||lastFull<1)return null;let cum=0;const ok=[];for(let k=1;k<=lastFull;k++){const need=Math.max(0,(G-cum)/(DIM9-k+1));ok[k]=dv(s,k)>=need;cum+=dv(s,k)}
+     let n=0;const st=ok[lastFull];for(let k=lastFull;k>=1&&ok[k]===st;k--)n++;return{st,n}};
+   const wowCell=(v,tag='td')=>v==null?`<${tag} class="muted">—</${tag}>`:`<${tag} class="${v>=0?'pos':'neg'}">${sgn(v)}</${tag}>`;
+   const stkCell=x=>!x?'<td class="muted">—</td>':x.st?`<td class="pos" title="${x.n} ngày liền đạt cần/ngày">${x.n>=2?'🔥 ':''}${x.n} ngày đạt</td>`:`<td class="${x.n>=3?'neg':'muted'}" title="${x.n} ngày liền hụt cần/ngày">${x.n>=2?'⚠️ ':''}<b>${x.n} ngày hụt</b></td>`;
    const TT={aug:tot(RR.map(r=>r.aug)),day:tot(RR.map(r=>r.day)),goal:tot(RR.map(r=>r.goal)),proj:tot(RR.map(r=>r.proj)),avg:tot(RR.map(r=>r.avg)),cum:tot(RR.map(r=>r.cum))};TT.need=Math.max(0,(TT.goal-(TT.cum-TT.day))/left);
    // Cảnh báo tự động (tính lại mỗi khi có số liệu mới)
    {const WARN={need:.8,wow:.2,wow2:.3,lossMin:.03,lossX:2};
@@ -945,9 +956,9 @@ function render(){
      const mb=document.getElementById('wbMore');if(mb)mb.onclick=()=>{box.dataset.open=open?'0':'1';render()};
      box.querySelectorAll('[data-ws]').forEach(b=>{const go=()=>setShop(b.dataset.ws);b.onclick=go;b.onkeydown=e=>{if(e.key==='Enter')go()}})}}
    const note=r=>{if(left<=0)return r.proj>=r.goal?`<span class="pill up">Đạt mục tiêu tháng</span>`:`<span class="pill down">Không đạt</span>`;const d=r.day-r.need;return d>=0?`<span class="pill up">Đạt</span> <small class="pos">+${tr1(d)} tr</small>`:`<span class="pill down">Không đạt</span> <small class="neg">−${tr1(-d)} tr</small>`};
-   let t=`<thead><tr><th class="l">Siêu thị</th><th>DT ${dayLbl}</th><th class="need">Cần/ngày</th><th>% hoàn thành</th><th>Mục tiêu T${M}</th><th>Lũy kế T${M}</th><th>Dự kiến T${M}</th><th>Tăng trưởng so T${P}</th></tr></thead><tbody>`;
-   RR.forEach(r=>{const o=D.shops[r.s];t+=`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(o.name)}</td><td><b>${tr(r.day)} tr</b></td><td class="need">${left>0?tr(r.need)+' tr':'—'}</td><td class="${r.need>0?(r.day>=r.need?'pos':'neg'):''}"><b>${r.need>0?nf(1).format(r.day/r.need*100)+'%':'—'}</b></td><td>${tr(r.goal)} tr</td><td>${tr(r.cum)} tr</td><td class="${r.proj>=r.goal?'pos':'neg'}">${tr(r.proj)} tr</td><td class="${r.aug?(r.proj>=r.aug?'pos':'neg'):''}"><b>${r.aug?sgn(r.proj/r.aug-1):'—'}</b></td></tr>`});
-   if(RR.length>1)t+=`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th>${tr(TT.day)} tr</th><th class="need">${left>0?tr(TT.need)+' tr':'—'}</th><th class="${TT.need>0?(TT.day>=TT.need?'pos':'neg'):''}">${TT.need>0?nf(1).format(TT.day/TT.need*100)+'%':'—'}</th><th>${tr(TT.goal)} tr</th><th>${tr(TT.cum)} tr</th><th>${tr(TT.proj)} tr</th><th class="${TT.proj>=TT.aug?'pos':'neg'}">${TT.aug?sgn(TT.proj/TT.aug-1):'—'}</th></tr></tfoot>`;else t+='</tbody>';
+   let t=`<thead><tr><th class="l">Siêu thị</th><th>DT ${dayLbl}</th><th class="need">Cần/ngày</th><th>% hoàn thành</th><th>Mục tiêu T${M}</th><th>Lũy kế T${M}</th><th>Dự kiến T${M}</th><th>Tăng trưởng so T${P}</th><th title="DT ngày so với cùng thứ tuần trước (chỉ tính khi đủ ngày, từ 21h00)">So cùng thứ tuần trước</th><th title="Số ngày liên tiếp đạt / hụt cần/ngày">Chuỗi ngày</th></tr></thead><tbody>`;
+   RR.forEach(r=>{const o=D.shops[r.s];t+=`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(o.name)}</td><td><b>${tr(r.day)} tr</b></td><td class="need">${left>0?tr(r.need)+' tr':'—'}</td><td class="${r.need>0?(r.day>=r.need?'pos':'neg'):''}"><b>${r.need>0?nf(1).format(r.day/r.need*100)+'%':'—'}</b></td><td>${tr(r.goal)} tr</td><td>${tr(r.cum)} tr</td><td class="${r.proj>=r.goal?'pos':'neg'}">${tr(r.proj)} tr</td><td class="${r.aug?(r.proj>=r.aug?'pos':'neg'):''}"><b>${r.aug?sgn(r.proj/r.aug-1):'—'}</b></td>${wowCell(wowOf([r.s]))}${stkCell(streakOf(r.s))}</tr>`});
+   if(RR.length>1)t+=`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th>${tr(TT.day)} tr</th><th class="need">${left>0?tr(TT.need)+' tr':'—'}</th><th class="${TT.need>0?(TT.day>=TT.need?'pos':'neg'):''}">${TT.need>0?nf(1).format(TT.day/TT.need*100)+'%':'—'}</th><th>${tr(TT.goal)} tr</th><th>${tr(TT.cum)} tr</th><th>${tr(TT.proj)} tr</th><th class="${TT.proj>=TT.aug?'pos':'neg'}">${TT.aug?sgn(TT.proj/TT.aug-1):'—'}</th>${wowCell(wowOf(RR.map(r=>r.s)),'th')}<th></th></tr></tfoot>`;else t+='</tbody>';
    const gt=document.getElementById('goalTbl');gt.innerHTML=t;
    // xem 1 siêu thị: làm nổi bật DT ngày so với cần/ngày
    {const hero=document.getElementById('goalHero');if(RR.length===1){const r=RR[0],pc=r.need>0?r.day/r.need:null,ok=pc!=null&&pc>=1,gap=r.day-r.need;
@@ -983,6 +994,7 @@ function render(){
    document.getElementById('gh3').innerHTML=`3. Hủy Thủy hải sản <small>${dayLb}</small>`;
    document.getElementById('gh4').innerHTML=`4. Tỷ lệ bán Trứng <small>${dayLb}</small>`;
    const le=document.getElementById('goalLoss'),ee=document.getElementById('goalEgg');
+   const sumC2=(s,pred,day)=>{const o=L.daily[s]&&L.daily[s][day];let n=0,h=0,x=0;if(o)for(const c in o){if(!pred(c))continue;n+=o[c][0];h+=o[c][1];x+=o[c][2]||0}return{n,h,x}};
    const sumC=(s,pred)=>{const o=L.daily[s]&&L.daily[s][ld];let n=0,h=0,x=0;if(o)for(const c in o){if(!pred(c))continue;n+=o[c][0];h+=o[c][1];x+=o[c][2]||0}return{n,h,x}};
    const q1=v=>nf(1).format(v),q0=v=>nf(0).format(v),rp=(a,b)=>b>0?pct(a/b):'—';
    const noX=HX?'':`<tr><td colspan="6" class="l muted" style="white-space:normal">Chưa có SL bán: tải lại file nhập xuất Fresh để có cột thực xuất.</td></tr>`;
@@ -994,10 +1006,11 @@ function render(){
     if(!R3.length)h+=`<tr><td colspan="6" class="l muted">Không có nhập / hủy thủy hải sản ${dayLb}.</td></tr>`;
     h+=R3.length>1?`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th>${q1(N)}</th><th>${HX?q1(X):'—'}</th><th>${q1(H)}</th><th>${HX?rp(X,N):'—'}</th><th>${rp(H,N)}</th></tr></tfoot>`:'</tbody>';le.innerHTML=h;
     const R4=scope.map(s=>({s,...sumC(s,EGG)})).filter(r=>r.n||r.x).sort((a,b)=>(a.n?a.x/a.n:9)-(b.n?b.x/b.n:9));
-    let N4=0,X4=0;let e=`<thead><tr><th class="l">Siêu thị</th><th>SL nhập</th><th>SL bán</th><th>Bán / nhập</th></tr></thead><tbody>${HX?'':noX.replace('colspan="6"','colspan="4"')}`;
-    R4.forEach(r=>{N4+=r.n;X4+=r.x;e+=`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(shopName(r.s))}</td><td>${q0(r.n)}</td><td>${HX?q0(r.x):'—'}</td><td class="${HX&&r.n>0&&r.x/r.n<1?'neg':''}"><b>${HX?rp(r.x,r.n):'—'}</b></td></tr>`});
-    if(!R4.length)e+=`<tr><td colspan="4" class="l muted">Không có nhập / bán trứng ${dayLb}.</td></tr>`;
-    e+=R4.length>1?`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th>${q0(N4)}</th><th>${HX?q0(X4):'—'}</th><th class="${HX&&N4>0&&X4/N4<1?'neg':''}">${HX?rp(X4,N4):'—'}</th></tr></tfoot>`:'</tbody>';ee.innerHTML=e}
+    const eggLow=s=>{if(!HX)return null;let n=0;for(let k=ld;k>=1;k--){const v=sumC2(s,EGG,k);if(!(v.n>0))break;if(v.x/v.n<1)n++;else break}return n};
+    let N4=0,X4=0;let e=`<thead><tr><th class="l">Siêu thị</th><th>SL nhập</th><th>SL bán</th><th>Bán / nhập</th><th title="Số ngày liên tiếp (tính đến ${dayLb}) bán dưới 100% lượng nhập">Ngày liền &lt;100%</th></tr></thead><tbody>${HX?'':noX.replace('colspan="6"','colspan="5"')}`;
+    R4.forEach(r=>{N4+=r.n;X4+=r.x;e+=`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(shopName(r.s))}</td><td>${q0(r.n)}</td><td>${HX?q0(r.x):'—'}</td><td class="${HX&&r.n>0&&r.x/r.n<1?'neg':''}"><b>${HX?rp(r.x,r.n):'—'}</b></td>${(()=>{const c=eggLow(r.s);return c==null?'<td class="muted">—</td>':`<td class="${c>=3?'neg':c?'':'muted'}">${c>=3?'<b>⚠️ '+c+' ngày</b>':c+' ngày'}</td>`})()}</tr>`});
+    if(!R4.length)e+=`<tr><td colspan="5" class="l muted">Không có nhập / bán trứng ${dayLb}.</td></tr>`;
+    e+=R4.length>1?`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th>${q0(N4)}</th><th>${HX?q0(X4):'—'}</th><th class="${HX&&N4>0&&X4/N4<1?'neg':''}">${HX?rp(X4,N4):'—'}</th><th></th></tr></tfoot>`:'</tbody>';ee.innerHTML=e}
    // bấm 1 siêu thị ở mục Hủy: hiện / ẩn 3 SP thủy hải sản hủy nhiều nhất
    if(ld){
     const topLoss=s=>{let arr=null,lbl='';const P=L.prd&&L.prd.day===ld&&L.prd.s?L.prd.s[s]:null;
@@ -1010,7 +1023,19 @@ function render(){
         d.innerHTML=`<td colspan="6">${!t||!t.items.length?'<span class="muted">Không có sản phẩm thủy hải sản bị hủy.</span>':`<div class="lxh">Top ${t.items.length} SP thủy hải sản hủy nhiều nhất · ${t.lbl}</div><ol class="lxl">${t.items.map(i=>`<li><span>${esc(i.nm)}</span><b>${nf(1).format(i.x)}</b><small>/ nhập ${nf(1).format(i.n)}</small></li>`).join('')}</ol>`}</td>`;
         trEl.after(d);trEl.classList.add('open')};
       trEl.onclick=tog;trEl.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog()}}});}
-   ['goalFresh','goalEgg'].forEach(id=>document.getElementById(id).querySelectorAll('tr[data-s]').forEach(tr=>{const go=()=>setShop(tr.dataset.s);tr.onclick=go;tr.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}}));
+   // 5. Lượt khách & giá trị bill (ngày cuối có số bill)
+   {const bd=D.sep.billDays||0,be=document.getElementById('goalBill');const PB=D.prev.dim||new Date(D.prev.y,D.prev.m,0).getDate();
+    const bv=(s,k)=>k>=1?+(((D.sep.bills||{})[s]||{})[k]||0):+(((D.aug.bills||{})[s]||{})[PB+k]||0);
+    document.getElementById('gh5').innerHTML=`5. Lượt khách &amp; giá trị bill <small>${bd?`ngày ${bd}/${M} · so cùng thứ tuần trước`:''}</small>`;
+    if(!bd)be.innerHTML=`<tbody><tr><td class="l muted" style="white-space:normal">Chưa có số bill. Tải file doanh thu / số bill để xem.</td></tr></tbody>`;
+    else{const R5=scope.map(s=>{const b1=bv(s,bd),b0=bv(s,bd-7),d1=dv(s,bd),d0=dv(s,bd-7);return{s,b1,b0,d1,d0,a1:b1?d1/b1:0,a0:b0?d0/b0:0}}).filter(r=>r.b1>0);
+     const chg=(a,b)=>a>0&&b>0?a/b-1:null;R5.sort((x,y)=>(chg(x.b1,x.b0)??9)-(chg(y.b1,y.b0)??9));
+     const k1=v=>nf(0).format(Math.round(v/1e3))+'k';
+     let b=`<thead><tr><th class="l">Siêu thị</th><th>Số bill</th><th>So tuần trước</th><th>TB / bill</th><th>So tuần trước</th></tr></thead><tbody>`;
+     R5.forEach(r=>{b+=`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(shopName(r.s))}</td><td><b>${nf(0).format(r.b1)}</b></td>${wowCell(chg(r.b1,r.b0))}<td>${k1(r.a1)}</td>${wowCell(chg(r.a1,r.a0))}</tr>`});
+     const T5=R5.reduce((t,r)=>({b1:t.b1+r.b1,b0:t.b0+r.b0,d1:t.d1+r.d1,d0:t.d0+r.d0}),{b1:0,b0:0,d1:0,d0:0});
+     b+=R5.length>1?`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th>${nf(0).format(T5.b1)}</th>${wowCell(chg(T5.b1,T5.b0),'th')}<th>${k1(T5.b1?T5.d1/T5.b1:0)}</th>${wowCell(chg(T5.b1?T5.d1/T5.b1:0,T5.b0?T5.d0/T5.b0:0),'th')}</tr></tfoot>`:'</tbody>';be.innerHTML=b}}
+   ['goalFresh','goalEgg','goalBill'].forEach(id=>document.getElementById(id).querySelectorAll('tr[data-s]').forEach(tr=>{const go=()=>setShop(tr.dataset.s);tr.onclick=go;tr.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}}));
    document.getElementById('goalFoot').innerHTML=''}
 
   // Year view
