@@ -177,6 +177,17 @@ tr.muted-row td{color:var(--muted)}
 .tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media (max-width:520px){.tab{flex:0 0 auto;padding:9px 12px;font-size:13px}}
 .wrap:not(.v-comp) #compSec{display:none}
+.wrap:not(.v-cat) #catSec{display:none}
+.wrap.v-cat>section:not(#catSec),.wrap.v-cat>.two,.wrap.v-cat .alertbar{display:none!important}
+.ct-card{border:1.5px solid var(--accent);border-radius:14px;margin:0 0 18px;overflow:hidden;box-shadow:0 2px 10px color-mix(in srgb,var(--accent) 14%,transparent)}
+.ct-h{background:var(--accent-soft);padding:12px 16px;border-bottom:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.ct-h h3{margin:0 0 6px;font-size:16px;color:var(--accent)}.ct-meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--ink2)}
+.ct-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.ct-chips span{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:2px 9px;font-size:12px}
+.ct-chips span.lv{border-color:var(--accent);color:var(--accent);font-weight:600}
+.ct-b{padding:12px 16px}.ct-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}
+@media (max-width:760px){.ct-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.ct-h,.ct-b{padding:10px 12px}.ct-tbl .cm-h{display:none}}
+.ct-tbl tr[data-s]{cursor:pointer}.lvp{display:inline-block;border-radius:999px;padding:1px 9px;font-size:12px;font-weight:700;white-space:nowrap}
+.lvp.l0{background:var(--bad-bg);color:var(--bad)}.lvp.l1{background:var(--warn-bg);color:#9a6400}.lvp.l2,.lvp.l3,.lvp.l4{background:var(--good-bg);color:var(--good)}
 .wrap:not(.v-year) #yearSec{display:none}
 .wrap:not(.v-goal) #goalSec{display:none}
 .wrap.v-goal>section:not(#goalSec),.wrap.v-goal>.two{display:none!important}
@@ -536,7 +547,8 @@ body.pv .wrap{padding-bottom:120px}
   <nav class="tabs" role="tablist" aria-label="Chọn trang">
     <button class="tab" role="tab" type="button" data-view="goal" id="tabGoal"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span class="tl">Mục tiêu ngày</span><span class="ts">Mục tiêu</span></button>
     <button class="tab" role="tab" type="button" data-view="dash" id="tabDash"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12l4-4 4 4 6-6 4 4M3 20h18"/></svg><span class="tl">Dashboard doanh thu</span><span class="ts">Dashboard</span></button>
-    <button class="tab" role="tab" type="button" data-view="comp" id="tabComp"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg><span class="tl">Bảng thi đua Quản lý</span><span class="ts">Thi đua</span></button>
+    <button class="tab" role="tab" type="button" data-view="comp" id="tabComp"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg><span class="tl">Bảng thi đua Quản lý</span><span class="ts">Thi đua QL</span></button>
+    <button class="tab" role="tab" type="button" data-view="cat" id="tabCat"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4z"/><path d="M14 17.5l2 2 4-4"/></svg><span class="tl">Thi đua ngành hàng</span><span class="ts">Ngành hàng</span></button>
     <button class="tab" role="tab" type="button" data-view="year" id="tabYear"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="tl">Doanh thu năm</span><span class="ts">Năm</span></button>
   </nav>
 
@@ -564,6 +576,11 @@ body.pv .wrap{padding-bottom:120px}
     <div id="yearChart"></div>
     <div class="tbl-wrap"><table id="yearTbl"></table></div>
     <p class="lhint" style="margin:10px 0 0">Tháng <span data-t="M"></span> so sánh bằng doanh thu dự kiến cả tháng. Cột "TB/ngày" giúp so sánh công bằng giữa các tháng có số ngày khác nhau. Tháng <span data-t="P"></span> và <span data-t="M"></span> lấy từ file hằng ngày; các tháng trước lấy từ file doanh thu năm.</p>
+  </section>
+
+  <section class="card" id="catSec">
+    <div class="sec-title"><h2>Thi đua ngành hàng</h2><span class="note" id="catNote"></span></div>
+    <div id="catBody"></div>
   </section>
 
   <section class="card" id="compSec">
@@ -648,6 +665,7 @@ body.pv .wrap{padding-bottom:120px}
       <li><b>Báo cáo hiệu quả bán Fresh</b> (gửi hằng ngày)</li>
       <li><b>Báo cáo nhập xuất Fresh</b> có cột SL hủy tồn, SL mất mát kiểm kê (gửi hằng ngày)</li>
       <li><b>Base</b> và các file <b>tháng trước</b>: chỉ khi thay đổi hoặc sang tháng mới</li>
+      <li><b>Thi đua ngành hàng</b> (file có cột "Chương trình Thi đua"): mỗi khi có chương trình mới</li>
       <li class="ed-admin"><b>Bản sao lưu (.json)</b>: chỉ quản trị, dùng khi cần khôi phục số liệu cũ</li>
     </ul>
     <label class="drop" id="drop" for="upFiles">
@@ -753,8 +771,8 @@ async function exportGoalPdf(btn,filename){
   }catch(e){console.error(e);alert('Không tạo được PDF.')}
   finally{btn.disabled=false;btn.innerHTML=old}
 }
-const __R=(window.__ME||{}).role;let CAN_EDIT=__R==='admin'||__R==='editor';const IS_ADMIN=__R==='admin';let VIEW='goal';try{if(/^#(dash|dashboard)$/i.test(location.hash))VIEW='dash';if(/^#thi-?dua$/i.test(location.hash))VIEW='comp';if(/^#(doanh-?thu-?)?nam$/i.test(location.hash))VIEW='year';if(/^#muc-?tieu$/i.test(location.hash))VIEW='goal'}catch(e){}
-function applyView(){const w=document.querySelector('.wrap');if(!w)return;w.classList.toggle('v-comp',VIEW==='comp');w.classList.toggle('v-year',VIEW==='year');w.classList.toggle('v-goal',VIEW==='goal');
+const __R=(window.__ME||{}).role;let CAN_EDIT=__R==='admin'||__R==='editor';const IS_ADMIN=__R==='admin';let VIEW='goal';try{if(/^#(dash|dashboard)$/i.test(location.hash))VIEW='dash';if(/^#thi-?dua$/i.test(location.hash))VIEW='comp';if(/^#(doanh-?thu-?)?nam$/i.test(location.hash))VIEW='year';if(/^#muc-?tieu$/i.test(location.hash))VIEW='goal';if(/^#(thi-?dua-?)?nganh(-?hang)?$/i.test(location.hash))VIEW='cat'}catch(e){}
+function applyView(){const w=document.querySelector('.wrap');if(!w)return;w.classList.toggle('v-comp',VIEW==='comp');w.classList.toggle('v-cat',VIEW==='cat');w.classList.toggle('v-year',VIEW==='year');w.classList.toggle('v-goal',VIEW==='goal');
   document.querySelectorAll('.tabs .tab').forEach(b=>{const on=b.dataset.view===VIEW;b.setAttribute('aria-selected',on);b.classList.toggle('on',on)})}
 function setView(v){VIEW=v;applyView();window.scrollTo({top:0});if(v==='dash')requestAnimationFrame(()=>drawCurrent&&drawCurrent())} // vẽ lại biểu đồ đúng chiều rộng khi mở tab
 document.addEventListener('click',e=>{const b=e.target.closest('.tabs .tab');if(b)setView(b.dataset.view)});
@@ -1185,6 +1203,39 @@ function render(){
     cs.filter(c=>c.isNew||c.ratio==null).forEach(c=>{h+=`<tr${rowS(c.s)} class="muted-row ${cur===c.s?'sel':''}"><td><span class="rk">–</span></td><td class="l">${mgrCell(c.s)}</td><td>${sgn(c.ch)}</td><td>${c.ratio==null?'—':pct(c.ratio)}</td><td>${c.li==null?'—':f2.format(c.li)}</td><td class="l"><span class="pill warn">${c.isNew?'Shop mới, chưa đủ tháng '+P:'Thiếu dữ liệu Fresh'}</span></td></tr>`});
     document.getElementById('compTbl').innerHTML=h+'</tbody>';}
 
+  // Thi đua ngành hàng (chương trình tải lên từ file Excel)
+  {const box=document.getElementById('catBody'),note=document.getElementById('catNote');const CT=D.contests||[];
+   const nk=t=>String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[đĐ]/g,'d').toLowerCase().replace(/[^a-z0-9]/g,'');
+   const allCats=new Set();[D.sep.cat,D.aug.cat].forEach(o=>{for(const s in o||{})for(const k in o[s])allCats.add(k)});
+   const scope=cur==='all'?SHOPS:[cur];const left=Math.max(0,DIM9-d9);
+   note.textContent=CT.length?`Tháng ${M}/${D.cur.y}, số liệu đến ngày ${d9}/${M} · dự kiến = lũy kế ÷ ${d9} ngày × ${DIM9} ngày`:'';
+   if(!CT.length){box.innerHTML=`<p class="hint">Chưa có chương trình thi đua. ${CAN_EDIT?'Bấm <b>Tải file lên</b> và chọn file thi đua ngành hàng (có cột "Chương trình Thi đua").':'Quản trị sẽ tải file chương trình lên.'}</p>`}
+   else box.innerHTML=CT.map((c,ci)=>{
+     const keys=[],miss=[];c.cats.forEach(n=>{const k=[...allCats].find(x=>nk(x)===nk(n));if(k)keys.push(k);else miss.push(n)});
+     const lv=c.levels.length?c.levels:[{n:1,r:1}];
+     const sum=(o,s)=>keys.reduce((t,k)=>t+(+(((o||{})[s]||{})[k])||0),0);
+     const R=scope.map(s=>{const base=sum(D.aug.cat,s),cum=sum(D.sep.cat,s),proj=d9?cum/d9*DIM9:0,r=base>0?proj/base:null;
+       let li=-1;lv.forEach((l,i)=>{if(r!=null&&r>=l.r)li=i});const nx=lv[li+1];const need=nx&&left>0&&base>0?Math.max(0,(nx.r*base-cum)/left):null;
+       const st=shopStats(s),tg=(D.shops[s]||{}).tg,tgr=tg?st.proj/tg:null;return{s,base,cum,proj,r,li,nx,need,tgr}}).filter(x=>x.base>0||x.cum>0).sort((a,b)=>(b.r??-1)-(a.r??-1));
+     const T={base:R.reduce((t,x)=>t+x.base,0),cum:R.reduce((t,x)=>t+x.cum,0)};T.proj=d9?T.cum/d9*DIM9:0;T.r=T.base?T.proj/T.base:null;
+     const cnt=i=>R.filter(x=>x.li>=i).length;const win=R.filter(x=>x.li>=0&&(!c.needTarget||x.tgr==null||x.tgr>=1)).length;
+     const lvName=i=>i<0?'Chưa đạt':`Mức ${lv[i].n}`;
+     const tgCell=x=>!c.needTarget?'':x.tgr==null?'<td class="muted">—</td>':`<td class="${x.tgr>=1?'pos':'neg'}">${x.tgr>=1?'✓ ':'✗ '}${pct(x.tgr)}</td>`;
+     let t=`<table class="ct-tbl"><thead><tr><th class="cm-h">#</th><th class="l">Siêu thị</th><th>DT T${P}</th><th class="cm-h">Lũy kế T${M}</th><th>Dự kiến T${M}</th><th>Dự kiến / T${P}</th><th class="l">Mức đạt</th><th>Cần/ngày lên mức kế</th>${c.needTarget?'<th title="Dự kiến doanh thu tổng / Target của siêu thị">Target DT</th>':''}</tr></thead><tbody>`;
+     R.forEach((x,i)=>{t+=`<tr${!VIEW_SHOP?` tabindex="0" data-s="${x.s}"`:''} class="${cur===x.s?'sel':''}"><td class="cm-h"><span class="rk">${i+1}</span></td><td class="l">${esc(shopName(x.s))}</td><td>${tr(x.base)} tr</td><td class="cm-h">${tr(x.cum)} tr</td><td><b>${tr(x.proj)} tr</b></td><td class="${x.r!=null&&x.r>=lv[0].r?'pos':'neg'}"><b>${x.r==null?'—':pct(x.r)}</b></td><td class="l"><span class="lvp l${x.li+1}">${lvName(x.li)}</span></td><td>${x.nx?(x.need==null?'—':`${tr1(x.need)} tr <small class="muted">→ ${lvName(lv.indexOf(x.nx))}</small>`):'<span class="pos">Mức cao nhất</span>'}</td>${tgCell(x)}</tr>`});
+     if(R.length>1)t+=`</tbody><tfoot><tr><th class="cm-h"></th><th class="l">Toàn khu vực</th><th>${tr(T.base)} tr</th><th class="cm-h">${tr(T.cum)} tr</th><th>${tr(T.proj)} tr</th><th>${T.r==null?'—':pct(T.r)}</th><th class="l"></th><th></th>${c.needTarget?'<th></th>':''}</tr></tfoot>`;else t+='</tbody>';
+     t+='</table>';
+     return `<div class="ct-card"><div class="ct-h"><h3>${esc(c.name)}</h3><div class="ct-meta"><span>🗓 ${esc(c.time)}</span><span>🏬 ${esc(c.scope)}</span><span>🎯 ${esc(c.goal)}</span></div>
+       <div class="ct-chips">${c.cats.map(n=>`<span${miss.includes(n)?' style="border-color:var(--bad);color:var(--bad)" title="Không tìm thấy ngành hàng này trong số liệu"':''}>${esc(n)}</span>`).join('')}${c.needTarget?'<span class="lv">Điều kiện: đạt Target DT</span>':''}${lv.map(l=>`<span class="lv">Mức ${l.n}: ≥ ${nf(0).format(l.r*100)}% DT T${P}</span>`).join('')}</div>
+       ${(()=>{const mm=c.time.match(/\/(\d{1,2})(?:\/\d+)?\s*$/);const cm=mm?+mm[1]:null;return cm&&cm!==M?`<p class="msg-err" style="margin:8px 0 0;font-size:12px">Chương trình áp dụng tháng ${cm}, số liệu đang là tháng ${M}/${D.cur.y} (so với T${P}).</p>`:''})()}
+       ${miss.length?`<p class="msg-err" style="margin:8px 0 0;font-size:12px">Chưa khớp ngành hàng: ${miss.map(esc).join(', ')}.</p>`:''}</div>
+       <div class="ct-b"><div class="ct-kpis">
+         <div class="fk"><span class="lbl">Dự kiến / T${P} ${scope.length>1?'(khu vực)':''}</span><span class="val num ${T.r!=null&&T.r>=lv[0].r?'pos':'neg'}">${T.r==null?'—':pct(T.r)}</span></div>
+         ${lv.map((l,i)=>`<div class="fk"><span class="lbl">Siêu thị đạt Mức ${l.n}${i<lv.length-1?' trở lên':''}</span><span class="val num">${cnt(i)}/${R.length}</span></div>`).slice(0,2).join('')}
+         <div class="fk"><span class="lbl">Đủ điều kiện thưởng${c.needTarget?' (kèm Target)':''}</span><span class="val num">${win}/${R.length}</span></div></div>
+       <div class="tbl-wrap">${t}</div></div></div>`}).join('');
+   box.querySelectorAll('tr[data-s]').forEach(tr=>{const go=()=>setShop(tr.dataset.s);tr.onclick=go;tr.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}})}
+
   // fresh
   const rl=pct(ratio);
   document.getElementById('freshKpis').innerHTML=
@@ -1335,12 +1386,20 @@ async function readSheet(buf){
 }
 async function readFile(f){
   const aoa=await readSheet(await f.arrayBuffer());
-  const KEYS=['nganh hang bhx','tong so bill','ln luy ke','ma st','sl huy ton'];
+  const KEYS=['nganh hang bhx','tong so bill','ln luy ke','ma st','sl huy ton','chuong trinh thi dua'];
   const hi=aoa.findIndex((r,i)=>i<15&&r&&r.some(c=>KEYS.includes(hk(c))));
   if(hi<0)throw new Error('Không nhận ra loại file: không thấy cột "Ngành hàng BHX", "Tổng số bill", "LN lũy kế" hoặc "Mã ST".');
   const H=aoa[hi].map(hk);const ix=n=>H.indexOf(hk(n));
   const rows=aoa.slice(hi+1).filter(r=>r&&r.some(c=>c!=null&&c!==''));
   const need=(...ns)=>{const miss=ns.filter(n=>ix(n)<0);if(miss.length)throw new Error('Thiếu cột: '+miss.join(', '));return ns.map(ix)};
+  if(ix('Chương trình Thi đua')>=0){
+    // file chương trình thi đua ngành hàng: mỗi dòng 1 chương trình
+    const [cN,cT,cP,cG,cM,cK]=need('Chương trình Thi đua','Thời gian','Phạm vi','Sản phẩm/Nhóm hàng Thi đua','Mục tiêu','Điều kiện nhận thưởng');
+    const list=rows.filter(r=>nz(r[cN])).map(r=>{const cond=nz(r[cK]);const lv=[];let m;const re=/m[uứ]c\s*(\d+)\s*:\s*~?\s*(\d+(?:[.,]\d+)?)\s*%/gi;
+      while((m=re.exec(cond.normalize('NFC'))))lv.push({n:+m[1],r:parseFloat(m[2].replace(',','.'))/100});lv.sort((a,b)=>a.r-b.r);
+      return{name:nz(r[cN]).trim(),time:nz(r[cT]).trim(),scope:nz(r[cP]).trim(),cats:nz(r[cG]).split(/\n|;/).map(x=>x.trim()).filter(Boolean),goal:nz(r[cM]).trim(),cond,levels:lv,needTarget:/target/i.test(cond)}});
+    if(!list.length)throw new Error('Không thấy chương trình thi đua nào trong file.');
+    return{kind:'contest',list,label:'Thi đua ngành hàng',desc:list.map(c=>c.name).join(' · ')}}
   if(ix('SL hủy tồn')>=0){
     const [cD,cS,cC,cN,cH,cM]=need('Ngày','Mã siêu thị','Ngành hàng - Phân tích','SL thực nhập','SL hủy tồn','SL mất mát kiểm kê');
     const cP=ix('Mã sản phẩm'),cPN=ix('Tên sản phẩm'),cX=ix('SL thực xuất');
@@ -1405,13 +1464,14 @@ function merge(B,list){
   const mon={};
   mon[ymKey(B.cur.y,B.cur.m)]=Object.assign({y:B.cur.y,m:B.cur.m},B.sep);
   mon[ymKey(B.prev.y,B.prev.m)]=Object.assign({y:B.prev.y,m:B.prev.m},B.aug);
-  let shops=B.shops,fresh=B.fresh,freshMonth=B.freshMonth||null,loss=B.loss||null;
+  let shops=B.shops,fresh=B.fresh,freshMonth=B.freshMonth||null,loss=B.loss||null,contests=B.contests||null;
   let ytd=B.ytd?JSON.parse(JSON.stringify(B.ytd)):null;
   list.forEach(p=>{
     if(p.kind==='nganh'||p.kind==='bills')for(const k in p.months){const s=p.months[k];const o=mon[k]||(mon[k]={y:s.y,m:s.m});
       if(p.kind==='nganh'){o.daily=s.daily;o.cat=s.cat;o.days=s.days;o.fday=s.fday}else{o.bills=s.bills;o.billDays=s.billDays;if(s.rev){if(!ytd||ytd.y<s.y)ytd={y:s.y,mon:{}};if(ytd.y===s.y)ytd.mon[s.m]=s.rev}}}
     if(p.kind==='base')shops=p.shops;
     if(p.kind==='loss')loss=p.loss;
+    if(p.kind==='contest')contests=p.list;
     if(p.kind==='fresh'){fresh=p.rows;freshMonth=p.month||freshMonth}
   });
   const keys=Object.keys(mon).filter(k=>mon[k].daily).sort();
@@ -1423,7 +1483,7 @@ function merge(B,list){
   if(!p||!p.bills)errs.push(`file doanh thu (số bill) tháng ${pm.m}/${pm.y}`);
   if(errs.length)return{errs,c};
   const pack=o=>({daily:o.daily,cat:o.cat,days:o.days,bills:o.bills,billDays:o.billDays,fday:o.fday});
-  const D={shops,freshCats:B.freshCats,cur:{m:c.m,y:c.y,dim:dimOf(c.y,c.m)},prev:{m:pm.m,y:pm.y,dim:dimOf(pm.y,pm.m)},aug:pack(p),sep:pack(c),fresh,freshMonth,loss,ytd,goalPct:(PREVIEW_D||B).goalPct||0};
+  const D={shops,freshCats:B.freshCats,cur:{m:c.m,y:c.y,dim:dimOf(c.y,c.m)},prev:{m:pm.m,y:pm.y,dim:dimOf(pm.y,pm.m)},aug:pack(p),sep:pack(c),fresh,freshMonth,loss,ytd,contests,goalPct:(PREVIEW_D||B).goalPct||0};
   const warn=[];
   if(p.days<dimOf(pm.y,pm.m))warn.push(`Doanh thu tháng ${pm.m} mới có đến ngày ${p.days}. Nên tải thêm file ngành hàng tháng ${pm.m} đủ cả tháng để so sánh chính xác.`);
   if(p.billDays<dimOf(pm.y,pm.m))warn.push(`Số bill tháng ${pm.m} mới có đến ngày ${p.billDays}. Nên tải thêm file doanh thu tháng ${pm.m} đủ cả tháng.`);
