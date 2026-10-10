@@ -65,6 +65,11 @@ select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid 
 select:focus-visible,button:focus-visible,tr[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .sec-title{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
 .sec-title h2{margin:0;font-size:15px;font-weight:600}
+/* tab Dashboard: mỗi mục đóng khung, tiêu đề làm dải màu */
+.card.dsec{border:1.5px solid var(--accent);border-radius:14px;box-shadow:0 2px 10px color-mix(in srgb,var(--accent) 14%,transparent);overflow:hidden}
+.card.dsec>.sec-title:first-child{margin:-18px -18px 14px;padding:11px 18px;background:var(--accent-soft);border-bottom:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.card.dsec>.sec-title:first-child h2{color:var(--accent);font-weight:700}
+@media (max-width:760px){.card.dsec>.sec-title:first-child{margin:-12px -12px 10px;padding:9px 12px}.card.dsec>.sec-title:first-child h2{font-size:14px}}
 .sec-title .note{font-size:12px;color:var(--muted)}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px}
 .kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
@@ -570,12 +575,12 @@ body.pv .wrap{padding-bottom:120px}
 
   <section class="kpis" id="kpis" aria-label="Chỉ số chính"></section>
 
-  <section>
+  <section class="card dsec">
     <div class="sec-title"><h2>Doanh thu dự kiến tháng <span data-t="M"></span> so với target và base</h2><span class="note">Vạch đen = 100% target / base</span></div>
     <div class="base-grid" id="baseGrid"></div>
   </section>
 
-  <section class="card">
+  <section class="card dsec">
     <div class="sec-title">
       <h2>Xu hướng doanh thu theo ngày</h2>
       <div class="row">
@@ -588,24 +593,24 @@ body.pv .wrap{padding-bottom:120px}
   </section>
 
   <div class="two">
-    <section class="card">
+    <section class="card dsec">
       <div class="sec-title"><h2>Dự kiến cơ cấu doanh thu theo ngành hàng</h2><span class="note">Tháng <span data-t="M"></span>, quy về <span data-t="DIM"></span> ngày</span></div>
       <div class="legend" style="margin-bottom:6px"><span><i class="sw box" style="background:var(--fmcg)"></i>FMCG <b class="num" id="shFm"></b></span><span><i class="sw box" style="background:var(--fresh)"></i>FRESH <b class="num" id="shFr"></b></span></div>
       <div class="split" id="split"></div>
       <div class="pie" id="mix"></div>
     </section>
-    <section class="card">
+    <section class="card dsec">
       <div class="sec-title"><h2>Doanh thu dự kiến ngành hàng so với tháng <span data-t="P"></span></h2><span class="note">Theo FMCG / FRESH, giảm nhiều nhất ở trên · ẩn ngành &lt; 0,2% doanh thu</span></div>
       <div class="hbars" id="catCmp"></div>
     </section>
   </div>
 
-  <section class="card" id="rankSec">
+  <section class="card dsec" id="rankSec">
     <div class="sec-title"><h2>Xếp hạng shop theo % doanh thu giảm so với tháng <span data-t="P"></span></h2><span class="note">Giảm nhiều nhất ở trên · Bấm vào một dòng để lọc cả trang</span></div>
     <div class="tbl-wrap"><table id="rankTbl"></table></div>
   </section>
 
-  <section class="card">
+  <section class="card dsec">
     <div class="sec-title"><h2>Hiệu quả Fresh</h2><span class="note" id="freshNote">Lợi nhuận và tỷ lệ doanh thu / giá vốn cơ bản, lũy kế tháng <span data-t="M"></span></span></div>
     <div class="fresh-kpis" id="freshKpis"></div>
     <div class="stack">
@@ -615,7 +620,7 @@ body.pv .wrap{padding-bottom:120px}
     </div>
   </section>
 
-  <section class="card" id="lossSec">
+  <section class="card dsec" id="lossSec">
     <div class="sec-title"><h2>Tỷ lệ hủy / nhập theo ngành hàng Fresh</h2><span class="note" id="lossNote"></span></div>
     <p class="lhint">Bấm vào một ngành hàng: khi xem toàn khu vực sẽ hiện tỷ lệ hủy / nhập của từng siêu thị; khi xem 1 siêu thị sẽ hiện top 5 sản phẩm có tỷ lệ hủy cao nhất.</p>
     <div class="fresh-kpis" id="lossKpis"></div>
@@ -749,7 +754,7 @@ async function exportGoalPdf(btn,filename){
 const __R=(window.__ME||{}).role;let CAN_EDIT=__R==='admin'||__R==='editor';const IS_ADMIN=__R==='admin';let VIEW='goal';try{if(/^#(dash|dashboard)$/i.test(location.hash))VIEW='dash';if(/^#thi-?dua$/i.test(location.hash))VIEW='comp';if(/^#(doanh-?thu-?)?nam$/i.test(location.hash))VIEW='year';if(/^#muc-?tieu$/i.test(location.hash))VIEW='goal'}catch(e){}
 function applyView(){const w=document.querySelector('.wrap');if(!w)return;w.classList.toggle('v-comp',VIEW==='comp');w.classList.toggle('v-year',VIEW==='year');w.classList.toggle('v-goal',VIEW==='goal');
   document.querySelectorAll('.tabs .tab').forEach(b=>{const on=b.dataset.view===VIEW;b.setAttribute('aria-selected',on);b.classList.toggle('on',on)})}
-function setView(v){VIEW=v;applyView();window.scrollTo({top:0})}
+function setView(v){VIEW=v;applyView();window.scrollTo({top:0});if(v==='dash')requestAnimationFrame(()=>drawCurrent&&drawCurrent())} // vẽ lại biểu đồ đúng chiều rộng khi mở tab
 document.addEventListener('click',e=>{const b=e.target.closest('.tabs .tab');if(b)setView(b.dataset.view)});
 function applyEditor(){const b=document.getElementById('uploadBtn');if(b)b.hidden=!CAN_EDIT;document.querySelectorAll('.ed-only').forEach(e=>e.hidden=!IS_ADMIN);document.querySelectorAll('.view-only').forEach(e=>e.hidden=IS_ADMIN)}
 
