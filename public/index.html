@@ -720,17 +720,20 @@ async function renderGoalPages(opt={}){
   const wrapLines=(t,font,maxW)=>{ctx.font=font;const words=t.split(' ');const out=[];let line='';for(const w of words){const tt=line?line+' '+w:w;if(ctx.measureText(tt).width>maxW&&line){out.push(line);line=w}else line=tt}if(line)out.push(line);return out};
   const table=(title,tbl)=>{
     const rows=[...tbl.querySelectorAll('tr')].filter(tr=>!tr.classList.contains('lxd')).map(tr=>({kind:tr.parentElement.tagName,cells:[...tr.children].map(td=>{const pill=td.querySelector('.pill');const small=td.querySelector('small');
-      return{t:(pill?pill.textContent+(small?'  '+small.textContent:''):td.textContent).replace(/\s+/g,' ').trim(),left:td.classList.contains('l')||td===tr.children[0],
+      return{t:(pill?pill.textContent+(small?'  '+small.textContent:''):td.textContent).replace(/[\u2600-\u27BF\uFE0F]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F\uDE80-\uDEFF]|\uD83E[\uDD00-\uDDFF]/g,'').replace(/\s+/g,' ').trim(),left:td.classList.contains('l')||td===tr.children[0],
         col:td.classList.contains('pos')||td.querySelector('.pos')?'pos':td.classList.contains('neg')||td.querySelector('.neg')?'neg':'',pill:pill?(pill.classList.contains('up')?'up':'down'):null,need:td.classList.contains('need'),bold:!!td.querySelector('b')||td.tagName==='TH'}})}));
     if(!rows.length)return;
-    const nc=Math.max(...rows.map(r=>r.cells.length));const fs=14,RH=27,PAD=10;
-    const wd=new Array(nc).fill(0);rows.forEach(r=>{if(r.cells.length<nc)return;r.cells.forEach((c,i)=>{ctx.font=`${c.bold?600:400} ${fs}px ${F}`;wd[i]=Math.max(wd[i],ctx.measureText(c.t).width+2*PAD+(c.pill?12:0))})});
-    const tot=wd.reduce((a,b)=>a+b,0);const sc=tot>UW?UW/tot:1;let extra=tot<UW?(UW-tot):0;const W=wd.map((w,i)=>w*sc+(i===0?extra:0));
+    const nc=Math.max(...rows.map(r=>r.cells.length));let fs=14;const RH=27,PAD=10;
+    const measure=()=>{const w=new Array(nc).fill(0);rows.forEach(r=>{if(r.cells.length<nc)return;r.cells.forEach((c,i)=>{ctx.font=`${c.bold?600:400} ${fs}px ${F}`;w[i]=Math.max(w[i],ctx.measureText(c.t).width+2*PAD+(c.pill?12:0))})});return w};
+    let wd=measure();let tot=wd.reduce((a,b)=>a+b,0);
+    // bảng quá rộng: thu nhỏ chữ để tên siêu thị không bị cắt
+    for(let k=0;k<6&&tot>UW&&fs>10;k++){fs=Math.max(10,Math.floor(fs*UW/tot*10)/10);wd=measure();tot=wd.reduce((a,b)=>a+b,0)}
+    const sc=tot>UW?UW/tot:1;let extra=tot<UW?(UW-tot):0;const W=wd.map((w,i)=>w*sc+(i===0?extra:0));
     const drawRow=r=>{if(r.cells.length<nc){ctx.font=`400 ${fs}px ${F}`;const ls=wrapLines(r.cells[0].t,`400 ${fs}px ${F}`,UW-2*PAD);ls.forEach((l,k)=>txt(l,MG+PAD,y+RH/2+k*22,`400 ${fs}px ${F}`,C.muted));y+=Math.max(RH,ls.length*22+12);return}
       const isH=r.kind==='THEAD',isF=r.kind==='TFOOT';
       if(isH||isF){ctx.fillStyle=C.head;ctx.fillRect(MG,y,UW,RH)}
       let x=MG;r.cells.forEach((c,i)=>{const w=W[i];if(c.need){ctx.fillStyle=C.accSoft;ctx.fillRect(x,y,w,RH)}
-        const font=`${c.bold||isF?600:400} ${isH?13:fs}px ${F}`;let col=isH?C.ink2:c.col==='pos'?C.good:c.col==='neg'?C.bad:C.ink;if(c.need&&isH)col=C.acc;
+        const font=`${c.bold||isF?600:400} ${isH?Math.min(13,fs):fs}px ${F}`;let col=isH?C.ink2:c.col==='pos'?C.good:c.col==='neg'?C.bad:C.ink;if(c.need&&isH)col=C.acc;
         if(c.pill){ctx.font=`600 13px ${F}`;const pt=c.t.split('  ')[0],rest=c.t.slice(pt.length).trim();const pw=ctx.measureText(pt).width+16;const px=c.left?x+PAD:x+w-PAD-pw-(rest?ctx.measureText(rest).width+8:0);
           ctx.fillStyle=c.pill==='up'?C.goodBg:C.badBg;ctx.beginPath();ctx.roundRect?ctx.roundRect(px,y+4,pw,RH-8,9):ctx.rect(px,y+4,pw,RH-8);ctx.fill();
           txt(pt,px+8,y+RH/2,`600 13px ${F}`,c.pill==='up'?C.good:C.bad);if(rest)txt(rest,px+pw+8,y+RH/2,`400 13px ${F}`,c.pill==='up'?C.good:C.bad)}
@@ -1225,8 +1228,8 @@ function render(){
      R.forEach((x,i)=>{t+=`<tr${!VIEW_SHOP?` tabindex="0" data-s="${x.s}"`:''} class="${cur===x.s?'sel':''}"><td class="cm-h"><span class="rk">${i+1}</span></td><td class="l">${esc(shopName(x.s))}</td><td>${tr(x.base)} tr</td><td class="cm-h">${tr(x.cum)} tr</td><td><b>${tr(x.proj)} tr</b></td><td class="${x.r!=null&&x.r>=lv[0].r?'pos':'neg'}"><b>${x.r==null?'—':pct(x.r)}</b></td><td class="l"><span class="lvp l${x.li+1}">${lvName(x.li)}</span></td><td>${x.nx?(x.need==null?'—':`${tr1(x.need)} tr <small class="muted">→ ${lvName(lv.indexOf(x.nx))}</small>`):'<span class="pos">Mức cao nhất</span>'}</td></tr>`});
      if(R.length>1)t+=`</tbody><tfoot><tr><th class="cm-h"></th><th class="l">Toàn khu vực</th><th>${tr(T.base)} tr</th><th class="cm-h">${tr(T.cum)} tr</th><th>${tr(T.proj)} tr</th><th>${T.r==null?'—':pct(T.r)}</th><th class="l"></th><th></th></tr></tfoot>`;else t+='</tbody>';
      t+='</table>';
-     return `<div class="ct-card"><div class="ct-h"><h3>${esc(c.name)}</h3><div class="ct-meta"><span>🗓 ${esc(c.time)}</span><span>🏬 ${esc(c.scope)}</span><span>🎯 ${esc(c.goal)}</span></div>
-       <div class="ct-chips">${c.cats.map(n=>`<span${miss.includes(n)?' style="border-color:var(--bad);color:var(--bad)" title="Không tìm thấy ngành hàng này trong số liệu"':''}>${esc(n)}</span>`).join('')}${lv.map(l=>`<span class="lv">Mức ${l.n}: ≥ ${nf(0).format(l.r*100)}% DT T${P}</span>`).join('')}</div>
+     return `<div class="ct-card"><div class="ct-h"><h3 title="${esc(c.time)} · ${esc(c.scope)} · ${esc(c.goal)} · ${esc(c.cats.join(', '))}">${esc(c.name)}</h3>
+       <div class="ct-chips">${lv.map(l=>`<span class="lv">Mức ${l.n}: ≥ ${nf(0).format(l.r*100)}% DT T${P}</span>`).join('')}</div>
        ${(()=>{const mm=c.time.match(/\/(\d{1,2})(?:\/\d+)?\s*$/);const cm=mm?+mm[1]:null;return cm&&cm!==M?`<p class="msg-err" style="margin:8px 0 0;font-size:12px">Chương trình áp dụng tháng ${cm}, số liệu đang là tháng ${M}/${D.cur.y} (so với T${P}).</p>`:''})()}
        ${miss.length?`<p class="msg-err" style="margin:8px 0 0;font-size:12px">Chưa khớp ngành hàng: ${miss.map(esc).join(', ')}.</p>`:''}</div>
        <div class="ct-b"><div class="ct-kpis">
