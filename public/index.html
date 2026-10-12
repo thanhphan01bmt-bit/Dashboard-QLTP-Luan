@@ -365,7 +365,7 @@ body.pv .wrap{padding-bottom:120px}
 .stb.fut i{background:var(--grid)}.stb span{position:absolute;bottom:-16px;left:0;right:0;text-align:center;font-size:9px;color:var(--muted)}
 .strip{display:inline-flex;gap:2px;flex-wrap:nowrap}.strip i{width:7px;height:14px;border-radius:2px;background:var(--grid)}.strip i.on{background:var(--accent)}.strip i.fut{opacity:.35}.strip i.td{outline:1.5px solid var(--ink);outline-offset:1px}
 .sttbl td,.sttbl th{vertical-align:middle}
-@media (max-width:760px){.m-hide,#goalPdf,#goalTbl .m-goal{display:none!important}}
+@media (max-width:760px){.m-hide,#goalPdf,#goalTbl .m-goal,#tabComp{display:none!important}}
 @media (max-width:760px){.stb span:not(.lb){visibility:hidden}}
 .newdata{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));z-index:45;display:flex;gap:12px;align-items:center;background:var(--ink);color:var(--surface);border-radius:12px;padding:10px 12px 10px 16px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:13px;width:max-content;max-width:calc(100% - 24px)}
 .newdata .btn.primary{padding:6px 12px;flex:none}
@@ -777,7 +777,7 @@ async function exportGoalPdf(btn,filename){
   }catch(e){console.error(e);alert('Không tạo được PDF.')}
   finally{btn.disabled=false;btn.innerHTML=old}
 }
-const __R=(window.__ME||{}).role;let CAN_EDIT=__R==='admin'||__R==='editor';const IS_ADMIN=__R==='admin';let VIEW='goal';try{if(/^#(dash|dashboard)$/i.test(location.hash))VIEW='dash';if(/^#thi-?dua$/i.test(location.hash))VIEW='comp';if(/^#(doanh-?thu-?)?nam$/i.test(location.hash))VIEW='year';if(/^#muc-?tieu$/i.test(location.hash))VIEW='goal';if(/^#(thi-?dua-?)?nganh(-?hang)?$/i.test(location.hash))VIEW='cat'}catch(e){}
+const __R=(window.__ME||{}).role;let CAN_EDIT=__R==='admin'||__R==='editor';const IS_ADMIN=__R==='admin';let VIEW='goal';try{if(/^#(dash|dashboard)$/i.test(location.hash))VIEW='dash';if(/^#thi-?dua$/i.test(location.hash))VIEW='comp';if(/^#(doanh-?thu-?)?nam$/i.test(location.hash))VIEW='year';if(/^#muc-?tieu$/i.test(location.hash))VIEW='goal';if(/^#(thi-?dua-?)?nganh(-?hang)?$/i.test(location.hash))VIEW='cat';if(VIEW==='comp'&&matchMedia('(max-width:760px)').matches)VIEW='goal'}catch(e){}
 function applyView(){const w=document.querySelector('.wrap');if(!w)return;w.classList.toggle('v-comp',VIEW==='comp');w.classList.toggle('v-cat',VIEW==='cat');w.classList.toggle('v-year',VIEW==='year');w.classList.toggle('v-goal',VIEW==='goal');
   document.querySelectorAll('.tabs .tab').forEach(b=>{const on=b.dataset.view===VIEW;b.setAttribute('aria-selected',on);b.classList.toggle('on',on)})}
 function setView(v){VIEW=v;applyView();window.scrollTo({top:0});if(v==='dash')requestAnimationFrame(()=>drawCurrent&&drawCurrent())} // vẽ lại biểu đồ đúng chiều rộng khi mở tab
