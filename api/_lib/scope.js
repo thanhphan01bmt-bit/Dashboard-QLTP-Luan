@@ -32,5 +32,11 @@ export function filterShop(d, s) {
     for (const m in d.ytd.mon) mon[m] = pick(d.ytd.mon[m], s);
     out.ytd = { ...d.ytd, mon };
   }
+  if (d.ly && d.ly.mon) {
+    const mon = {}, day = {};
+    for (const m in d.ly.mon) mon[m] = pick(d.ly.mon[m], s);
+    for (const m in d.ly.day || {}) day[m] = pick(d.ly.day[m], s);
+    out.ly = { ...d.ly, mon, day };
+  }
   return out;
 }
