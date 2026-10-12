@@ -258,6 +258,8 @@ td.dt-big b{font-size:15px}
 .mbars{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px;align-items:end;height:230px;margin:6px 0 18px;padding-top:4px;border-bottom:1px solid var(--axis)}
 .mb{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0;gap:4px}
 .mb .lv{font-size:11px;font-weight:600;color:var(--ink2);white-space:nowrap}
+.mb{position:relative}.mb .lyk{position:absolute;left:50%;transform:translateX(-50%);width:min(58px,96%);border-top:2px dashed var(--ink2);pointer-events:none}.sw.lyl{display:inline-block;width:16px;border-top:2px dashed var(--ink2);vertical-align:middle;margin-right:6px;height:0;border-radius:0}
+@media (min-width:801px){#yearKpis.k5{grid-template-columns:repeat(5,minmax(0,1fr))}}@media (max-width:800px){#yearKpis.k5 .fk:last-child{grid-column:1/-1}}
 .mb .col{width:min(46px,80%);position:relative;border-radius:4px 4px 0 0;background:var(--accent)}
 .mb .col.fc{background:var(--accent-soft);outline:1.5px dashed var(--accent);outline-offset:-1.5px}
 .mb .col.fc i{position:absolute;left:0;right:0;bottom:0;background:var(--accent);border-radius:0}
@@ -580,10 +582,11 @@ body.pv .wrap{padding-bottom:120px}
     <div class="sec-title"><h2>Doanh thu năm <span data-t="Y"></span> theo tháng</h2><span class="note" id="yearNote"></span></div>
     <div class="fresh-kpis" id="yearKpis"></div>
     <div id="declineBox"></div>
-    <div class="legend" style="margin-bottom:4px"><span><i class="sw box" style="background:var(--accent)"></i>Doanh thu tháng</span><span><i class="sw box" style="background:var(--good)"></i>Tháng cao nhất</span><span><i class="sw box" style="background:var(--accent-soft);outline:1.5px dashed var(--accent);outline-offset:-1.5px"></i>Tháng hiện tại: lũy kế + phần dự kiến</span></div>
+    <div class="legend" style="margin-bottom:4px"><span><i class="sw box" style="background:var(--accent)"></i>Doanh thu tháng</span><span><i class="sw box" style="background:var(--good)"></i>Tháng cao nhất</span><span><i class="sw box" style="background:var(--accent-soft);outline:1.5px dashed var(--accent);outline-offset:-1.5px"></i>Tháng hiện tại: lũy kế + phần dự kiến</span><span id="lyLeg" hidden><i class="sw lyl" aria-hidden="true"></i>Cùng tháng năm trước</span></div>
     <div id="yearChart"></div>
     <div class="tbl-wrap"><table id="yearTbl"></table></div>
-    <p class="lhint" style="margin:10px 0 0">Tháng <span data-t="M"></span> so sánh bằng doanh thu dự kiến cả tháng. Cột "TB/ngày" giúp so sánh công bằng giữa các tháng có số ngày khác nhau. Tháng <span data-t="P"></span> và <span data-t="M"></span> lấy từ file hằng ngày; các tháng trước lấy từ file doanh thu năm.</p>
+    <div id="yoyBox"></div>
+    <p class="lhint" style="margin:10px 0 0">Tháng <span data-t="M"></span> so sánh bằng doanh thu dự kiến cả tháng. Cột "TB/ngày" giúp so sánh công bằng giữa các tháng có số ngày khác nhau. Tháng <span data-t="P"></span> và <span data-t="M"></span> lấy từ file hằng ngày; các tháng trước và năm trước lấy từ file doanh thu / số bill. Cột "% so năm trước" của tháng <span data-t="M"></span> so doanh thu dự kiến với cả tháng năm trước.</p>
   </section>
 
   <section class="card" id="catSec">
@@ -1084,15 +1087,27 @@ function render(){
       else if(m===D.prev.m&&D.prev.y===D.cur.y)v=aug;
       else if(Y.mon[m])v=tot(shops.map(s=>Y.mon[m][s]||0));
       rows.push({m,v,days,fc,full:fc!=null?fc:v,dim:dm(m)})}
+    // so cùng kỳ năm trước (file doanh thu / số bill năm trước)
+    const LY=D.ly&&D.ly.y===D.cur.y-1&&D.ly.mon?D.ly:null,LYY=D.cur.y-1,ldm=m=>new Date(LYY,m,0).getDate();
+    const lyHas=(m,days)=>!!(LY&&LY.mon[m])&&!(LY.n&&LY.n[m]&&LY.n[m]<days);
+    const lyFull=(m,ss)=>lyHas(m,ldm(m))?tot(ss.map(s=>LY.mon[m][s]||0)):null;
+    const lyPart=(m,ss,days)=>{if(!lyHas(m,Math.min(days,ldm(m))))return null;const dd=LY.day&&LY.day[m];
+      if(dd)return tot(ss.map(s=>{const a=dd[s]||[];let t=0;for(let i=0;i<days&&i<a.length;i++)t+=a[i]||0;return t}));
+      const f=lyFull(m,ss);return f==null?null:f*Math.min(1,days/ldm(m))};
+    rows.forEach(r=>{r.ly=lyFull(r.m,shops);r.lyCK=r.fc!=null?lyPart(r.m,shops,r.days):r.ly});
+    // lũy kế cùng kỳ: chỉ cộng những tháng có số cả hai năm
+    const ckRows=rows.filter(r=>r.v!=null&&r.lyCK!=null);const ckNow=tot(ckRows.map(r=>r.v)),ckLY=tot(ckRows.map(r=>r.lyCK));
+    const lyMiss=LY?rows.filter(r=>r.lyCK==null).map(r=>'T'+r.m):[];
     const done=rows.filter(r=>r.fc==null&&r.v!=null);const miss=rows.filter(r=>r.v==null).map(r=>'T'+r.m);
     const ytdV=tot(rows.map(r=>r.v||0));const avg=done.length?tot(done.map(r=>r.v))/done.length:0;
     const best=done.reduce((a,r)=>!a||r.v>a.v?r:a,null);
     const cr=rows[rows.length-1],pr=rows[rows.length-2];
     const fk=(l,v,sub)=>`<div class="fk"><div class="lbl">${l}</div><div class="val num">${v}</div><div class="muted" style="font-size:12px">${sub}</div></div>`;
-    document.getElementById('yearKpis').innerHTML=
+    document.getElementById('yearKpis').classList.toggle('k5',!!(LY&&ckLY>0));document.getElementById('yearKpis').innerHTML=
       fk(`Doanh thu năm ${D.cur.y}`,moneyS(ytdV),`1/1–${d9}/${M}${miss.length?` · <span class="pill warn">Thiếu ${miss.join(', ')}</span>`:''}`)+
       fk(`TB tháng (T1–T${D.cur.m-1})`,moneyS(avg),`${done.length} tháng đủ dữ liệu`)+
       fk('Tháng cao nhất',best?`T${best.m}`:'—',best?moneyS(best.v):'')+
+      (LY&&ckLY>0?fk(`So cùng kỳ năm ${LYY}`,`<span class="${ckNow>=ckLY?'pos':'neg'}">${sgn(ckNow/ckLY-1)}</span>`,`${moneyS(ckNow)} vs ${moneyS(ckLY)}${lyMiss.length?` · <span class="pill warn">Thiếu ${lyMiss.join(', ')}/${LYY}</span>`:''}`):'')+
       fk(`Dự kiến T${M} so T${P}`,pr&&pr.v?`<span class="${cr.fc>=pr.v?'pos':'neg'}">${sgn(cr.fc/pr.v-1)}</span>`:'—',pr&&pr.v?`${moneyS(cr.fc)} vs ${moneyS(pr.v)}`:'');
     {const db=document.getElementById('declineBox');db.hidden=cur!=='all';
      if(cur!=='all')db.innerHTML='';else if(!DECL||!DECL.length){db.innerHTML=`<div class="dbox" style="background:var(--good-bg);border-color:transparent"><h3 style="margin:0">Không có siêu thị nào giảm doanh thu 2 tháng liên tiếp trở lên</h3></div>`}
@@ -1105,19 +1120,31 @@ function render(){
         <td class="neg"><b>${sgn(x.drop)}</b><br><small class="muted">${moneyS(x.v[x.ms[0]])} → ${moneyS(x.v[D.cur.m])}</small></td></tr>`}).join('')}</tbody></table></div></div>`;
      db.querySelectorAll('tr[data-s]').forEach(tr=>{const go=()=>setShop(tr.dataset.s);tr.onclick=go;tr.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}})}
     document.getElementById('yearNote').textContent=`Lũy kế đến ${d9}/${M}/${D.cur.y}`;
-    const mx=Math.max(...rows.map(r=>r.full||0));
+    const mx=Math.max(...rows.map(r=>Math.max(r.full||0,r.ly||0)));const lyMk=r=>r.ly?`<b class="lyk" style="bottom:${r.ly/mx*88}%" aria-hidden="true"></b>`:'';const lyT=r=>r.ly?` · cùng tháng ${LYY}: ${moneyS(r.ly)}`:'';
     document.getElementById('yearChart').innerHTML=`<div class="mbars" role="img" aria-label="Doanh thu theo tháng năm ${D.cur.y}">${rows.map(r=>{const h=(r.full||0)/mx*88;
-      if(r.fc!=null)return `<div class="mb" title="T${r.m}: lũy kế ${moneyS(r.v)} đến ${d9}/${r.m} · dự kiến ${moneyS(r.fc)}"><span class="lv num">${moneyS(r.fc).replace(' tỷ','')}</span><div class="col fc" style="height:${h}%"><i style="height:${r.v/r.fc*100}%"></i></div></div>`;
-      return `<div class="mb ${best&&best.m===r.m?'best':''}" title="T${r.m}: ${r.v==null?'chưa có dữ liệu':moneyS(r.v)}"><span class="lv num">${r.v==null?'—':moneyS(r.v).replace(' tỷ','')}</span><div class="col" style="height:${h}%"></div></div>`}).join('')}</div>
+      if(r.fc!=null)return `<div class="mb" title="T${r.m}: lũy kế ${moneyS(r.v)} đến ${d9}/${r.m} · dự kiến ${moneyS(r.fc)}${lyT(r)}"><span class="lv num">${moneyS(r.fc).replace(' tỷ','')}</span><div class="col fc" style="height:${h}%"><i style="height:${r.v/r.fc*100}%"></i></div>${lyMk(r)}</div>`;
+      return `<div class="mb ${best&&best.m===r.m?'best':''}" title="T${r.m}: ${r.v==null?'chưa có dữ liệu':moneyS(r.v)}${lyT(r)}"><span class="lv num">${r.v==null?'—':moneyS(r.v).replace(' tỷ','')}</span><div class="col" style="height:${h}%"></div>${lyMk(r)}</div>`}).join('')}</div>
       <div class="mlab">${rows.map(r=>`<span>T${r.m}</span>`).join('')}</div>`;
-    let t=`<thead><tr><th>Tháng</th><th>Doanh thu</th><th>TB/ngày</th><th>So tháng trước</th><th>% so tháng trước</th><th>% TB/ngày so tháng trước</th></tr></thead><tbody>`;
+    let t=`<thead><tr><th>Tháng</th><th>Doanh thu</th><th>TB/ngày</th><th>So tháng trước</th><th>% so tháng trước</th><th>% TB/ngày so tháng trước</th>${LY?`<th title="Doanh thu cả tháng cùng kỳ năm ${LYY}">Cùng tháng ${LYY}</th><th>% so ${LYY}</th>`:''}</tr></thead><tbody>`;
     rows.forEach((r,i)=>{const p=i?rows[i-1]:null;const cv=r.full;const pv=p?p.full:null;
       const pd=r.fc!=null?r.v/r.days:r.v/r.dim, ppd=p&&p.v!=null?(p.fc!=null?p.v/p.days:p.v/p.dim):null;
       const ok=cv!=null&&pv;const d=ok?cv-pv:null;
       t+=`<tr${r.fc!=null?' class="sel"':''}><td>T${r.m}/${D.cur.y}${r.fc!=null?` <small class="muted">(dự kiến · lũy kế ${moneyS(r.v)})</small>`:''}</td><td><b>${cv==null?'—':moneyS(cv)}</b></td><td>${r.v==null?'—':moneyS(pd)}</td>
-      <td class="${ok?(d>=0?'pos':'neg'):''}">${ok?sgnM(d):'—'}</td><td>${ok?`<span class="pill ${d>=0?'up':'down'}">${sgn(cv/pv-1)}</span>`:'—'}</td><td class="${ppd&&r.v!=null?(pd>=ppd?'pos':'neg'):''}">${ppd&&r.v!=null?sgn(pd/ppd-1):'—'}</td></tr>`});
-    t+=`</tbody><tfoot><tr><th>Lũy kế năm</th><th>${moneyS(ytdV)}</th><th>${moneyS(ytdV/rows.reduce((a,r)=>a+(r.v==null?0:(r.fc!=null?r.days:r.dim)),0))}</th><th colspan="3"></th></tr></tfoot>`;
-    document.getElementById('yearTbl').innerHTML=t}}
+      <td class="${ok?(d>=0?'pos':'neg'):''}">${ok?sgnM(d):'—'}</td><td>${ok?`<span class="pill ${d>=0?'up':'down'}">${sgn(cv/pv-1)}</span>`:'—'}</td><td class="${ppd&&r.v!=null?(pd>=ppd?'pos':'neg'):''}">${ppd&&r.v!=null?sgn(pd/ppd-1):'—'}</td>${LY?(()=>{const ok2=cv!=null&&r.ly;return `<td>${r.ly?moneyS(r.ly):'—'}</td><td>${ok2?`<span class="pill ${cv>=r.ly?'up':'down'}">${sgn(cv/r.ly-1)}</span>`:'—'}</td>`})():''}</tr>`});
+    t+=`</tbody><tfoot><tr><th>Lũy kế năm</th><th>${moneyS(ytdV)}</th><th>${moneyS(ytdV/rows.reduce((a,r)=>a+(r.v==null?0:(r.fc!=null?r.days:r.dim)),0))}</th><th colspan="3"></th>${LY?`<th title="Lũy kế cùng kỳ năm ${LYY} (đến ${d9}/${M}/${LYY}, chỉ tính tháng có số cả hai năm)">${ckLY>0?moneyS(ckLY):'—'}</th><th>${ckLY>0?`<span class="pill ${ckNow>=ckLY?'up':'down'}">${sgn(ckNow/ckLY-1)}</span>`:'—'}</th>`:''}</tr></tfoot>`;
+    document.getElementById('yearTbl').innerHTML=t;
+    {const yb=document.getElementById('yoyBox'),me=window.__ME||{},ed=me.role==='admin'||me.role==='editor';
+     document.getElementById('lyLeg').hidden=!LY;
+     if(!LY){yb.innerHTML=ed?`<p class="lhint" style="margin:12px 0 0">Muốn so với năm ${LYY}: tải file doanh thu / số bill (có cột Doanh thu offline) của năm ${LYY} qua nút "Tải file lên". Có thể tải file cả năm ${LYY} một lần.</p>`:'';}
+     else if(cur!=='all'||!ckRows.length)yb.innerHTML='';
+     else{const ms=ckRows.map(r=>r.m);
+      const sv=(s,m)=>m===D.cur.m?tot(sumDaily(D.sep.daily,[s],31)):(m===D.prev.m&&D.prev.y===D.cur.y)?tot(sumDaily(D.aug.daily,[s],31)):((Y.mon[m]||{})[s]||0);
+      const sl=(s,m)=>m===D.cur.m?lyPart(m,[s],d9):lyFull(m,[s]);
+      const R6=SHOPS.map(s=>{const a=tot(ms.map(m=>sv(s,m))),b=tot(ms.map(m=>sl(s,m)||0));return{s,a,b,g:b>0?a/b-1:null}}).filter(r=>r.a||r.b)
+        .sort((x,y)=>(x.g??9)-(y.g??9));
+      yb.innerHTML=`<h3 style="margin:18px 0 6px;font-size:15px">Tăng trưởng từng siêu thị so cùng kỳ năm ${LYY}</h3><p class="lhint" style="margin:0 0 8px">Lũy kế ${ms.length===rows.length?`1/1–${d9}/${M}`:`các tháng ${ms.map(m=>'T'+m).join(', ')} (tháng ${M} tính đến ngày ${d9})`}. Thấp nhất ở trên. Bấm một dòng để xem siêu thị đó.</p>
+       <div class="tbl-wrap"><table><thead><tr><th class="l">Siêu thị</th><th>Năm ${D.cur.y}</th><th>Cùng kỳ ${LYY}</th><th>Tăng trưởng</th></tr></thead><tbody>${R6.map(r=>`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(shopName(r.s))}</td><td><b>${moneyS(r.a)}</b></td><td>${r.b?moneyS(r.b):'—'}</td><td>${r.g==null?'<span class="pill">Mới</span>':`<span class="pill ${r.g>=0?'up':'down'}">${sgn(r.g)}</span>`}</td></tr>`).join('')}</tbody></table></div>`;
+      yb.querySelectorAll('tr[data-s]').forEach(tr=>{const go=()=>setShop(tr.dataset.s);tr.onclick=go;tr.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}})}}}}
 
   // KPIs
   const k=(lbl,val,unit,sub,cls='')=>`<div class="kpi ${cls}"><div class="lbl">${lbl}</div><div class="val num">${val}<small>${unit}</small></div><div class="sub">${sub}</div></div>`;
@@ -1449,9 +1476,9 @@ async function readFile(f){
     const cOff=ix('Doanh thu offline'),cOn=ix('Doanh thu Online');
     const months={};
     rows.forEach(r=>{const d=toYMD(r[cD]);if(!d)return;const k=ymKey(d.y,d.m);
-      const o=months[k]||(months[k]={y:d.y,m:d.m,bills:{},billDays:0,n:0,rev:cOff>=0?{}:null});
+      const o=months[k]||(months[k]={y:d.y,m:d.m,bills:{},billDays:0,n:0,rev:cOff>=0?{}:null,revd:cOff>=0?{}:null});
       const code=nz(r[cS]).split(' - ')[0].trim();if(!code)return;
-      const bb=o.bills[code]||(o.bills[code]={});bb[d.d]=(bb[d.d]||0)+Math.round(numU(r[cB]));if(o.rev)o.rev[code]=(o.rev[code]||0)+Math.round(numU(r[cOff])+(cOn>=0?numU(r[cOn]):0));
+      const bb=o.bills[code]||(o.bills[code]={});bb[d.d]=(bb[d.d]||0)+Math.round(numU(r[cB]));if(o.rev){const v=Math.round(numU(r[cOff])+(cOn>=0?numU(r[cOn]):0));o.rev[code]=(o.rev[code]||0)+v;const rd=o.revd[code]||(o.revd[code]=[]);rd[d.d-1]=(rd[d.d-1]||0)+v}
       if(d.d>o.billDays)o.billDays=d.d;o.n++});
     if(!Object.keys(months).length)throw new Error('Không đọc được ngày trong cột "Ngày".');
     return{kind:'bills',months,label:'Doanh thu / số bill',desc:Object.values(months).map(o=>`tháng ${o.m}/${o.y}, đến ngày ${o.billDays}`).join(' · ')}}
@@ -1478,15 +1505,22 @@ function merge(B,list){
   mon[ymKey(B.cur.y,B.cur.m)]=Object.assign({y:B.cur.y,m:B.cur.m},B.sep);
   mon[ymKey(B.prev.y,B.prev.m)]=Object.assign({y:B.prev.y,m:B.prev.m},B.aug);
   let shops=B.shops,fresh=B.fresh,freshMonth=B.freshMonth||null,loss=B.loss||null,contests=B.contests||null;
-  let ytd=B.ytd?JSON.parse(JSON.stringify(B.ytd)):null;
+  let ytd=B.ytd?JSON.parse(JSON.stringify(B.ytd)):null,ly=B.ly?JSON.parse(JSON.stringify(B.ly)):null;const revs=[];
   list.forEach(p=>{
     if(p.kind==='nganh'||p.kind==='bills')for(const k in p.months){const s=p.months[k];const o=mon[k]||(mon[k]={y:s.y,m:s.m});
-      if(p.kind==='nganh'){o.daily=s.daily;o.cat=s.cat;o.days=s.days;o.fday=s.fday}else{o.bills=s.bills;o.billDays=s.billDays;if(s.rev){if(!ytd||ytd.y<s.y)ytd={y:s.y,mon:{}};if(ytd.y===s.y)ytd.mon[s.m]=s.rev}}}
+      if(p.kind==='nganh'){o.daily=s.daily;o.cat=s.cat;o.days=s.days;o.fday=s.fday}else{o.bills=s.bills;o.billDays=s.billDays;if(s.rev)revs.push(s)}}
     if(p.kind==='base')shops=p.shops;
     if(p.kind==='loss')loss=p.loss;
     if(p.kind==='contest')contests=p.list;
     if(p.kind==='fresh'){fresh=p.rows;freshMonth=p.month||freshMonth}
   });
+  // doanh thu theo tháng: năm mới nhất vào ytd, năm liền trước vào ly (để so cùng kỳ)
+  if(revs.length){const maxY=Math.max(ytd?ytd.y:0,...revs.map(s=>s.y));
+    if(ytd&&ytd.y<maxY){if(ytd.y===maxY-1){const same=ly&&ly.y===ytd.y;ly={y:ytd.y,mon:Object.assign({},same?ly.mon:{},ytd.mon),day:same?ly.day||{}:{},n:same?ly.n||{}:{}}}ytd=null}
+    if(!ytd)ytd={y:maxY,mon:{}};if(ly&&ly.y!==maxY-1)ly=null;
+    revs.forEach(s=>{if(s.y===maxY)ytd.mon[s.m]=s.rev;
+      else if(s.y===maxY-1){if(!ly)ly={y:s.y,mon:{},day:{},n:{}};ly.day=ly.day||{};ly.n=ly.n||{};ly.mon[s.m]=s.rev;ly.n[s.m]=s.billDays;
+        if(s.revd){const dd={};for(const c in s.revd)dd[c]=Array.from(s.revd[c],v=>v||0);ly.day[s.m]=dd}}})}
   const keys=Object.keys(mon).filter(k=>mon[k].daily).sort();
   const c=mon[keys[keys.length-1]];
   const pm=c.m===1?{y:c.y-1,m:12}:{y:c.y,m:c.m-1};const p=mon[ymKey(pm.y,pm.m)];
@@ -1496,7 +1530,7 @@ function merge(B,list){
   if(!p||!p.bills)errs.push(`file doanh thu (số bill) tháng ${pm.m}/${pm.y}`);
   if(errs.length)return{errs,c};
   const pack=o=>({daily:o.daily,cat:o.cat,days:o.days,bills:o.bills,billDays:o.billDays,fday:o.fday});
-  const D={shops,freshCats:B.freshCats,cur:{m:c.m,y:c.y,dim:dimOf(c.y,c.m)},prev:{m:pm.m,y:pm.y,dim:dimOf(pm.y,pm.m)},aug:pack(p),sep:pack(c),fresh,freshMonth,loss,ytd,contests,goalPct:(PREVIEW_D||B).goalPct||0};
+  const D={shops,freshCats:B.freshCats,cur:{m:c.m,y:c.y,dim:dimOf(c.y,c.m)},prev:{m:pm.m,y:pm.y,dim:dimOf(pm.y,pm.m)},aug:pack(p),sep:pack(c),fresh,freshMonth,loss,ytd,ly,contests,goalPct:(PREVIEW_D||B).goalPct||0};
   const warn=[];
   if(p.days<dimOf(pm.y,pm.m))warn.push(`Doanh thu tháng ${pm.m} mới có đến ngày ${p.days}. Nên tải thêm file ngành hàng tháng ${pm.m} đủ cả tháng để so sánh chính xác.`);
   if(p.billDays<dimOf(pm.y,pm.m))warn.push(`Số bill tháng ${pm.m} mới có đến ngày ${p.billDays}. Nên tải thêm file doanh thu tháng ${pm.m} đủ cả tháng.`);
@@ -1549,7 +1583,7 @@ async function handleFiles(files){
   if(merged.errs){sum.className='upsum err';sum.innerHTML=`<b>Còn thiếu để hiển thị tháng ${merged.c.m}/${merged.c.y}:</b> ${merged.errs.map(escU).join('; ')}.`;return}
   const D=merged.D;
   sum.className='upsum';
-  sum.innerHTML=`<b>Sau khi cập nhật:</b> tháng ${D.cur.m}/${D.cur.y}, doanh thu đến ngày ${D.sep.days}, số bill đến ngày ${D.sep.billDays}, so với tháng ${D.prev.m}/${D.prev.y}.`+
+  sum.innerHTML=`<b>Sau khi cập nhật:</b> tháng ${D.cur.m}/${D.cur.y}, doanh thu đến ngày ${D.sep.days}, số bill đến ngày ${D.sep.billDays}, so với tháng ${D.prev.m}/${D.prev.y}.`+(D.ly&&D.ly.mon?`<br>Doanh thu năm ${D.ly.y} (để so cùng kỳ): ${Object.keys(D.ly.mon).map(Number).sort((a,b)=>a-b).map(m=>'T'+m).join(', ')}.`:'')+
     (merged.warn.length?'<br>'+merged.warn.map(w=>'• '+escU(w)).join('<br>'):'');
   applyBtn.disabled=false;
 }
