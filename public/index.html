@@ -1089,7 +1089,8 @@ function render(){
       rows.push({m,v,days,fc,full:fc!=null?fc:v,dim:dm(m)})}
     // so cùng kỳ năm trước (file doanh thu / số bill năm trước)
     const LY=D.ly&&D.ly.y===D.cur.y-1&&D.ly.mon?D.ly:null,LYY=D.cur.y-1,ldm=m=>new Date(LYY,m,0).getDate();
-    const lyHas=(m,days)=>!!(LY&&LY.mon[m])&&!(LY.n&&LY.n[m]&&LY.n[m]<days);
+    // tháng đủ: có ngày cuối tháng, hoặc đã có số tháng sau (siêu thị nghỉ Tết cuối tháng vẫn tính là đủ)
+    const lyHas=(m,days)=>!!(LY&&LY.mon[m])&&(!(LY.n&&LY.n[m]&&LY.n[m]<days)||(m<12?!!LY.mon[m+1]:!!(Y.mon&&Y.mon[1])));
     const lyFull=(m,ss)=>lyHas(m,ldm(m))?tot(ss.map(s=>LY.mon[m][s]||0)):null;
     const lyPart=(m,ss,days)=>{if(!lyHas(m,Math.min(days,ldm(m))))return null;const dd=LY.day&&LY.day[m];
       if(dd)return tot(ss.map(s=>{const a=dd[s]||[];let t=0;for(let i=0;i<days&&i<a.length;i++)t+=a[i]||0;return t}));
