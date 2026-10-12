@@ -938,6 +938,10 @@ function render(){
      const vn=new Date(dt.getTime()+7*3600e3);const same=vn.getUTCFullYear()===D.cur.y&&vn.getUTCMonth()+1===M&&vn.getUTCDate()===d9;
      return same?String(vn.getUTCHours()).padStart(2,'0')+':'+String(vn.getUTCMinutes()).padStart(2,'0'):null})();
    const dayLbl=upAt?`ngày ${d9}/${M} đến ${upAt}`:`ngày ${d9}/${M}`;
+   // ngày đủ số liệu cho mục 3-5: lưu từ 21h00 mới tính ngày đó, trước 21h chỉ hiện đến hôm trước
+   const fullCap=(()=>{const iso=(typeof PREVIEW_D!=='undefined'&&PREVIEW_D)?null:(window.__META||{}).updatedAt;const dt=iso?new Date(iso):new Date();
+     const vn=new Date(dt.getTime()+7*3600e3),y=vn.getUTCFullYear(),m=vn.getUTCMonth()+1,d=vn.getUTCDate();
+     if(y!==D.cur.y||m!==M)return(y>D.cur.y||(y===D.cur.y&&m>M))?99:0;return vn.getUTCHours()>=21?d:d-1})();
    document.getElementById('goalTitle').textContent=`Mục tiêu ngày ${d9}/${M}/${D.cur.y} · ${scopeName}`;
    document.getElementById('goalNote').innerHTML=`<span class="lg">Doanh thu ${upAt?`đến ${upAt} ngày ${d9}/${M}`:`đến hết ngày ${d9}/${M}`} · ${left>1?`còn ${left} ngày (tính cả ngày ${d9}/${M})`:'ngày cuối tháng'}</span><span class="sm">${upAt?`Đến ${upAt}`:'Cả ngày'} · ${left>1?`còn ${left} ngày`:'ngày cuối tháng'} · MT ${g>0?'+':''}${nf(0).format(g*100)}% so T${P}</span>`;
    document.getElementById('goalHint').textContent=`Mục tiêu tháng ${M} = DT tháng ${P} × ${nf(0).format(100+g*100)}%`;
@@ -1016,7 +1020,7 @@ function render(){
     h+=rows.length>1?`</tbody><tfoot><tr><th class="l">${single?'Tổng Fresh':'Toàn khu vực'}</th><th>${tr1(fgv)} tr</th><th class="need">${tr1(fdt)} tr</th><th class="${fgv>0?(fdt>=fgv?'pos':'neg'):''}">${fgv>0?pct(fdt/fgv):'—'}</th></tr></tfoot>`:'</tbody>';fe.innerHTML=h}
    // 3. loss by category for latest day
    const LG=c=>{const k=c.normalize('NFC').toLowerCase();if(/^th[uủ]y h[aả]i s[aả]n (nh[aậ]p kh[aẩ]u|t[aậ]p trung)$/.test(k))return 'Thủy Hải Sản Các Loại';if(/^th[iị]t (đ[iị]a ph[uư][oơ]ng|nh[aậ]p kh[aẩ]u)$/.test(k))return 'Thịt gia cầm gia súc các loại';return c};
-   const L=D.loss&&D.loss.daily&&D.loss.y===D.cur.y&&D.loss.m===D.cur.m?D.loss:null;let ld=0;if(L)for(const s in L.daily)for(const k in L.daily[s])ld=Math.max(ld,+k);
+   const L=D.loss&&D.loss.daily&&D.loss.y===D.cur.y&&D.loss.m===D.cur.m?D.loss:null;let ld=0;if(L)for(const s in L.daily)for(const k in L.daily[s])if(+k<=fullCap)ld=Math.max(ld,+k);
    // 3. Hủy thủy hải sản · 4. Tỷ lệ bán trứng (theo ngày cuối của file nhập xuất)
    const THS=c=>/^th[uủ]y h[aả]i s[aả]n/i.test(String(c).normalize('NFC')),EGG=c=>/^tr[uứ]ng/i.test(String(c).normalize('NFC'));
    const HX=!!(L&&L.hasX);const dayLb=ld?`ngày ${ld}/${M}`:'hôm nay';
@@ -1057,7 +1061,7 @@ function render(){
         trEl.after(d);trEl.classList.add('open')};
       trEl.onclick=tog;trEl.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog()}}});}
    // 5. Lượt khách & giá trị bill (ngày cuối có số bill)
-   {const bd=D.sep.billDays||0,be=document.getElementById('goalBill');const PB=D.prev.dim||new Date(D.prev.y,D.prev.m,0).getDate();
+   {let bd=Math.min(D.sep.billDays||0,fullCap);while(bd>0&&!SHOPS.some(s=>+(((D.sep.bills||{})[s]||{})[bd]||0)>0))bd--;const be=document.getElementById('goalBill');const PB=D.prev.dim||new Date(D.prev.y,D.prev.m,0).getDate();
     const bv=(s,k)=>k>=1?+(((D.sep.bills||{})[s]||{})[k]||0):+(((D.aug.bills||{})[s]||{})[PB+k]||0);
     document.getElementById('gh5').innerHTML=`5. Lượt khách &amp; giá trị bill <small>${bd?`ngày ${bd}/${M} · so cùng thứ tuần trước`:''}</small>`;
     if(!bd)be.innerHTML=`<tbody><tr><td class="l muted" style="white-space:normal">Chưa có số bill. Tải file doanh thu / số bill để xem.</td></tr></tbody>`;
