@@ -1933,7 +1933,9 @@ addEventListener('offline',()=>{if(window.__ME)setOffline(true)});
 // có phiên bản dashboard mới (service worker báo sau khi tải ngầm)
 let SHELL_NEW=false;
 function showShellNew(){if(!SHELL_NEW||!window.__ME)return;$('newDataTxt').textContent='Đã có phiên bản dashboard mới.';$('newData').hidden=false;$('newDataBtn').onclick=()=>location.reload()}
-if('serviceWorker' in navigator)navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.type==='shell-updated'){SHELL_NEW=true;showShellNew()}});
+if('serviceWorker' in navigator)navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.type==='shell-updated'){SHELL_NEW=true;showShellNew()}
+  // vừa nhận thông báo số liệu mới: kiểm tra ngay (bỏ qua giới hạn 1 phút); trang đang ẩn thì kiểm tra khi mở lại
+  if(e.data&&e.data.type==='data-push'&&!/test/.test(e.data.tag||'')){lastChk=0;if(document.visibilityState==='visible')setTimeout(()=>checkNew(true),1500)}});
 try{navigator.serviceWorker&&navigator.serviceWorker.startMessages()}catch(e){}
 start();
 // tự kiểm tra số liệu mới: khi quay lại app / tab và 5 phút một lần khi đang mở

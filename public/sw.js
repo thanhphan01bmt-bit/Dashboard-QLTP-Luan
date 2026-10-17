@@ -80,6 +80,10 @@ self.addEventListener('push', (e) => {
     tag: d.tag || 'kv-update',
     renotify: true,
     data: { url: d.url || '/' },
+  }).then(async () => {
+    // báo cho trang đang mở: có số liệu mới thì tải ngay (không chờ người dùng bấm thông báo)
+    const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    all.forEach((c) => c.postMessage({ type: 'data-push', tag: d.tag || '' }));
   }));
 });
 self.addEventListener('notificationclick', (e) => {
