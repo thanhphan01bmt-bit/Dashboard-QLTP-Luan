@@ -596,6 +596,7 @@ body.pv .wrap{padding-bottom:120px}
 
   <section class="card" id="compSec">
     <div class="sec-title"><h2>Bảng thi đua Quản lý</h2><span class="note">Thang 100 điểm · Doanh thu so T<span data-t="P"></span> 40 · Hiệu quả Fresh 35 · Kiểm soát hủy 25</span></div>
+    <p class="lhint" id="compPrize"></p>
     <p class="lhint">Bấm vào một quản lý để xem dashboard của siêu thị đó. Mỗi tiêu chí chấm theo tỷ lệ so với siêu thị tốt nhất khu vực: Doanh thu = (DT dự kiến ÷ DT tháng trước) ÷ mức cao nhất × 40; Fresh = (DT/giá vốn) ÷ mức cao nhất × 35; Hủy = chỉ số hủy thấp nhất ÷ chỉ số hủy của siêu thị × 25. Chỉ số hủy = SL hủy thực tế ÷ SL hủy nếu hủy đúng mức trung bình khu vực ở từng ngành (dưới 1,00 là tốt hơn mặt bằng).</p>
     <div class="tbl-wrap"><table id="compTbl"></table></div>
   </section>
@@ -1220,6 +1221,8 @@ function render(){
 
   // competition
   {const W1=40,W2=35,W3=25,LOSS_MAX=.25,RATIO_MIN=.95;const L=D.loss;
+    // điều kiện nhận thưởng: DT dự kiến tăng trưởng so tháng trước đạt mục tiêu (% mục tiêu ở tab Mục tiêu ngày)
+    const GOALG=(+D.goalPct||0)/100,PRZ=[1500000,1000000,500000],przTxt=v=>nf(0).format(v)+'đ',gLbl=(GOALG>0?'+':'')+nf(0).format(GOALG*100)+'%';
     const area={};if(L)for(const s in L.rows)for(const c in L.rows[s]){const v=L.rows[s][c];const a=area[c]||(area[c]=[0,0]);a[0]+=v[0];a[1]+=v[1]+v[2]}
     const cs=ALL.map(a=>{const s=a.s;const fr=D.fresh.filter(r=>r[0]===s);const dt=tot(fr.map(r=>r[2])),gv=tot(fr.map(r=>r[3]));
       let li=null,lr=null;if(L&&L.rows[s]){let exp=0,act=0,n=0;for(const c in L.rows[s]){const v=L.rows[s][c];if(area[c]&&area[c][0]>0)exp+=v[0]*area[c][1]/area[c][0];act+=v[1]+v[2];n+=v[0]}li=exp>0?act/exp:null;lr=n>0?act/n:null}
@@ -1227,7 +1230,7 @@ function render(){
       return {s,ch:a.ch,ratio:gv>0?dt/gv:null,li,lr,isNew:pd<DIM8}});
     const rk=cs.filter(c=>!c.isNew&&c.ratio!=null);
     const sc=(k,v,hi)=>{const vs=rk.map(c=>c[k]).filter(x=>x!=null&&x>0);if(v==null||v<=0||!vs.length)return 0;return hi?v/Math.max(...vs):Math.min(...vs)/v};
-    rk.forEach(c=>{c.gi=1+c.ch});rk.forEach(c=>{c.p1=W1*sc('gi',c.gi,true);c.p2=W2*sc('ratio',c.ratio,true);c.p3=L?W3*sc('li',c.li,false):0;c.tot=c.p1+c.p2+c.p3;c.ok=true});
+    rk.forEach(c=>{c.gi=1+c.ch});rk.forEach(c=>{c.p1=W1*sc('gi',c.gi,true);c.p2=W2*sc('ratio',c.ratio,true);c.p3=L?W3*sc('li',c.li,false):0;c.tot=c.p1+c.p2+c.p3;c.ok=c.ch>=GOALG-1e-9});
     rk.sort((a,b)=>b.tot-a.tot);if(rk.length>6)rk.slice(-3).forEach((c,i)=>{c.bot=3-i});let prize=0;rk.forEach(c=>{if(c.ok&&prize<3){c.prize=++prize}});
     // bảng tính sẵn: lưu kèm số liệu để tài khoản chỉ xem (chỉ có số liệu 1 siêu thị) vẫn xem được xếp hạng
     const snapRow=c=>{const i=D.shops[c.s]||{};return{s:c.s,n:shopName(c.s),qn:i.qlName||'',ql:i.ql||'',ch:c.ch,ratio:c.ratio,li:c.li,lr:c.lr,isNew:!!c.isNew,p1:c.p1||0,p2:c.p2||0,p3:c.p3||0,tot:c.tot||0,prize:c.prize||0,bot:c.bot||0,ok:c.ok!==false}};
@@ -1238,13 +1241,15 @@ function render(){
     const rowS=s=>!VIEW_SHOP||s===VIEW_SHOP?` tabindex="0" data-s="${s}"`:'';
     const mgrCell=s=>{const i=NM[s]?{qlName:NM[s].qn,ql:NM[s].ql}:(D.shops[s]||{});return i.qlName?`<div class="shopcell"><span style="font-weight:600">${esc(i.qlName)}</span><small>User ${esc(i.ql||'')}</small></div>`:`<div class="shopcell"><span class="muted">Chưa có tên QL</span><small>${esc(shopNameR(s))}</small></div>`};
     const cell=(val,pts,max,cls)=>`<td><span class="${cls||''}">${val}</span><small class="pts">${f1.format(pts)}/${max}</small></td>`;
-    let h=`<thead><tr><th>#</th><th class="l">Quản lý</th><th>DT so T${P}</th><th>DT / giá vốn</th><th>Chỉ số hủy</th><th class="l">Tổng điểm</th></tr></thead><tbody>`;
-    if(VIEW_SHOP&&!SN)h+=`<tr><td colspan="6" class="l muted" style="white-space:normal">Bảng xếp hạng sẽ có sau lần cập nhật số liệu tới.</td></tr>`;
+    let h=`<thead><tr><th>#</th><th class="l">Quản lý</th><th>DT so T${P}</th><th>DT / giá vốn</th><th>Chỉ số hủy</th><th class="l">Tổng điểm</th><th class="l" title="Top 1: ${przTxt(PRZ[0])} · Top 2: ${przTxt(PRZ[1])} · Top 3: ${przTxt(PRZ[2])}. Điều kiện: DT dự kiến so T${P} từ ${gLbl} trở lên">Thưởng</th></tr></thead><tbody>`;
+    const przCell=c=>c.prize?`<td class="l"><span class="pill up">${['🥇','🥈','🥉'][c.prize-1]} ${przTxt(PRZ[c.prize-1])}</span></td>`:c.ok===false?`<td class="l"><span class="pill down" title="Cần DT dự kiến so T${P} từ ${gLbl}">Chưa đạt MT DT</span></td>`:'<td class="l muted">—</td>';
+    if(VIEW_SHOP&&!SN)h+=`<tr><td colspan="7" class="l muted" style="white-space:normal">Bảng xếp hạng sẽ có sau lần cập nhật số liệu tới.</td></tr>`;
     rk.forEach((c,i)=>{h+=`<tr${rowS(c.s)} class="${cur===c.s?'sel':''}"><td><span class="rk ${c.prize?'top top'+c.prize:(c.bot?'hot':'')}">${i+1}</span></td><td class="l">${mgrCell(c.s)}</td>`+
       cell(sgn(c.ch),c.p1,W1,c.ch>=0?'pos':'neg')+cell(pct(c.ratio),c.p2,W2,c.ratio>=1?'pos':'neg')+cell(c.li==null?'—':f2.format(c.li),c.p3,W3,c.li==null?'':(c.li<=1?'pos':'neg'))+
-      `<td class="l"><span class="cbar"><i style="width:${c.tot}%"></i></span><b>${f1.format(c.tot)}</b></td></tr>`});
-    cs.filter(c=>c.isNew||c.ratio==null).forEach(c=>{h+=`<tr${rowS(c.s)} class="muted-row ${cur===c.s?'sel':''}"><td><span class="rk">–</span></td><td class="l">${mgrCell(c.s)}</td><td>${sgn(c.ch)}</td><td>${c.ratio==null?'—':pct(c.ratio)}</td><td>${c.li==null?'—':f2.format(c.li)}</td><td class="l"><span class="pill warn">${c.isNew?'Shop mới, chưa đủ tháng '+P:'Thiếu dữ liệu Fresh'}</span></td></tr>`});
-    document.getElementById('compTbl').innerHTML=h+'</tbody>';}
+      `<td class="l"><span class="cbar"><i style="width:${c.tot}%"></i></span><b>${f1.format(c.tot)}</b></td>${przCell(c)}</tr>`});
+    cs.filter(c=>c.isNew||c.ratio==null).forEach(c=>{h+=`<tr${rowS(c.s)} class="muted-row ${cur===c.s?'sel':''}"><td><span class="rk">–</span></td><td class="l">${mgrCell(c.s)}</td><td>${sgn(c.ch)}</td><td>${c.ratio==null?'—':pct(c.ratio)}</td><td>${c.li==null?'—':f2.format(c.li)}</td><td class="l"><span class="pill warn">${c.isNew?'Shop mới, chưa đủ tháng '+P:'Thiếu dữ liệu Fresh'}</span></td><td class="l muted">—</td></tr>`});
+    document.getElementById('compTbl').innerHTML=h+'</tbody>';
+    document.getElementById('compPrize').innerHTML=`<b>Thưởng:</b> Top 1 ${przTxt(PRZ[0])} · Top 2 ${przTxt(PRZ[1])} · Top 3 ${przTxt(PRZ[2])}. <b>Điều kiện nhận thưởng:</b> doanh thu dự kiến tháng ${M} tăng trưởng so tháng ${P} đạt mục tiêu (từ ${gLbl} trở lên). Quản lý chưa đạt vẫn được xếp hạng nhưng không nhận thưởng; giải được chuyển cho người kế tiếp đạt điều kiện.`;}
 
   // Thi đua ngành hàng (chương trình tải lên từ file Excel)
   {const box=document.getElementById('catBody'),note=document.getElementById('catNote');const CT=D.contests||[];
