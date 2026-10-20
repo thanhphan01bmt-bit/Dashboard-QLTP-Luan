@@ -1258,8 +1258,8 @@ function render(){
 
   // Thi đua ngành hàng (chương trình tải lên từ file Excel)
   {const box=document.getElementById('catBody'),note=document.getElementById('catNote');
-   // QL siêu thị (tài khoản xem 1 siêu thị) không xem thi đua tính theo khu vực (Cá - Trứng: bán / nhập)
-   const CT=(D.contests||[]).filter(c=>!(VIEW_SHOP&&/b[aá]n\s*\/\s*nh[aậ]p/i.test(c.cond||'')));
+   // thi đua Cá - Trứng (bán / nhập): chỉ tài khoản Quản trị xem
+   const CT=(D.contests||[]).filter(c=>IS_ADMIN||!/b[aá]n\s*\/\s*nh[aậ]p/i.test(c.cond||''));
    const GRP=false,UH='Siêu thị',ALBL='Toàn khu vực',UNITS=[],xs=u=>u==='all'?SHOPS:[u],isQ=u=>u==='all',unitName=u=>u==='all'?'Toàn khu vực':shopName(u);
    const nk=t=>String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[đĐ]/g,'d').toLowerCase().replace(/[^a-z0-9]/g,'');
    const allCats=new Set();[D.sep.cat,D.aug.cat,...Object.values(D.catm||{}).map(x=>x.c)].forEach(o=>{for(const s in o||{})for(const k in o[s])allCats.add(k)});
