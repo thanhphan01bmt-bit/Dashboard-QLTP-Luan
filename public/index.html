@@ -8,11 +8,11 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="DT KV Luân">
+<meta name="apple-mobile-web-app-title" content="DT Miền TD">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#f2f5f3" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0c1210" media="(prefers-color-scheme: dark)">
-<title data-page>Doanh thu KV QLTP Luân</title>
+<title data-page>Doanh thu Miền RSM Thanh Danh</title>
 <link data-page rel="preconnect" href="https://fonts.googleapis.com">
 <link data-page rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link data-page rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
@@ -76,9 +76,9 @@ select:focus-visible,button:focus-visible,tr[tabindex]:focus-visible{outline:2px
 @media (max-width:1100px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:700px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:420px){.kpis{grid-template-columns:1fr}}
+.dsec .kpi{background:var(--surface2);border-color:transparent}.dsec .kpi.hl{border-color:var(--accent)}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
 .kpi.hl{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
-.dsec .kpi{background:var(--surface2);border-color:transparent}.dsec .kpi.hl{border-color:var(--accent)}
 .kpi .lbl{font-size:12px;color:var(--ink2);font-weight:500}
 .kpi .val{font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1.15}
 .kpi .val small{font-size:14px;font-weight:500;color:var(--ink2);margin-left:3px;letter-spacing:0}
@@ -133,6 +133,7 @@ select:focus-visible,button:focus-visible,tr[tabindex]:focus-visible{outline:2px
 .hb .tr div{position:absolute;left:0;top:0;bottom:0;border-radius:0 4px 4px 0}
 .hb .v{text-align:right;min-width:92px;color:var(--ink2)}
 .hb .v b{color:var(--ink);font-weight:600}
+.div.ccr{cursor:pointer;border-radius:6px}.div.ccr:hover{background:var(--surface2)}.div.ccr.open{background:var(--accent-soft)}.ccd{grid-column:1/-1;margin:4px 0 10px;padding:8px 10px;background:var(--surface2);border-radius:8px}.ccd-h{font-size:12px;color:var(--ink2);margin-bottom:6px}.ccd table{width:100%}
 .div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;font-size:12.5px}
 .div .tr{display:none}
 .div .tr::before{content:"";position:absolute;left:50%;top:-4px;bottom:-4px;width:1px;background:var(--axis)}
@@ -177,7 +178,8 @@ tr.muted-row td{color:var(--muted)}
 .tab.on{color:var(--on-accent);background:var(--accent);border-color:var(--accent);box-shadow:0 3px 10px color-mix(in srgb,var(--accent) 35%,transparent)}
 .tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media (max-width:520px){.tab{flex:0 0 auto;padding:9px 12px;font-size:13px}}
-.wrap:not(.v-comp) #compSec{display:none}
+#compSec,#qtSec{display:none!important} /* bản miền: bỏ bảng thi đua quản lý */
+.qt-tbl .qn small{display:block;color:var(--muted);font-size:11.5px;font-weight:400}@media (max-width:760px){.qt-tbl .cm-h{display:none}}
 .wrap:not(.v-cat) #catSec{display:none}
 .wrap.v-cat>section:not(#catSec),.wrap.v-cat>.two,.wrap.v-cat .alertbar{display:none!important}
 .ct-card{border:1.5px solid var(--accent);border-radius:14px;margin:0 0 18px;overflow:hidden;box-shadow:0 2px 10px color-mix(in srgb,var(--accent) 14%,transparent)}
@@ -237,7 +239,7 @@ td.dt-big b{font-size:15px}
 .td-c ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}.td-c li{font-size:12.5px;line-height:1.45;color:var(--ink2)}.td-c li b{display:block;color:var(--ink);font-weight:600}.td-c li[data-s]{cursor:pointer}.td-c li[data-s]:hover b{text-decoration:underline}
 .td-c .ok{font-size:12.5px;color:var(--good)}.td-c .btn{margin-top:8px;padding:3px 10px;font-size:12px}
 .ct-near{margin:0 0 12px;background:var(--accent-soft);border-radius:10px;padding:8px 12px;font-size:12.5px;line-height:1.5}.ct-near>b{color:var(--accent)}.ct-near ul{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
-.ct-near li{background:var(--surface);border-radius:8px;padding:4px 9px;cursor:pointer}.ct-near li:hover{box-shadow:inset 0 0 0 1px var(--accent)}.ct-near .kv{margin:0 0 4px}.ct-near .kv:last-child{margin:0}
+.ct-near li{background:var(--surface);border-radius:8px;padding:4px 9px;cursor:pointer}.ct-near li:hover{box-shadow:inset 0 0 0 1px var(--accent)}.ct-near p[data-ns]{cursor:pointer}.ct-near p[data-ns]:hover b{text-decoration:underline}.ct-near .kv{margin:0 0 4px}.ct-near .kv:last-child{margin:0}
 .ap-job{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px}.ap-row{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap}.ap-row label{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:14px;cursor:pointer;flex:1;min-width:200px}.ap-row input{width:18px;height:18px;accent-color:var(--accent)}
 .ap-row .btn{padding:4px 10px;font-size:12.5px}.ap-last{font-size:12px;color:var(--ink2);margin-top:4px}.ap-pv{margin-top:8px;background:var(--surface2);border-radius:8px;padding:8px 10px;font-size:13px;line-height:1.5;white-space:pre-wrap}.ap-pv b{display:block}.ap-pv select{margin:6px 0;font:inherit;font-size:12.5px;max-width:100%}
 .bk-cur{background:var(--accent-soft);border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:10px;line-height:1.55}.bk-undo{background:var(--warn-bg);border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.bk-undo span{flex:1;min-width:200px}
@@ -246,6 +248,10 @@ td.dt-big b{font-size:15px}
 .zimg-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:12px;font-size:13px}.zimg-top .btn{margin-left:auto;padding:4px 10px;font-size:12.5px}
 .zimg img{display:block;width:100%;max-height:220px;object-fit:contain;object-position:top;background:#fff;border-radius:6px;border:1px solid var(--line)}.zimg img:not([src]){display:none}
 #goalPdf{padding:6px 12px}#goalPdf[disabled]{opacity:.6;cursor:progress}
+h4.gsub{margin:14px 0 6px;font-size:13.5px;font-weight:600;color:var(--ink2)}#goalQtTbl td.need{background:var(--accent-soft);font-weight:700}#goalQtTbl th.need{background:var(--accent-soft);color:var(--accent)}#goalQtTbl tr[data-q]{cursor:pointer}
+@media (max-width:760px){#goalQtTbl .cm-h{display:none}}
+.dvc{white-space:nowrap;font-size:12.5px;margin:2px 0}.btn.sm{padding:2px 8px;font-size:12px;min-height:0}
+.auth-foot{margin:14px 0 0;text-align:center;font-size:12.5px;color:var(--muted);line-height:1.5}
 #goalTbl th.grp{text-align:center;border-bottom:1px solid var(--axis);background:var(--surface)}
 #goalTbl td.need{background:var(--accent-soft);font-weight:700;color:var(--ink)}
 #goalTbl th.need{background:var(--accent-soft);color:var(--accent)}
@@ -269,14 +275,14 @@ td.dt-big b{font-size:15px}
 .mb{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0;gap:4px}
 .mb .lv{font-size:11px;font-weight:600;color:var(--ink2);white-space:nowrap}
 .mb{position:relative}.mb .lyk{position:absolute;left:50%;transform:translateX(-50%);width:min(58px,96%);border-top:2px dashed var(--ink2);pointer-events:none}.sw.lyl{display:inline-block;width:16px;border-top:2px dashed var(--ink2);vertical-align:middle;margin-right:6px;height:0;border-radius:0}
-@media (min-width:801px){#yearKpis.k5{grid-template-columns:repeat(5,minmax(0,1fr))}}@media (max-width:800px){#yearKpis.k5 .fk:last-child{grid-column:1/-1}}
+@media (min-width:801px){#yearKpis.k5{grid-template-columns:repeat(5,minmax(0,1fr))}#yearKpis.k6{grid-template-columns:repeat(3,minmax(0,1fr))}}@media (max-width:760px){#yoyBox .cm-h{display:none}}@media (max-width:800px){#yearKpis.k5 .fk:last-child{grid-column:1/-1}}
 .mb .col{width:min(46px,80%);position:relative;border-radius:4px 4px 0 0;background:var(--accent)}
 .mb .col.fc{background:var(--accent-soft);outline:1.5px dashed var(--accent);outline-offset:-1.5px}
 .mb .col.fc i{position:absolute;left:0;right:0;bottom:0;background:var(--accent);border-radius:0}
 .mb.best .col{background:var(--good)}
 .mlab{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px;margin-top:-12px;margin-bottom:16px;font-size:11.5px;color:var(--muted);text-align:center}
 @media (max-width:520px){.mb .lv{font-size:9.5px}.mbars{gap:4px}.mlab{gap:4px}}
-.wrap.v-comp>section:not(#compSec),.wrap.v-comp>.two,.wrap.v-comp .filter{display:none!important}
+.wrap.v-comp>section:not(#compSec):not(#qtSec),.wrap.v-comp>.two,.wrap.v-comp .filter{display:none!important}
 
 #compTbl .pill+.pill{margin-left:6px}
 .mini{display:inline-block;width:70px;height:8px;position:relative;vertical-align:middle;margin-right:8px}
@@ -445,12 +451,13 @@ body.pv .wrap{padding-bottom:120px}
 <body>
 <div class="auth" id="authView" hidden>
   <form class="auth-card" id="loginForm" autocomplete="on">
-    <div class="eyebrow">BHX_QLTP · Thành Luân</div>
-    <h1>Doanh thu KV QLTP Luân</h1>
+    <div class="eyebrow">BHX · RSM Thanh Danh</div>
+    <h1>Doanh thu Miền RSM Thanh Danh</h1>
     <div class="fld"><label for="lgUser">Tên đăng nhập</label><input id="lgUser" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required></div>
     <div class="fld"><label for="lgPass">Mật khẩu</label><input id="lgPass" name="password" type="password" autocomplete="current-password" required></div>
     <div class="auth-err" id="lgErr" role="alert"></div>
     <button class="btn primary" id="lgBtn" type="submit">Đăng nhập</button>
+    <p class="auth-foot">Mọi thắc mắc về Dashboard liên hệ QLTP - Thành Luân - 56605</p>
   </form>
 </div>
 <div class="boot-msg" id="bootMsg">Đang tải…</div>
@@ -465,7 +472,6 @@ body.pv .wrap{padding-bottom:120px}
   <div class="ub-menu" id="ubMenu">
   <button class="btn" type="button" id="ubPush" hidden><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:4px"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span id="ubPushTxt">Bật thông báo</span></button>
   <button class="btn" type="button" id="ubZalo" hidden>Tin nhắn nhóm</button>
-  <button class="btn" type="button" id="ubStats" hidden>Thống kê lượt xem</button>
   <button class="btn" type="button" id="ubUsers" hidden>Quản lý tài khoản</button>
   <button class="btn" type="button" id="ubAuto" hidden>Thông báo tự động</button>
   <button class="btn" type="button" id="ubBackup" hidden>Sao lưu &amp; khôi phục</button>
@@ -477,16 +483,21 @@ body.pv .wrap{padding-bottom:120px}
 <div class="ov" id="usersPanel" hidden>
   <div class="panel wide" role="dialog" aria-modal="true" aria-labelledby="usersTitle">
     <div class="sec-title"><h2 id="usersTitle">Quản lý tài khoản</h2><button class="btn" type="button" data-close>Đóng</button></div>
-    <p class="hint"><b>Quản trị</b>: xem, cập nhật dữ liệu, đặt % mục tiêu và quản lý tài khoản. <b>Cập nhật dữ liệu</b>: xem và tải file lên. <b>Chỉ xem</b>: chỉ xem số liệu siêu thị được gán và Bảng thi đua Quản lý (gán "Toàn khu vực" để xem cả khu vực).</p>
+    <p class="hint">Mỗi tài khoản đăng nhập được <b>1 điện thoại và 1 máy tính</b>. Máy thứ hai cùng loại sẽ bị chặn cho tới khi máy cũ bấm Đăng xuất hoặc quản trị bấm <b>Gỡ</b> ở cột "Máy đang đăng nhập".</p>
+    <p class="hint"><b>QL siêu thị</b>: xem siêu thị của mình. <b>QLTP</b>: xem các siêu thị trong khu vực của mình và thưởng QLTP. <b>Chỉ xem</b>: xem theo phạm vi được gán. <b>Quản trị</b>: xem, cập nhật dữ liệu, đặt % mục tiêu và quản lý tài khoản. <b>Cập nhật dữ liệu</b>: xem và tải file lên. <b>Chỉ xem</b>: chỉ xem số liệu siêu thị được gán và Bảng thi đua Quản lý (gán "Toàn miền" để xem cả miền).</p>
     <div class="tbl-wrap"><table class="utbl" id="usersTbl"></table></div>
+    <h3 class="gh" style="margin-top:18px">Cập nhật tài khoản từ file Excel</h3>
+    <p class="hint">File .xlsx, dòng đầu là tiêu đề cột: <b>Tên đăng nhập</b> · <b>Tên hiển thị</b> · <b>Quyền</b> (QL / QLTP / Chỉ xem / Cập nhật dữ liệu / Quản trị) · <b>Phạm vi</b> (mã siêu thị cho QL, mã QLTP cho QLTP, "Toàn miền" hoặc mã cho Chỉ xem; để trống thì tự khớp) · <b>Mật khẩu</b> (bắt buộc với tài khoản mới; tài khoản đã có để trống thì giữ mật khẩu cũ). Tài khoản đã có sẽ được cập nhật tên, quyền, phạm vi.</p>
+    <div class="row" style="gap:8px;flex-wrap:wrap"><input type="file" id="uImp" accept=".xlsx"><button class="btn primary" type="button" id="uImpBtn" disabled>Cập nhật tài khoản</button></div>
+    <p class="hint" id="uImpMsg" style="white-space:pre-line"></p>
     <h3 class="gh" style="margin-top:18px">Thêm tài khoản</h3>
     <form id="addUser">
       <div class="ugrid">
         <div class="fld"><label for="nuU">Tên đăng nhập</label><input id="nuU" autocapitalize="none" spellcheck="false" placeholder="vd: ql.leduan" required></div>
         <div class="fld"><label for="nuN">Tên hiển thị</label><input id="nuN" placeholder="vd: Nguyễn Văn A"></div>
-        <div class="fld"><label for="nuR">Quyền</label><select id="nuR"><option value="viewer">Chỉ xem</option><option value="editor">Cập nhật dữ liệu</option><option value="admin">Quản trị</option></select></div>
+        <div class="fld"><label for="nuR">Quyền</label><select id="nuR"><option value="ql">QL siêu thị</option><option value="qltp">QLTP</option><option value="viewer">Chỉ xem</option><option value="editor">Cập nhật dữ liệu</option><option value="admin">Quản trị</option></select></div>
         <div class="fld"><label for="nuP">Mật khẩu (ít nhất 6 ký tự)</label><input id="nuP" autocomplete="new-password" required></div>
-        <div class="fld" id="nuSWrap"><label for="nuS">Siêu thị được xem (quyền Chỉ xem)</label><select id="nuS"></select></div>
+        <div class="fld" id="nuSWrap"><label for="nuS">Phạm vi được xem</label><select id="nuS"></select></div>
       </div>
       <div class="row" style="justify-content:space-between"><span class="msg-err" id="usersMsg" role="status"></span><button class="btn primary" type="submit">Thêm tài khoản</button></div>
     </form>
@@ -516,7 +527,7 @@ body.pv .wrap{padding-bottom:120px}
     <div class="sec-title"><h2 id="zaloTitle">Tin nhắn gửi nhóm</h2><button class="btn" type="button" data-close>Đóng</button></div>
     <p class="hint">Tin nhắn soạn sẵn theo số liệu đang hiển thị. Sửa nếu cần, bấm <b>Sao chép</b> rồi dán vào nhóm Zalo. Trên điện thoại, bấm <b>Chia sẻ ảnh + tin</b> rồi chọn Zalo để gửi kèm cả 3 ảnh.</p>
     <textarea id="zaloTxt" rows="9" class="zalo-ta"></textarea>
-    <div class="zimg-top"><b>Ảnh gửi kèm</b> <small class="muted">(toàn khu vực)</small><button class="btn" type="button" id="zaloShare" hidden>Chia sẻ ảnh + tin</button></div>
+    <div class="zimg-top"><b>Ảnh gửi kèm</b> <small class="muted">(toàn miền)</small><button class="btn" type="button" id="zaloShare" hidden>Chia sẻ ảnh + tin</button></div>
     <div id="zImgs"></div>
     <div class="row" style="justify-content:space-between;margin-top:10px"><span class="msg-ok" id="zaloMsg" role="status"></span><span class="row" style="gap:8px"><button class="btn primary" type="button" id="zaloCopy">Sao chép</button></span></div>
   </div>
@@ -551,8 +562,8 @@ body.pv .wrap{padding-bottom:120px}
 <div class="wrap" data-page>
   <header class="top">
     <div>
-      <div class="eyebrow">BHX_QLTP · Thành Luân</div>
-      <h1>Doanh thu KV QLTP Luân</h1>
+      <div class="eyebrow">BHX · RSM Thanh Danh</div>
+      <h1>Doanh thu Miền RSM Thanh Danh</h1>
       <div class="meta" id="meta"></div>
     </div>
     <div class="tools">
@@ -567,7 +578,6 @@ body.pv .wrap{padding-bottom:120px}
   <nav class="tabs" role="tablist" aria-label="Chọn trang">
     <button class="tab" role="tab" type="button" data-view="goal" id="tabGoal"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span class="tl">Mục tiêu ngày</span><span class="ts">Mục tiêu</span></button>
     <button class="tab" role="tab" type="button" data-view="dash" id="tabDash"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12l4-4 4 4 6-6 4 4M3 20h18"/></svg><span class="tl">Dashboard doanh thu</span><span class="ts">Dashboard</span></button>
-    <button class="tab" role="tab" type="button" data-view="comp" id="tabComp"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg><span class="tl">Bảng thi đua Quản lý</span><span class="ts">Thi đua QL</span></button>
     <button class="tab" role="tab" type="button" data-view="cat" id="tabCat"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4z"/><path d="M14 17.5l2 2 4-4"/></svg><span class="tl">Thi đua ngành hàng</span><span class="ts">Ngành hàng</span></button>
     <button class="tab" role="tab" type="button" data-view="year" id="tabYear"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="tl">Doanh thu năm</span><span class="ts">Năm</span></button>
   </nav>
@@ -579,6 +589,7 @@ body.pv .wrap{padding-bottom:120px}
     <div class="warnbox" id="goalWarn" hidden style="display:none"></div>
     <div id="goalBlk1"><h3 class="gh" id="gh1">1. Doanh thu</h3>
     <div class="ghero" id="goalHero" hidden></div>
+    <div id="goalQtWrap" hidden><h4 class="gsub" id="gh1q" data-img-title="1. Doanh thu theo QLTP">Theo QLTP</h4><div class="tbl-wrap"><table id="goalQtTbl"></table></div><h4 class="gsub">Theo siêu thị</h4></div>
     <div class="tbl-wrap"><table id="goalTbl"></table></div></div>
     <div class="goal2">
       <div><h3 class="gh" id="gh2">2. Hiệu quả Fresh</h3><div class="tbl-wrap"><table id="goalFresh"></table></div></div>
@@ -597,7 +608,7 @@ body.pv .wrap{padding-bottom:120px}
     <div id="yearChart"></div>
     <div class="tbl-wrap"><table id="yearTbl"></table></div>
     <div id="yoyBox"></div>
-    <p class="lhint" style="margin:10px 0 0">Tháng <span data-t="M"></span> so sánh bằng doanh thu dự kiến cả tháng. Cột "TB/ngày" giúp so sánh công bằng giữa các tháng có số ngày khác nhau. Tháng <span data-t="P"></span> và <span data-t="M"></span> lấy từ file hằng ngày; các tháng trước và năm trước lấy từ file doanh thu / số bill. Cột "% so năm trước" của tháng <span data-t="M"></span> so doanh thu dự kiến với cả tháng năm trước.</p>
+    <p class="lhint" style="margin:10px 0 0">Tháng <span data-t="M"></span> so sánh bằng doanh thu dự kiến cả tháng. Cột "TB/ngày" giúp so sánh công bằng giữa các tháng có số ngày khác nhau. Doanh thu siêu thị = doanh thu offline + online trong file doanh thu / số bill (cả tháng này, tháng trước, các tháng trước và năm trước). Cột "% so năm trước" của tháng <span data-t="M"></span> so doanh thu dự kiến với cả tháng năm trước.</p>
   </section>
 
   <section class="card" id="catSec">
@@ -605,10 +616,15 @@ body.pv .wrap{padding-bottom:120px}
     <div id="catBody"></div>
   </section>
 
+  <section class="card" id="qtSec">
+    <div class="sec-title"><h2>Xếp hạng QLTP</h2><span class="note" id="qtNote">Thang 100 điểm · Doanh thu so T<span data-t="P"></span> 40 · Hiệu quả Fresh 35 · Kiểm soát hủy 25</span></div>
+    <p class="lhint">Cộng số liệu các siêu thị của từng QLTP rồi chấm điểm như bảng thi đua quản lý, so với QLTP tốt nhất miền. Doanh thu so tháng trước không tính siêu thị mới (chưa đủ tháng <span data-t="P"></span>). Bấm một dòng để lọc bảng quản lý bên dưới theo khu vực đó, bấm lại để bỏ lọc.</p>
+    <div class="tbl-wrap"><table id="qtTbl" class="qt-tbl"></table></div>
+  </section>
+
   <section class="card" id="compSec">
     <div class="sec-title"><h2>Bảng thi đua Quản lý</h2><span class="note">Thang 100 điểm · Doanh thu so T<span data-t="P"></span> 40 · Hiệu quả Fresh 35 · Kiểm soát hủy 25</span></div>
-    <p class="lhint" id="compPrize"></p>
-    <p class="lhint">Bấm vào một quản lý để xem dashboard của siêu thị đó. Mỗi tiêu chí chấm theo tỷ lệ so với siêu thị tốt nhất khu vực: Doanh thu = (DT dự kiến ÷ DT tháng trước) ÷ mức cao nhất × 40; Fresh = (DT/giá vốn) ÷ mức cao nhất × 35; Hủy = chỉ số hủy thấp nhất ÷ chỉ số hủy của siêu thị × 25. Chỉ số hủy = SL hủy thực tế ÷ SL hủy nếu hủy đúng mức trung bình khu vực ở từng ngành (dưới 1,00 là tốt hơn mặt bằng).</p>
+    <p class="lhint">Bấm vào một quản lý để xem dashboard của siêu thị đó. Mỗi tiêu chí chấm theo tỷ lệ so với siêu thị tốt nhất miền: Doanh thu = (DT dự kiến ÷ DT tháng trước) ÷ mức cao nhất × 40; Fresh = (DT/giá vốn) ÷ mức cao nhất × 35; Hủy = chỉ số hủy thấp nhất ÷ chỉ số hủy của siêu thị × 25. Chỉ số hủy = SL hủy thực tế ÷ SL hủy nếu hủy đúng mức trung bình khu vực ở từng ngành (dưới 1,00 là tốt hơn mặt bằng).</p>
     <div class="tbl-wrap"><table id="compTbl"></table></div>
   </section>
 
@@ -659,14 +675,14 @@ body.pv .wrap{padding-bottom:120px}
     <div class="fresh-kpis" id="freshKpis"></div>
     <div class="stack">
       <div class="tbl-wrap"><table id="freshCatTbl"></table></div>
-      <div class="sec-title" id="freshShopHead" style="margin:8px 0 0"><h2 style="font-size:14px">Theo siêu thị</h2><span class="note">Sắp xếp theo lợi nhuận lũy kế tăng dần</span></div>
+      <div class="sec-title" id="freshShopHead" style="margin:8px 0 0"><h2 style="font-size:14px" id="freshShopH">Theo siêu thị</h2><span class="note">Sắp xếp theo lợi nhuận lũy kế tăng dần</span></div>
       <div class="tbl-wrap" id="freshShopWrap"><table id="freshShopTbl"></table></div>
     </div>
   </section>
 
   <section class="card dsec" id="lossSec">
     <div class="sec-title"><h2>Tỷ lệ hủy / nhập theo ngành hàng Fresh</h2><span class="note" id="lossNote"></span></div>
-    <p class="lhint">Bấm vào một ngành hàng: khi xem toàn khu vực sẽ hiện tỷ lệ hủy / nhập của từng siêu thị; khi xem 1 siêu thị sẽ hiện top 5 sản phẩm có tỷ lệ hủy cao nhất.</p>
+    <p class="lhint">Bấm vào một ngành hàng: khi xem toàn miền sẽ hiện tỷ lệ hủy / nhập của từng siêu thị; khi xem 1 siêu thị sẽ hiện top 5 sản phẩm có tỷ lệ hủy cao nhất.</p>
     <div class="fresh-kpis" id="lossKpis"></div>
     <div class="tbl-wrap"><table id="lossTbl"></table></div>
   </section>
@@ -744,8 +760,8 @@ async function renderGoalPages(opt={}){
   const sub=[(noteEl||{}).textContent||'',(document.querySelector('.view-only')||{}).textContent||'',T('goalHint')].filter(Boolean).join('  ·  ');
   if(!opt.secs){txt(sub,MG,y+8,`400 15px ${F}`,C.ink2);y+=34}else y+=6;
   const wrapLines=(t,font,maxW)=>{ctx.font=font;const words=t.split(' ');const out=[];let line='';for(const w of words){const tt=line?line+' '+w:w;if(ctx.measureText(tt).width>maxW&&line){out.push(line);line=w}else line=tt}if(line)out.push(line);return out};
-  const table=(title,tbl)=>{
-    const rows=[...tbl.querySelectorAll('tr')].filter(tr=>!tr.classList.contains('lxd')).map(tr=>({kind:tr.parentElement.tagName,cells:[...tr.children].map(td=>{const pill=td.querySelector('.pill');const small=td.querySelector('small');
+  const table=(title,tbl,mx)=>{
+    let bi=0;const rows=[...tbl.querySelectorAll('tr')].filter(tr=>!tr.classList.contains('lxd')&&!(mx&&tr.parentElement.tagName==='TBODY'&&++bi>mx)).map(tr=>({kind:tr.parentElement.tagName,cells:[...tr.children].map(td=>{const pill=td.querySelector('.pill');const small=td.querySelector('small');
       return{t:(pill?pill.textContent+(small?'  '+small.textContent:''):td.textContent).replace(/[\u2600-\u27BF\uFE0F]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F\uDE80-\uDEFF]|\uD83E[\uDD00-\uDDFF]/g,'').replace(/\s+/g,' ').trim(),left:td.classList.contains('l')||td===tr.children[0],
         col:td.classList.contains('pos')||td.querySelector('.pos')?'pos':td.classList.contains('neg')||td.querySelector('.neg')?'neg':'',pill:pill?(pill.classList.contains('up')?'up':'down'):null,need:td.classList.contains('need'),bold:!!td.querySelector('b')||td.tagName==='TH'}})}));
     if(!rows.length)return;
@@ -771,10 +787,10 @@ async function renderGoalPages(opt={}){
     head.forEach(drawRow);
     rows.filter(r=>r.kind!=='THEAD').forEach(drawRow);
     y+=20};
-  if(opt.secs)opt.secs.forEach(([g,t])=>table(T(g),document.getElementById(t)));else table(T('gh1'),document.getElementById('goalTbl'));
+  if(opt.secs)opt.secs.forEach(([g,t,mx])=>table(((document.getElementById(g)||{}).dataset||{}).imgTitle||T(g)+(mx?` · ${mx} siêu thị cần chú ý nhất`:''),document.getElementById(t),mx));else table(T('gh1'),document.getElementById('goalTbl'));
   if(opt.image){// ảnh PNG của 1 hoặc vài mục, để gửi kèm tin nhắn nhóm
     const ch=y+MG-20,im=document.createElement('canvas');im.width=PW*2;im.height=ch*2;const g=im.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,im.width,im.height);
-    g.drawImage(cv,0,0,PW*2,ch*2,0,0,PW*2,ch*2);g.font=`400 22px ${F}`;g.fillStyle=C.muted;g.textAlign='right';g.textBaseline='middle';g.fillText('Doanh thu KV QLTP Luân · luan56605.app',PW*2-MG*2,ch*2-28);
+    g.drawImage(cv,0,0,PW*2,ch*2,0,0,PW*2,ch*2);g.font=`400 22px ${F}`;g.fillStyle=C.muted;g.textAlign='right';g.textBaseline='middle';g.fillText('Doanh thu Miền RSM Thanh Danh · '+location.host+'',PW*2-MG*2,ch*2-28);
     return await new Promise(r=>im.toBlob(r,'image/png'))}
   table(T('gh2'),document.getElementById('goalFresh'));
   table(T('gh3'),document.getElementById('goalLoss'));
@@ -784,7 +800,7 @@ async function renderGoalPages(opt={}){
   const ch=y+MG-10,out=document.createElement('canvas');out.width=OW;out.height=OH;const o=out.getContext('2d');o.fillStyle='#fff';o.fillRect(0,0,OW,OH);
   const FOOT=60,k=Math.min(OW/(PW*2),(OH-FOOT)/(ch*2)),dw=PW*2*k,dh=ch*2*k;o.imageSmoothingQuality='high';
   o.drawImage(cv,0,0,PW*2,ch*2,(OW-dw)/2,0,dw,dh);
-  o.font=`400 22px ${F}`;o.fillStyle=C.muted;o.textAlign='right';o.textBaseline='middle';o.fillText('Doanh thu KV QLTP Luân',OW-(OW-dw)/2-MG*2*k,OH-30);
+  o.font=`400 22px ${F}`;o.fillStyle=C.muted;o.textAlign='right';o.textBaseline='middle';o.fillText('Doanh thu Miền RSM Thanh Danh',OW-(OW-dw)/2-MG*2*k,OH-30);
   const b=await new Promise(r=>out.toBlob(r,'image/jpeg',0.9));const out2=[{jpg:new Uint8Array(await b.arrayBuffer()),w:OW,h:OH}];
   return out2;
 }
@@ -800,22 +816,36 @@ async function exportGoalPdf(btn,filename){
   }catch(e){console.error(e);alert('Không tạo được PDF.')}
   finally{btn.disabled=false;btn.innerHTML=old}
 }
-const __R=(window.__ME||{}).role;let CAN_EDIT=__R==='admin'||__R==='editor';const IS_ADMIN=__R==='admin';let VIEW='goal';try{if(/^#(dash|dashboard)$/i.test(location.hash))VIEW='dash';if(/^#thi-?dua$/i.test(location.hash))VIEW='comp';if(/^#(doanh-?thu-?)?nam$/i.test(location.hash))VIEW='year';if(/^#muc-?tieu$/i.test(location.hash))VIEW='goal';if(/^#(thi-?dua-?)?nganh(-?hang)?$/i.test(location.hash))VIEW='cat';if(VIEW==='comp'&&matchMedia('(max-width:760px)').matches)VIEW='goal'}catch(e){}
+const __R=(window.__ME||{}).role;let CAN_EDIT=__R==='admin'||__R==='editor';const IS_ADMIN=__R==='admin';let VIEW='goal';try{if(/^#(dash|dashboard)$/i.test(location.hash))VIEW='dash';if(/^#thi-?dua$/i.test(location.hash))VIEW='cat';if(/^#(doanh-?thu-?)?nam$/i.test(location.hash))VIEW='year';if(/^#muc-?tieu$/i.test(location.hash))VIEW='goal';if(/^#(thi-?dua-?)?nganh(-?hang)?$/i.test(location.hash))VIEW='cat';if(VIEW==='comp'&&matchMedia('(max-width:760px)').matches)VIEW='goal'}catch(e){}
 function applyView(){const w=document.querySelector('.wrap');if(!w)return;w.classList.toggle('v-comp',VIEW==='comp');w.classList.toggle('v-cat',VIEW==='cat');w.classList.toggle('v-year',VIEW==='year');w.classList.toggle('v-goal',VIEW==='goal');
   document.querySelectorAll('.tabs .tab').forEach(b=>{const on=b.dataset.view===VIEW;b.setAttribute('aria-selected',on);b.classList.toggle('on',on)})}
 function setView(v){VIEW=v;applyView();window.scrollTo({top:0});if(v==='dash')requestAnimationFrame(()=>drawCurrent&&drawCurrent())} // vẽ lại biểu đồ đúng chiều rộng khi mở tab
 document.addEventListener('click',e=>{const b=e.target.closest('.tabs .tab');if(b)setView(b.dataset.view)});
 function applyEditor(){const b=document.getElementById('uploadBtn');if(b)b.hidden=!CAN_EDIT;document.querySelectorAll('.ed-only').forEach(e=>e.hidden=!IS_ADMIN);document.querySelectorAll('.view-only').forEach(e=>e.hidden=IS_ADMIN)}
 
-function app(D){
+function app(D0){
+// Quy ước doanh thu: DT siêu thị (ngày, lũy kế, dự kiến, Target, năm) = offline + online trong file doanh thu / số bill;
+// DT ngành hàng và so với Base = file doanh thu ngành hàng. Thiếu số offline+online của 2 tháng thì dùng file ngành hàng như cũ.
+const RVOK=!!(D0.sep&&D0.sep.rd&&D0.aug&&D0.aug.rd);
+const D=RVOK?{...D0,sep:{...D0.sep,daily:D0.sep.rd,ndaily:D0.sep.daily},aug:{...D0.aug,daily:D0.aug.rd,ndaily:D0.aug.daily}}:D0;
+const NG9=D.sep.ndaily||D.sep.daily,NG8=D.aug.ndaily||D.aug.daily;
 fillTokens(D);applyEditor();applyView();
 const M=D.cur.m,P=D.prev.m,MM=String(M).padStart(2,'0'),Y=D.cur.y,PY=D.prev.y,DIM=D.cur.dim,PDIM=D.prev.dim;
 const FM=String(D.freshMonth||(''+Y+MM));
 const shopName=s=>(D.shops[s]&&D.shops[s].name)||s;
 const FRESH=new Set(D.freshCats);
 const SHOPS=Object.keys(D.shops);
+// cấp QLTP (khu vực) lấy từ file Base: cột QLTP
+const QT={};SHOPS.forEach(s=>{const o=D.shops[s];if(!o.qt)return;(QT[o.qt]||(QT[o.qt]={k:o.qt,name:o.qtName||o.qt,shops:[]})).shops.push(s)});
+const QKEYS=Object.keys(QT).sort((a,b)=>QT[a].name.localeCompare(QT[b].name,'vi'));
+const qtLbl=k=>'KV '+((QT[k]&&QT[k].name)||k);
+const scopeOf=c=>c==='all'?SHOPS:String(c).startsWith('q:')?((QT[c.slice(2)]||{}).shops||[]):[c];
+const isMulti=c=>c==='all'||String(c).startsWith('q:');
+const qtTag=s=>cur==='all'&&D.shops[s]&&D.shops[s].qt?' · '+esc(qtLbl(D.shops[s].qt)):'';
+const scopeLbl=c=>c==='all'?'Toàn miền':String(c).startsWith('q:')?qtLbl(c.slice(2)):shopName(c);
 const DIM9=D.cur.dim, DIM8=D.prev.dim;
-const d9=D.sep.days, bd9=D.sep.billDays;
+const dN=D.sep.days; // ngày cuối của file ngành hàng
+const d9=RVOK?(D.sep.billDays||dN):dN, bd9=D.sep.billDays; // ngày cuối của doanh thu siêu thị
 const nf=(d)=>new Intl.NumberFormat('vi-VN',{minimumFractionDigits:d,maximumFractionDigits:d});
 const f0=nf(0),f1=nf(1),f2=nf(2);
 const ty=v=>f2.format(v/1e9);
@@ -844,24 +874,31 @@ function shopStats(s){
   const cum9=tot(sumDaily(D.sep.daily,[s],31)), aug=tot(sumDaily(D.aug.daily,[s],31));
   const cat9=sumCat(D.sep.cat,[s]);let fr=0;for(const k in cat9) if(FRESH.has(k)) fr+=cat9[k];
   const proj=cum9/d9*DIM9;const b=D.shops[s];
-  return {s,cum9,aug,proj,ch:aug>0?proj/aug-1:0,baseT:proj/b.bT,tgT:b.tg?proj/b.tg:null,projFr:fr/d9*DIM9,projFm:(cum9-fr)/d9*DIM9};
+  const cumN=tot(sumDaily(NG9,[s],31)),projN=cumN/dN*DIM9;
+  return {s,cum9,aug,proj,ch:aug>0?proj/aug-1:0,baseT:projN/b.bT,tgT:b.tg?proj/b.tg:null,projFr:fr/dN*DIM9,projFm:(cumN-fr)/dN*DIM9,projN};
 }
 const ALL=SHOPS.map(shopStats);
 
 // ---- header
 const sel=document.getElementById('shopSel');
 const VIEW_SHOP=D.viewer&&D.viewer.shop&&D.shops[D.viewer.shop]?D.viewer.shop:null; // tài khoản chỉ xem 1 siêu thị
-sel.innerHTML=(VIEW_SHOP?'':'<option value="all">Toàn khu vực ('+SHOPS.length+' siêu thị)</option>')+
-  [...SHOPS].sort((a,b)=>D.shops[a].name.localeCompare(D.shops[b].name,'vi')).map(s=>`<option value="${s}">${s} · ${esc(D.shops[s].name)}</option>`).join('');
+const VIEW_Q=D.viewer&&String(D.viewer.shop||'').startsWith('q:')&&QT[D.viewer.shop.slice(2)]?D.viewer.shop:null; // tài khoản QLTP: xem khu vực của mình
+{const so=list=>[...list].sort((a,b)=>D.shops[a].name.localeCompare(D.shops[b].name,'vi')).map(s=>`<option value="${s}">${s} · ${esc(D.shops[s].name)}</option>`).join('');
+ const noQ=SHOPS.filter(s=>!D.shops[s].qt);
+ sel.innerHTML=(VIEW_SHOP?'':VIEW_Q?`<option value="${esc(VIEW_Q)}">${esc(qtLbl(VIEW_Q.slice(2)))} (${QT[VIEW_Q.slice(2)].shops.length} siêu thị)</option>`:`<option value="all">Toàn miền (${SHOPS.length} siêu thị)</option>`+(QKEYS.length?`<optgroup label="Khu vực QLTP">${QKEYS.map(k=>`<option value="q:${esc(k)}">${esc(qtLbl(k))} (${QT[k].shops.length} siêu thị)</option>`).join('')}</optgroup>`:''))+
+  (QKEYS.length?QKEYS.map(k=>`<optgroup label="${esc(qtLbl(k))}">${so(QT[k].shops)}</optgroup>`).join('')+(noQ.length?`<optgroup label="Chưa gán QLTP">${so(noQ)}</optgroup>`:''):so(SHOPS))}
 document.getElementById('meta').innerHTML=
-  `<span class="chip">Doanh thu ngành hàng đến <b>${d9}/${MM}/${Y}</b></span><span class="chip m-hide">So sánh: tháng ${P}/${PY} (${PDIM} ngày)</span>`;
+  (RVOK?`<span class="chip">Doanh thu (offline + online) đến <b>${d9}/${MM}/${Y}</b></span>`:'')+`<span class="chip">Doanh thu ngành hàng đến <b>${dN}/${MM}/${Y}</b></span><span class="chip m-hide">So sánh: tháng ${P}/${PY} (${PDIM} ngày)</span>`;
 
-let cur='all';let lossOpen=null;let freshOpen=null;const LOSS_MIN=10;
-try{const v=localStorage.getItem('qltp-shop');if(v&&(v==='all'||D.shops[v]))cur=v}catch(e){}
+let cur='all';let lossOpen=null;let freshOpen=null;let ccOpen=null;const LOSS_MIN=10;
+let lastMulti='all';
+try{const v=localStorage.getItem('qltp-shop');if(v&&(v==='all'||D.shops[v]||(v.startsWith('q:')&&QT[v.slice(2)])))cur=v}catch(e){}
+if(isMulti(cur))lastMulti=cur;
+if(VIEW_Q){cur=isMulti(cur)?VIEW_Q:cur;lastMulti=VIEW_Q;sel.title='Tài khoản QLTP: xem khu vực của bạn hoặc từng siêu thị'}
 if(VIEW_SHOP){document.body.classList.add('viewer-shop');cur=VIEW_SHOP;sel.value=VIEW_SHOP;sel.disabled=true;sel.title='Tài khoản của bạn chỉ xem được siêu thị này'}
 sel.value=cur;
 sel.addEventListener('change',()=>setShop(sel.value));
-function setShop(v){if(VIEW_SHOP&&v!==VIEW_SHOP)return;cur=v;sel.value=v;try{localStorage.setItem('qltp-shop',v)}catch(e){}render()}
+function setShop(v){if(VIEW_SHOP&&v!==VIEW_SHOP)return;if(VIEW_Q&&v==='all')v=VIEW_Q;cur=v;if(isMulti(v))lastMulti=v;sel.value=v;try{localStorage.setItem('qltp-shop',v)}catch(e){}render()}
 
 // ---- trend chart
 const tEl=document.getElementById('trend');let trendData=null;
@@ -911,7 +948,13 @@ tBtn.addEventListener('click',()=>{const on=tBtn.getAttribute('aria-pressed')!==
 
 // ---- render
 function render(){
-  const shops=cur==='all'?SHOPS:[cur];
+  const shops=scopeOf(cur),SC=new Set(shops),multi=isMulti(cur),ALBL=multi?scopeLbl(cur):'Toàn miền';
+  // xem toàn miền: các bảng hiển thị theo QLTP ("đơn vị" q:KEY); chọn 1 QLTP thì hiển thị siêu thị
+  const GRP=cur==='all'&&QKEYS.length>0;const isQ=u=>String(u).startsWith('q:');
+  const UNITS=GRP?[...QKEYS.map(k=>'q:'+k),...shops.filter(s=>!D.shops[s].qt)]:shops;
+  const xs=u=>isQ(u)?scopeOf(u):[u];const unitName=u=>isQ(u)?((QT[u.slice(2)]||{}).name||u):shopName(u);
+  const unitOf=s=>GRP&&D.shops[s]&&D.shops[s].qt?'q:'+D.shops[s].qt:s;const UH2=GRP?'QLTP':'siêu thị';
+  const unitSub=u=>isQ(u)?`${xs(u).length} siêu thị`:u;const UH=GRP?'QLTP':'Siêu thị';window.__HASQT=GRP;
   const s9=sumDaily(D.sep.daily,shops,31),s8=sumDaily(D.aug.daily,shops,31);
   const cum9=tot(s9),aug=tot(s8),cumAug=tot(s8.slice(0,d9));
   const proj=cum9/d9*DIM9;
@@ -919,7 +962,8 @@ function render(){
   const projB=b9/bd9*DIM9;
   const c9=sumCat(D.sep.cat,shops),c8=sumCat(D.aug.cat,shops);
   let fr9=0,fr8=0;for(const k in c9)if(FRESH.has(k))fr9+=c9[k];for(const k in c8)if(FRESH.has(k))fr8+=c8[k];
-  const projFr=fr9/d9*DIM9,projFm=(cum9-fr9)/d9*DIM9;
+  const cumN=tot(sumDaily(NG9,shops,31)),augN=tot(sumDaily(NG8,shops,31)),projN=cumN/dN*DIM9; // theo file ngành hàng
+  const projFr=fr9/dN*DIM9,projFm=(cumN-fr9)/dN*DIM9;
   let bT=0,bF=0,bR=0,tg=0,tgN=0;shops.forEach(s=>{const o=D.shops[s];bT+=o.bT;bF+=o.bF;bR+=o.bR;if(o.tg){tg+=o.tg;tgN++}});
   const fr=D.fresh.filter(r=>shops.includes(r[0]));
   const fDT=tot(fr.map(r=>r[2])),fGV=tot(fr.map(r=>r[3])),fLN=tot(fr.map(r=>r[4]));
@@ -938,10 +982,10 @@ function render(){
       if(st>=2){const ms=[];for(let m=D.cur.m-st;m<=D.cur.m;m++)ms.push(m);
         out.push({s,st,ms,v,ch:ms.slice(1).map(m=>({m,c:v[m]/v[m-1]-1})),drop:v[D.cur.m]/v[D.cur.m-st]-1})}});
     return out.sort((a,b)=>b.st-a.st||a.drop-b.drop)})();
-  {const ab=document.getElementById('alertBar');const list=DECL?(cur==='all'?DECL:DECL.filter(x=>x.s===cur)):[];
+  {const ab=document.getElementById('alertBar');const list=DECL?(multi?DECL.filter(x=>SC.has(x.s)):DECL.filter(x=>x.s===cur)):[];
    if(!list.length){ab.hidden=true;ab.innerHTML=''}else{ab.hidden=false;
     const n3=list.filter(x=>x.st>=3).length;
-    ab.innerHTML=`<span class="ic" aria-hidden="true">!</span><span class="msg">${cur==='all'?`<b>${list.length} siêu thị</b> giảm doanh thu ${n3?'2–3':'2'} tháng liên tiếp`:`<b>${esc(shopName(cur))}</b> giảm doanh thu ${list[0].st} tháng liên tiếp: ${list[0].ch.map(c=>`T${c.m} ${sgn(c.c)}`).join(' → ')} (tổng ${sgn(list[0].drop)})`}${cur==='all'?': '+list.map(x=>`${esc(shopName(x.s))} (${x.st} tháng, ${sgn(x.drop)})`).join(' · '):''}</span><button class="btn" type="button" id="alertGo">Xem chi tiết</button>`;
+    ab.innerHTML=`<span class="ic" aria-hidden="true">!</span><span class="msg">${multi?`<b>${list.length} siêu thị</b> giảm doanh thu ${n3?'2–3':'2'} tháng liên tiếp`:`<b>${esc(shopName(cur))}</b> giảm doanh thu ${list[0].st} tháng liên tiếp: ${list[0].ch.map(c=>`T${c.m} ${sgn(c.c)}`).join(' → ')} (tổng ${sgn(list[0].drop)})`}${GRP?': '+Object.entries(list.reduce((g,x)=>{const u=unitOf(x.s);g[u]=(g[u]||0)+1;return g},{})).sort((a,b)=>b[1]-a[1]).map(([u,n])=>`${esc(unitName(u))} ${n}`).join(' · '):multi?': '+list.map(x=>`${esc(shopName(x.s))} (${x.st} tháng, ${sgn(x.drop)})`).join(' · '):''}</span><button class="btn" type="button" id="alertGo">Xem chi tiết</button>`;
     document.getElementById('alertGo').onclick=()=>setView('year')}}
 
   // Goal (daily target) view
@@ -950,7 +994,7 @@ function render(){
    if(!gi.dataset.bound){gi.dataset.bound=1;gi.addEventListener('change',()=>{const v=Math.max(-50,Math.min(100,+gi.value||0));if(v!==gp&&window.__setGoal)window.__setGoal(v)})}
    applyEditor();
    {const b=document.getElementById('goalPdf');const noAcc=t=>t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_|_$/g,'');b.onclick=()=>exportGoalPdf(b,`Muc_tieu_ngay_${d9}-${M}-${D.cur.y}_${noAcc(scopeName)}.pdf`)}
-   const left=Math.max(1,DIM9-d9+1);const scope=cur==='all'?SHOPS:[cur];const scopeName=cur==='all'?'Toàn khu vực':shopName(cur);
+   const left=Math.max(1,DIM9-d9+1);const scope=shops;const scopeName=scopeLbl(cur);
    // giờ cập nhật: lúc lưu số liệu (đang xem trước thì lấy giờ hiện tại); chỉ ghi giờ khi lưu trong chính ngày đổ báo cáo
    const upAt=(()=>{const iso=(typeof PREVIEW_D!=='undefined'&&PREVIEW_D)?null:(window.__META||{}).updatedAt;const dt=iso?new Date(iso):new Date();
      const vn=new Date(dt.getTime()+7*3600e3);const same=vn.getUTCFullYear()===D.cur.y&&vn.getUTCMonth()+1===M&&vn.getUTCDate()===d9;
@@ -965,11 +1009,14 @@ function render(){
    document.getElementById('goalHint').textContent=`Mục tiêu tháng ${M} = DT tháng ${P} × ${nf(0).format(100+g*100)}%`;
    // 1. revenue
    document.getElementById('gh1').innerHTML=`1. Doanh thu <small>ngày đổ báo cáo ${d9}/${M}${upAt?`, cập nhật đến ${upAt}`:''}</small>`;
-   const rev=s=>{const st=shopStats(s);const day=(D.sep.daily[s]||{})[d9]||0;const goal=st.aug*(1+g);const avg=st.cum9/d9;const need=Math.max(0,(goal-(st.cum9-day))/left);return{s,day,goal,proj:st.proj,avg,need,cum:st.cum9,aug:st.aug}};
-   const pctHT=r=>r.need>0?r.day/r.need:(r.day>0?9:0);const RR=scope.map(rev).sort((a,b)=>pctHT(b)-pctHT(a));
+   const rev0=s=>{const st=shopStats(s);const day=(D.sep.daily[s]||{})[d9]||0;const goal=st.aug*(1+g);const avg=st.cum9/d9;const need=Math.max(0,(goal-(st.cum9-day))/left);return{s,day,goal,proj:st.proj,avg,need,cum:st.cum9,aug:st.aug}};
+   const rev=u=>{if(!isQ(u))return rev0(u);const o={s:u,day:0,goal:0,proj:0,avg:0,cum:0,aug:0};xs(u).forEach(x=>{const r=rev0(x);['day','goal','proj','avg','cum','aug'].forEach(k=>o[k]+=r[k])});o.need=Math.max(0,(o.goal-(o.cum-o.day))/left);return o};
+   const pctHT=r=>r.need>0?r.day/r.need:(r.day>0?9:0);const RR=UNITS.map(rev).sort((a,b)=>pctHT(b)-pctHT(a));
+   window.__STOP=GRP?scope.map(rev0).sort((a,b)=>pctHT(b)-pctHT(a)).slice(0,3).map(r=>({n:shopName(r.s),d:tr(r.day)+' tr',p:r.need>0?nf(1).format(r.day/r.need*100)+'%':null})):null;
    // so cùng thứ tuần trước + chuỗi ngày đạt / hụt (chỉ xét ngày đã đủ: lưu từ 21h00)
    const PDIM0=D.prev.dim||new Date(D.prev.y,D.prev.m,0).getDate();
-   const dv=(s,k)=>k>=1?+((D.sep.daily[s]||{})[k]||0):+(((D.aug.daily||{})[s]||{})[PDIM0+k]||0);
+   const dv0=(s,k)=>k>=1?+((D.sep.daily[s]||{})[k]||0):+(((D.aug.daily||{})[s]||{})[PDIM0+k]||0);
+   const dv=(u,k)=>isQ(u)?xs(u).reduce((t,s)=>t+dv0(s,k),0):dv0(u,k);
    const fullDay=!(upAt&&upAt<'21:00');const lastFull=fullDay?d9:d9-1;
    const wowOf=ss=>{if(!fullDay)return null;const a=ss.reduce((t,s)=>t+dv(s,d9),0),b=ss.reduce((t,s)=>t+dv(s,d9-7),0);return a>0&&b>0?a/b-1:null};
    const streakOf=s=>{const G=rev(s).goal;if(!(G>0)||lastFull<1)return null;let cum=0;const ok=[];for(let k=1;k<=lastFull;k++){const need=Math.max(0,(G-cum)/(DIM9-k+1));ok[k]=dv(s,k)>=need;cum+=dv(s,k)}
@@ -1007,9 +1054,10 @@ function render(){
      const mb=document.getElementById('wbMore');if(mb)mb.onclick=()=>{box.dataset.open=open?'0':'1';render()};
      box.querySelectorAll('[data-ws]').forEach(b=>{const go=()=>setShop(b.dataset.ws);b.onclick=go;b.onkeydown=e=>{if(e.key==='Enter')go()}})}}
    const note=r=>{if(left<=0)return r.proj>=r.goal?`<span class="pill up">Đạt mục tiêu tháng</span>`:`<span class="pill down">Không đạt</span>`;const d=r.day-r.need;return d>=0?`<span class="pill up">Đạt</span> <small class="pos">+${tr1(d)} tr</small>`:`<span class="pill down">Không đạt</span> <small class="neg">−${tr1(-d)} tr</small>`};
-   let t=`<thead><tr><th class="l">Siêu thị</th><th>DT ${dayLbl}</th><th class="need">Cần/ngày</th><th>% hoàn thành</th><th>Lũy kế T${M}</th><th>Dự kiến T${M}</th><th>Tăng trưởng so T${P}</th><th title="DT ngày so với cùng thứ tuần trước (chỉ tính khi đủ ngày, từ 21h00)">So cùng thứ tuần trước</th><th title="Số ngày liên tiếp đạt / hụt cần/ngày">Chuỗi ngày</th></tr></thead><tbody>`;
-   RR.forEach(r=>{const o=D.shops[r.s];t+=`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(o.name)}</td><td><b>${tr(r.day)} tr</b></td><td class="need">${left>0?tr(r.need)+' tr':'—'}</td><td class="${r.need>0?(r.day>=r.need?'pos':'neg'):''}"><b>${r.need>0?nf(1).format(r.day/r.need*100)+'%':'—'}</b></td><td>${tr(r.cum)} tr</td><td class="${r.proj>=r.goal?'pos':'neg'}">${tr(r.proj)} tr</td><td class="${r.aug?(r.proj>=r.aug?'pos':'neg'):''}"><b>${r.aug?sgn(r.proj/r.aug-1):'—'}</b></td>${wowCell(wowOf([r.s]))}${stkCell(streakOf(r.s))}</tr>`});
-   if(RR.length>1)t+=`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th>${tr(TT.day)} tr</th><th class="need">${left>0?tr(TT.need)+' tr':'—'}</th><th class="${TT.need>0?(TT.day>=TT.need?'pos':'neg'):''}">${TT.need>0?nf(1).format(TT.day/TT.need*100)+'%':'—'}</th><th>${tr(TT.cum)} tr</th><th>${tr(TT.proj)} tr</th><th class="${TT.proj>=TT.aug?'pos':'neg'}">${TT.aug?sgn(TT.proj/TT.aug-1):'—'}</th>${wowCell(wowOf(RR.map(r=>r.s)),'th')}<th></th></tr></tfoot>`;else t+='</tbody>';
+   document.getElementById('goalQtWrap').hidden=true;
+   let t=`<thead><tr><th class="l">${UH}</th><th>DT ${dayLbl}</th><th class="need">Cần/ngày</th><th>% hoàn thành</th><th>Lũy kế T${M}</th><th>Dự kiến T${M}</th><th>Tăng trưởng so T${P}</th><th title="DT ngày so với cùng thứ tuần trước (chỉ tính khi đủ ngày, từ 21h00)">So cùng thứ tuần trước</th><th title="Số ngày liên tiếp đạt / hụt cần/ngày">Chuỗi ngày</th></tr></thead><tbody>`;
+   RR.forEach(r=>{t+=`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(unitName(r.s))}${isQ(r.s)?` <small class="muted">(${xs(r.s).length})</small>`:''}</td><td><b>${tr(r.day)} tr</b></td><td class="need">${left>0?tr(r.need)+' tr':'—'}</td><td class="${r.need>0?(r.day>=r.need?'pos':'neg'):''}"><b>${r.need>0?nf(1).format(r.day/r.need*100)+'%':'—'}</b></td><td>${tr(r.cum)} tr</td><td class="${r.proj>=r.goal?'pos':'neg'}">${tr(r.proj)} tr</td><td class="${r.aug?(r.proj>=r.aug?'pos':'neg'):''}"><b>${r.aug?sgn(r.proj/r.aug-1):'—'}</b></td>${wowCell(wowOf([r.s]))}${stkCell(streakOf(r.s))}</tr>`});
+   if(RR.length>1)t+=`</tbody><tfoot><tr><th class="l">${esc(ALBL)}</th><th>${tr(TT.day)} tr</th><th class="need">${left>0?tr(TT.need)+' tr':'—'}</th><th class="${TT.need>0?(TT.day>=TT.need?'pos':'neg'):''}">${TT.need>0?nf(1).format(TT.day/TT.need*100)+'%':'—'}</th><th>${tr(TT.cum)} tr</th><th>${tr(TT.proj)} tr</th><th class="${TT.proj>=TT.aug?'pos':'neg'}">${TT.aug?sgn(TT.proj/TT.aug-1):'—'}</th>${wowCell(wowOf(scope),'th')}<th></th></tr></tfoot>`;else t+='</tbody>';
    const gt=document.getElementById('goalTbl');gt.innerHTML=t;
    // xem 1 siêu thị: làm nổi bật DT ngày so với cần/ngày
    {const hero=document.getElementById('goalHero');if(RR.length===1){const r=RR[0],pc=r.need>0?r.day/r.need:null,ok=pc!=null&&pc>=1,gap=r.day-r.need;
@@ -1022,20 +1070,20 @@ function render(){
      gt.querySelectorAll('tr').forEach(tr=>[3,2,1].forEach(i=>tr.cells[i]&&tr.cells[i].remove()))}else{hero.hidden=true;hero.innerHTML='';delete gt.dataset.orig}}
    gt.querySelectorAll('tr[data-s]').forEach(tr=>{const go=()=>setShop(tr.dataset.s);tr.onclick=go;tr.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}});
    // 2. fresh: DT from ngành report (fresh categories) of report day, giá vốn cơ bản hôm nay from fresh file
-   document.getElementById('gh2').innerHTML=`2. Hiệu quả Fresh <small>ngày ${d9}/${M}</small>`;
+   document.getElementById('gh2').innerHTML=`2. Hiệu quả Fresh <small>ngày ${dN}/${M}</small>`;
    const fe=document.getElementById('goalFresh');const FD=D.sep.fday;const hasGV=D.fresh.some(r=>r[6]!=null);
    if(!FD||!hasGV){fe.innerHTML=`<tbody><tr><td class="l muted" style="white-space:normal">Chưa có số. Cần tải lại file doanh thu ngành hàng và file hiệu quả Fresh (có cột "Giá vốn cơ bản hôm nay") qua nút "Tải file lên".</td></tr></tbody>`}
    else{const FMAP=c=>{const k=c.normalize('NFC').toLowerCase();if(/^th[iị]t/.test(k))return 'Thịt';if(/th[uủ]y h[aả]i s[aả]n|^c[aá]\b/.test(k))return 'Cá (Hải sản)';if(/^rau|c[uủ] qu[aả]/.test(k))return 'Rau Củ Quả CL';if(/^tr[aá]i c[aâ]y/.test(k))return 'Trái cây';if(/^tr[uứ]ng/.test(k))return 'Trứng';return c};
-    const dayDT=s=>{const o=(FD[s]||{})[d9];if(o==null)return{};return typeof o==='number'?{'_':o}:o};
+    const dayDT=s=>{const o=(FD[s]||{})[dN];if(o==null)return{};return typeof o==='number'?{'_':o}:o};
     let rows,single=scope.length===1,col1;
-    if(!single){col1='Siêu thị';rows=scope.map(s=>{const dt=tot(Object.values(dayDT(s)));let gv=0;D.fresh.forEach(r=>{if(r[0]===s)gv+=r[6]||0});return{k:s,n:shopName(s),dt,gv,r:gv>0?dt/gv:null}})}
+    if(!single){col1=UH;const gvS={};D.fresh.forEach(r=>{if(r[6]!=null)gvS[r[0]]=(gvS[r[0]]||0)+r[6]});rows=UNITS.map(u=>{let dt=0,gv=0;xs(u).forEach(s=>{dt+=tot(Object.values(dayDT(s)));gv+=gvS[s]||0});return{k:u,n:unitName(u),dt,gv,r:gv>0?dt/gv:null}})}
     else{col1='Ngành hàng';const s=scope[0];const m={};const add=(c,i,v)=>{const o=m[c]||(m[c]=[0,0]);o[i]+=v};
      const dd=dayDT(s);if('_' in dd){let gv=0;D.fresh.forEach(r=>{if(r[0]===s)gv+=r[6]||0});m['Tổng Fresh (tải lại file ngành hàng để xem từng ngành)']=[dd._,gv]}else{for(const c in dd)add(c,0,dd[c]);D.fresh.forEach(r=>{if(r[0]===s&&r[6]!=null)add(FMAP(r[1]),1,r[6])})}
      rows=Object.keys(m).map(c=>({k:null,n:c,dt:m[c][0],gv:m[c][1],r:m[c][1]>0?m[c][0]/m[c][1]:null}))}
     rows.sort((x,y)=>(x.r??9)-(y.r??9));
-    let fdt=0,fgv=0;let h=`<thead><tr><th class="l">${col1}</th><th>Giá vốn</th><th class="need">${upAt?`DT đến ${upAt}`:`DT ngày ${d9}/${M}`}</th><th>DT/giá vốn</th></tr></thead><tbody>`;
-    rows.forEach(r=>{fdt+=r.dt;fgv+=r.gv;h+=`<tr${r.k?` tabindex="0" data-s="${r.k}"`:''}><td class="l">${esc(r.n)}</td><td>${tr1(r.gv)} tr</td><td class="need"><b>${tr1(r.dt)} tr</b></td><td class="${r.r!=null?(r.r>=1?'pos':'neg'):''}"><b>${r.r!=null?pct(r.r):'—'}</b></td></tr>`});
-    h+=rows.length>1?`</tbody><tfoot><tr><th class="l">${single?'Tổng Fresh':'Toàn khu vực'}</th><th>${tr1(fgv)} tr</th><th class="need">${tr1(fdt)} tr</th><th class="${fgv>0?(fdt>=fgv?'pos':'neg'):''}">${fgv>0?pct(fdt/fgv):'—'}</th></tr></tfoot>`:'</tbody>';fe.innerHTML=h}
+    let fdt=0,fgv=0;let h=`<thead><tr><th class="l">${col1}</th><th>Giá vốn</th><th class="need">${upAt?`DT đến ${upAt}`:`DT ngày ${dN}/${M}`}</th><th>DT/giá vốn</th></tr></thead><tbody>`;
+    rows.forEach(r=>{fdt+=r.dt;fgv+=r.gv;h+=`<tr${r.k?` tabindex="0" data-s="${r.k}"`:''}><td class="l">${esc(r.n)}${r.k&&isQ(r.k)?` <small class="muted">(${xs(r.k).length})</small>`:''}</td><td>${tr1(r.gv)} tr</td><td class="need"><b>${tr1(r.dt)} tr</b></td><td class="${r.r!=null?(r.r>=1?'pos':'neg'):''}"><b>${r.r!=null?pct(r.r):'—'}</b></td></tr>`});
+    h+=rows.length>1?`</tbody><tfoot><tr><th class="l">${single?'Tổng Fresh':esc(ALBL)}</th><th>${tr1(fgv)} tr</th><th class="need">${tr1(fdt)} tr</th><th class="${fgv>0?(fdt>=fgv?'pos':'neg'):''}">${fgv>0?pct(fdt/fgv):'—'}</th></tr></tfoot>`:'</tbody>';fe.innerHTML=h}
    // 3. loss by category for latest day
    const LG=c=>{const k=c.normalize('NFC').toLowerCase();if(/^th[uủ]y h[aả]i s[aả]n (nh[aậ]p kh[aẩ]u|t[aậ]p trung)$/.test(k))return 'Thủy Hải Sản Các Loại';if(/^th[iị]t (đ[iị]a ph[uư][oơ]ng|nh[aậ]p kh[aẩ]u)$/.test(k))return 'Thịt gia cầm gia súc các loại';return c};
    const L=D.loss&&D.loss.daily&&D.loss.y===D.cur.y&&D.loss.m===D.cur.m?D.loss:null;let ld=0;if(L)for(const s in L.daily)for(const k in L.daily[s])if(+k<=fullCap)ld=Math.max(ld,+k);
@@ -1045,27 +1093,27 @@ function render(){
    document.getElementById('gh3').innerHTML=`3. Hủy Thủy hải sản <small>${dayLb}</small>`;
    document.getElementById('gh4').innerHTML=`4. Tỷ lệ bán Trứng <small>${dayLb}</small>`;
    const le=document.getElementById('goalLoss'),ee=document.getElementById('goalEgg');
-   const sumC2=(s,pred,day)=>{const o=L.daily[s]&&L.daily[s][day];let n=0,h=0,x=0;if(o)for(const c in o){if(!pred(c))continue;n+=o[c][0];h+=o[c][1];x+=o[c][2]||0}return{n,h,x}};
-   const sumC=(s,pred)=>{const o=L.daily[s]&&L.daily[s][ld];let n=0,h=0,x=0;if(o)for(const c in o){if(!pred(c))continue;n+=o[c][0];h+=o[c][1];x+=o[c][2]||0}return{n,h,x}};
+   const sumC2=(u,pred,day)=>{let n=0,h=0,x=0;xs(u).forEach(s=>{const o=L.daily[s]&&L.daily[s][day];if(o)for(const c in o){if(!pred(c))continue;n+=o[c][0];h+=o[c][1];x+=o[c][2]||0}});return{n,h,x}};
+   const sumC=(u,pred)=>sumC2(u,pred,ld);
    const q1=v=>nf(1).format(v),q0=v=>nf(0).format(v),rp=(a,b)=>b>0?pct(a/b):'—';
    const noX=HX?'':`<tr><td colspan="6" class="l muted" style="white-space:normal">Chưa có SL bán: tải lại file nhập xuất Fresh để có cột thực xuất.</td></tr>`;
    if(!ld){const msg=`<tbody><tr><td class="l muted" style="white-space:normal">Chưa có dữ liệu theo ngày. Tải lại file nhập xuất Fresh để cập nhật.</td></tr></tbody>`;le.innerHTML=msg;ee.innerHTML=msg}
    else{
-    const R3=scope.map(s=>({s,...sumC(s,THS)})).filter(r=>r.n||r.h).sort((a,b)=>(b.n?b.h/b.n:-9)-(a.n?a.h/a.n:-9));
+    const R3=UNITS.map(s=>({s,...sumC(s,THS)})).filter(r=>r.n||r.h).sort((a,b)=>(b.n?b.h/b.n:-9)-(a.n?a.h/a.n:-9));
     // trung bình 7 ngày trước; hôm nay cao bất thường (≥ 1,5 lần TB và cao hơn ít nhất 3 điểm %) thì tô đỏ
     const avg7=ss=>{let n=0,h=0;for(let k=Math.max(1,ld-7);k<ld;k++)ss.forEach(s=>{const v=sumC2(s,THS,k);n+=v.n;h+=v.h});return n>0?h/n:null};
     const odd=(r,a)=>r!=null&&a!=null&&r>=a*1.5&&r-a>=.03;
     const nowCell=(r,a,tag='td')=>r==null?`<${tag}>—</${tag}>`:`<${tag} class="${odd(r,a)?'neg':''}">${odd(r,a)?'▲ ':''}<b>${pct(r)}</b></${tag}>`;
-    let N=0,H=0,X=0;let h=`<thead><tr><th class="l">Siêu thị</th><th>SL nhập</th><th>SL hủy</th><th>Hủy / nhập</th><th title="Hủy / nhập thủy hải sản trung bình 7 ngày trước ${dayLb}">TB 7 ngày trước</th></tr></thead><tbody>`;
-    R3.forEach(r=>{N+=r.n;H+=r.h;X+=r.x;h+=`<tr class="lx" tabindex="0" data-ls="${r.s}"><td class="l"><span class="chev"></span>${esc(shopName(r.s))}</td><td>${q1(r.n)}</td><td><b>${q1(r.h)}</b></td>${(()=>{const a=avg7([r.s]);return nowCell(r.n>0?r.h/r.n:null,a)+`<td class="muted">${a==null?'—':pct(a)}</td>`})()}</tr>`});
+    let N=0,H=0,X=0;let h=`<thead><tr><th class="l">${UH}</th><th>SL nhập</th><th>SL hủy</th><th>Hủy / nhập</th><th title="Hủy / nhập thủy hải sản trung bình 7 ngày trước ${dayLb}">TB 7 ngày trước</th></tr></thead><tbody>`;
+    R3.forEach(r=>{N+=r.n;H+=r.h;X+=r.x;h+=`${isQ(r.s)?`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(unitName(r.s))} <small class="muted">(${xs(r.s).length})</small></td>`:`<tr class="lx" tabindex="0" data-ls="${r.s}"><td class="l"><span class="chev"></span>${esc(shopName(r.s))}</td>`}<td>${q1(r.n)}</td><td><b>${q1(r.h)}</b></td>${(()=>{const a=avg7([r.s]);return nowCell(r.n>0?r.h/r.n:null,a)+`<td class="muted">${a==null?'—':pct(a)}</td>`})()}</tr>`});
     if(!R3.length)h+=`<tr><td colspan="5" class="l muted">Không có nhập / hủy thủy hải sản ${dayLb}.</td></tr>`;
-    h+=R3.length>1?`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th>${q1(N)}</th><th>${q1(H)}</th>${(()=>{const a=avg7(R3.map(r=>r.s));return nowCell(N>0?H/N:null,a,'th')+`<th>${a==null?'—':pct(a)}</th>`})()}</tr></tfoot>`:'</tbody>';le.innerHTML=h;
-    const R4=scope.map(s=>({s,...sumC(s,EGG)})).filter(r=>r.n||r.x).sort((a,b)=>(a.n?a.x/a.n:9)-(b.n?b.x/b.n:9));
+    h+=R3.length>1?`</tbody><tfoot><tr><th class="l">${esc(ALBL)}</th><th>${q1(N)}</th><th>${q1(H)}</th>${(()=>{const a=avg7(scope);return nowCell(N>0?H/N:null,a,'th')+`<th>${a==null?'—':pct(a)}</th>`})()}</tr></tfoot>`:'</tbody>';le.innerHTML=h;
+    const R4=UNITS.map(s=>({s,...sumC(s,EGG)})).filter(r=>r.n||r.x).sort((a,b)=>(a.n?a.x/a.n:9)-(b.n?b.x/b.n:9));
     const eggLow=s=>{if(!HX)return null;let n=0;for(let k=ld;k>=1;k--){const v=sumC2(s,EGG,k);if(!(v.n>0))break;if(v.x/v.n<1)n++;else break}return n};
-    let N4=0,X4=0;let e=`<thead><tr><th class="l">Siêu thị</th><th>SL nhập</th><th>SL bán</th><th>Bán / nhập</th><th title="Số ngày liên tiếp (tính đến ${dayLb}) bán dưới 100% lượng nhập">Ngày liền &lt;100%</th></tr></thead><tbody>${HX?'':noX.replace('colspan="6"','colspan="5"')}`;
-    R4.forEach(r=>{N4+=r.n;X4+=r.x;e+=`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(shopName(r.s))}</td><td>${q0(r.n)}</td><td>${HX?q0(r.x):'—'}</td><td class="${HX&&r.n>0&&r.x/r.n<1?'neg':''}"><b>${HX?rp(r.x,r.n):'—'}</b></td>${(()=>{const c=eggLow(r.s);return c==null?'<td class="muted">—</td>':`<td class="${c>=3?'neg':c?'':'muted'}">${c>=3?'<b>⚠️ '+c+' ngày</b>':c+' ngày'}</td>`})()}</tr>`});
+    let N4=0,X4=0;let e=`<thead><tr><th class="l">${UH}</th><th>SL nhập</th><th>SL bán</th><th>Bán / nhập</th><th title="Số ngày liên tiếp (tính đến ${dayLb}) bán dưới 100% lượng nhập">Ngày liền &lt;100%</th></tr></thead><tbody>${HX?'':noX.replace('colspan="6"','colspan="5"')}`;
+    R4.forEach(r=>{N4+=r.n;X4+=r.x;e+=`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(unitName(r.s))}${isQ(r.s)?` <small class="muted">(${xs(r.s).length})</small>`:''}</td><td>${q0(r.n)}</td><td>${HX?q0(r.x):'—'}</td><td class="${HX&&r.n>0&&r.x/r.n<1?'neg':''}"><b>${HX?rp(r.x,r.n):'—'}</b></td>${(()=>{const c=eggLow(r.s);return c==null?'<td class="muted">—</td>':`<td class="${c>=3?'neg':c?'':'muted'}">${c>=3?'<b>⚠️ '+c+' ngày</b>':c+' ngày'}</td>`})()}</tr>`});
     if(!R4.length)e+=`<tr><td colspan="5" class="l muted">Không có nhập / bán trứng ${dayLb}.</td></tr>`;
-    e+=R4.length>1?`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th>${q0(N4)}</th><th>${HX?q0(X4):'—'}</th><th class="${HX&&N4>0&&X4/N4<1?'neg':''}">${HX?rp(X4,N4):'—'}</th><th></th></tr></tfoot>`:'</tbody>';ee.innerHTML=e}
+    e+=R4.length>1?`</tbody><tfoot><tr><th class="l">${esc(ALBL)}</th><th>${q0(N4)}</th><th>${HX?q0(X4):'—'}</th><th class="${HX&&N4>0&&X4/N4<1?'neg':''}">${HX?rp(X4,N4):'—'}</th><th></th></tr></tfoot>`:'</tbody>';ee.innerHTML=e}
    // bấm 1 siêu thị ở mục Hủy: hiện / ẩn 3 SP thủy hải sản hủy nhiều nhất
    if(ld){
     const topLoss=s=>{let arr=null,lbl='';const P=L.prd&&L.prd.day===ld&&L.prd.s?L.prd.s[s]:null;
@@ -1080,20 +1128,20 @@ function render(){
       trEl.onclick=tog;trEl.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog()}}});}
    // 5. Lượt khách & giá trị bill (ngày cuối có số bill)
    {let bd=Math.min(D.sep.billDays||0,fullCap);while(bd>0&&!SHOPS.some(s=>+(((D.sep.bills||{})[s]||{})[bd]||0)>0))bd--;const be=document.getElementById('goalBill');const PB=D.prev.dim||new Date(D.prev.y,D.prev.m,0).getDate();
-    const bv=(s,k)=>k>=1?+(((D.sep.bills||{})[s]||{})[k]||0):+(((D.aug.bills||{})[s]||{})[PB+k]||0);
+    const bv0=(s,k)=>k>=1?+(((D.sep.bills||{})[s]||{})[k]||0):+(((D.aug.bills||{})[s]||{})[PB+k]||0);const bv=(u,k)=>xs(u).reduce((t,s)=>t+bv0(s,k),0);
     document.getElementById('gh5').innerHTML=`5. Lượt khách &amp; giá trị bill <small>${bd?`ngày ${bd}/${M} · so cùng thứ tuần trước`:''}</small>`;
     if(!bd)be.innerHTML=`<tbody><tr><td class="l muted" style="white-space:normal">Chưa có số bill. Tải file doanh thu / số bill để xem.</td></tr></tbody>`;
-    else{const R5=scope.map(s=>{const b1=bv(s,bd),b0=bv(s,bd-7),d1=dv(s,bd),d0=dv(s,bd-7);return{s,b1,b0,d1,d0,a1:b1?d1/b1:0,a0:b0?d0/b0:0}}).filter(r=>r.b1>0);
+    else{const R5=UNITS.map(s=>{const b1=bv(s,bd),b0=bv(s,bd-7),d1=dv(s,bd),d0=dv(s,bd-7);return{s,b1,b0,d1,d0,a1:b1?d1/b1:0,a0:b0?d0/b0:0}}).filter(r=>r.b1>0);
      const chg=(a,b)=>a>0&&b>0?a/b-1:null;R5.sort((x,y)=>(chg(x.b1,x.b0)??9)-(chg(y.b1,y.b0)??9));
      const k1=v=>nf(0).format(Math.round(v/1e3))+'k';
-     let b=`<thead><tr><th class="l">Siêu thị</th><th>Số bill</th><th>So tuần trước</th><th>TB / bill</th><th>So tuần trước</th></tr></thead><tbody>`;
-     R5.forEach(r=>{b+=`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(shopName(r.s))}</td><td><b>${nf(0).format(r.b1)}</b></td>${wowCell(chg(r.b1,r.b0))}<td>${k1(r.a1)}</td>${wowCell(chg(r.a1,r.a0))}</tr>`});
+     let b=`<thead><tr><th class="l">${UH}</th><th>Số bill</th><th>So tuần trước</th><th>TB / bill</th><th>So tuần trước</th></tr></thead><tbody>`;
+     R5.forEach(r=>{b+=`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(unitName(r.s))}${isQ(r.s)?` <small class="muted">(${xs(r.s).length})</small>`:''}</td><td><b>${nf(0).format(r.b1)}</b></td>${wowCell(chg(r.b1,r.b0))}<td>${k1(r.a1)}</td>${wowCell(chg(r.a1,r.a0))}</tr>`});
      const T5=R5.reduce((t,r)=>({b1:t.b1+r.b1,b0:t.b0+r.b0,d1:t.d1+r.d1,d0:t.d0+r.d0}),{b1:0,b0:0,d1:0,d0:0});
-     b+=R5.length>1?`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th>${nf(0).format(T5.b1)}</th>${wowCell(chg(T5.b1,T5.b0),'th')}<th>${k1(T5.b1?T5.d1/T5.b1:0)}</th>${wowCell(chg(T5.b1?T5.d1/T5.b1:0,T5.b0?T5.d0/T5.b0:0),'th')}</tr></tfoot>`:'</tbody>';be.innerHTML=b}}
-   ['goalFresh','goalEgg','goalBill'].forEach(id=>document.getElementById(id).querySelectorAll('tr[data-s]').forEach(tr=>{const go=()=>setShop(tr.dataset.s);tr.onclick=go;tr.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}}));
+     b+=R5.length>1?`</tbody><tfoot><tr><th class="l">${esc(ALBL)}</th><th>${nf(0).format(T5.b1)}</th>${wowCell(chg(T5.b1,T5.b0),'th')}<th>${k1(T5.b1?T5.d1/T5.b1:0)}</th>${wowCell(chg(T5.b1?T5.d1/T5.b1:0,T5.b0?T5.d0/T5.b0:0),'th')}</tr></tfoot>`:'</tbody>';be.innerHTML=b}}
+   ['goalFresh','goalEgg','goalBill','goalLoss'].forEach(id=>document.getElementById(id).querySelectorAll('tr[data-s]').forEach(tr=>{const go=()=>setShop(tr.dataset.s);tr.onclick=go;tr.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}}));
    // Việc cần làm hôm nay: siêu thị hụt doanh thu cần/ngày, hủy thủy hải sản cao, bán trứng thấp (hiển thị sau khung thi đua)
    {const fdL=fullDay?d9:d9-1;const tA=[],tB=[],tC=[];
-    if(fdL>=1)scope.forEach(s=>{const G=rev(s).goal;if(!(G>0))return;let cm=0;for(let k=1;k<fdL;k++)cm+=dv(s,k);const need=Math.max(0,(G-cm)/(DIM9-fdL+1)),a=dv(s,fdL);
+    if(fdL>=1)scope.forEach(s=>{const G=rev0(s).goal;if(!(G>0))return;let cm=0;for(let k=1;k<fdL;k++)cm+=dv0(s,k);const need=Math.max(0,(G-cm)/(DIM9-fdL+1)),a=dv0(s,fdL);
       if(need>0&&a<need)tA.push({s,v:a/need,t:`Đạt ${tr(a)} / cần ${tr(need)} tr (${nf(0).format(a/need*100)}%) · thiếu ${tr1(need-a)} tr`})});
     tA.sort((a,b)=>a.v-b.v);
     if(ld){let AN=0,AH=0;scope.forEach(s=>{const v=sumC2(s,THS,ld);AN+=v.n;AH+=v.h});const AR=AN>0?AH/AN:0;
@@ -1132,18 +1180,31 @@ function render(){
     const best=done.reduce((a,r)=>!a||r.v>a.v?r:a,null);
     const cr=rows[rows.length-1],pr=rows[rows.length-2];
     const fk=(l,v,sub)=>`<div class="fk"><div class="lbl">${l}</div><div class="val num">${v}</div><div class="muted" style="font-size:12px">${sub}</div></div>`;
-    document.getElementById('yearKpis').classList.toggle('k5',!!(LY&&ckLY>0));document.getElementById('yearKpis').innerHTML=
+    // Target năm của QLTP (trang "base qltp" trong file Base)
+    const QTG=D.qtTarget&&D.qtTarget.t&&(!D.qtTarget.y||D.qtTarget.y===D.cur.y)?D.qtTarget.t:null;
+    const ysh=s=>{let t=0;for(let m=1;m<=D.cur.m;m++)t+=m===D.cur.m?tot(sumDaily(D.sep.daily,[s],31)):(m===D.prev.m&&D.prev.y===D.cur.y)?tot(sumDaily(D.aug.daily,[s],31)):((Y.mon[m]||{})[s]||0);return t};
+    const yDays=(new Date(D.cur.y,11,31)-new Date(D.cur.y,0,0))/864e5,elY=(new Date(D.cur.y,M-1,d9)-new Date(D.cur.y,0,0))/864e5/yDays,remM=Math.max(0.5,12-M+(DIM9-d9)/DIM9);
+    const tgU=u=>{if(!QTG)return null;if(u==='all'){const ks=QKEYS.filter(k=>QTG[k]);if(!ks.length)return null;const t=ks.reduce((a,k)=>a+QTG[k],0);return{t,n:ks.length===QKEYS.length?ytdV:ks.reduce((a,k)=>a+QT[k].shops.reduce((b,s)=>b+ysh(s),0),0),cov:ks.length}}
+      if(isQ(u)){const k=u.slice(2);return QTG[k]?{t:QTG[k],n:xs(u).reduce((b,s)=>b+ysh(s),0)}:null}return null};
+    const TGS=tgU(cur);const tgCls=r=>r>=elY?'pos':'neg';
+    const nK=4+(LY&&ckLY>0?1:0)+(TGS?1:0);const yk=document.getElementById('yearKpis');yk.classList.toggle('k5',nK===5);yk.classList.toggle('k6',nK===6);
+    document.getElementById('yearKpis').innerHTML=(TGS?fk(`Hoàn thành Target năm ${D.cur.y}`,`<span class="${tgCls(TGS.n/TGS.t)}">${pct(TGS.n/TGS.t)}</span>`,`${moneyS(TGS.n)} / ${moneyS(TGS.t)}${TGS.cov&&TGS.cov<QKEYS.length?` (${TGS.cov}/${QKEYS.length} QLTP có Target)`:''} · thời gian đã qua ${pct(elY)} · cần ${moneyS(Math.max(0,TGS.t-TGS.n)/remM)}/tháng`):'')+
       fk(`Doanh thu năm ${D.cur.y}`,moneyS(ytdV),`1/1–${d9}/${M}${miss.length?` · <span class="pill warn">Thiếu ${miss.join(', ')}</span>`:''}`)+
       fk(`TB tháng (T1–T${D.cur.m-1})`,moneyS(avg),`${done.length} tháng đủ dữ liệu`)+
       fk('Tháng cao nhất',best?`T${best.m}`:'—',best?moneyS(best.v):'')+
       (LY&&ckLY>0?fk(`So cùng kỳ năm ${LYY}`,`<span class="${ckNow>=ckLY?'pos':'neg'}">${sgn(ckNow/ckLY-1)}</span>`,`${moneyS(ckNow)} vs ${moneyS(ckLY)}${lyMiss.length?` · <span class="pill warn">Thiếu ${lyMiss.join(', ')}/${LYY}</span>`:''}`):'')+
       fk(`Dự kiến T${M} so T${P}`,pr&&pr.v?`<span class="${cr.fc>=pr.v?'pos':'neg'}">${sgn(cr.fc/pr.v-1)}</span>`:'—',pr&&pr.v?`${moneyS(cr.fc)} vs ${moneyS(pr.v)}`:'');
-    {const db=document.getElementById('declineBox');db.hidden=cur!=='all';
-     if(cur!=='all')db.innerHTML='';else if(!DECL||!DECL.length){db.innerHTML=`<div class="dbox" style="background:var(--good-bg);border-color:transparent"><h3 style="margin:0">Không có siêu thị nào giảm doanh thu 2 tháng liên tiếp trở lên</h3></div>`}
-     else db.innerHTML=`<div class="dbox"><h3><span class="ic" aria-hidden="true">!</span>Cảnh báo: ${DECL.length} siêu thị giảm doanh thu tháng liên tiếp</h3>
+    {const db=document.getElementById('declineBox');db.hidden=!multi;const DECL2=DECL?DECL.filter(x=>SC.has(x.s)):null;
+     if(!multi)db.innerHTML='';else if(!DECL2||!DECL2.length){db.innerHTML=`<div class="dbox" style="background:var(--good-bg);border-color:transparent"><h3 style="margin:0">Không có siêu thị nào giảm doanh thu 2 tháng liên tiếp trở lên</h3></div>`}
+     else if(GRP){const g={};DECL2.forEach(x=>{const u=unitOf(x.s);(g[u]||(g[u]=[])).push(x)});const gs=Object.entries(g).sort((a,b)=>b[1].length-a[1].length);
+      db.innerHTML=`<div class="dbox"><h3><span class="ic" aria-hidden="true">!</span>Cảnh báo: ${DECL2.length} siêu thị giảm doanh thu tháng liên tiếp</h3>
+      <p class="lhint" style="margin:0 0 8px">So sánh doanh thu cả tháng với tháng liền trước (tháng ${M} dùng doanh thu dự kiến). Bấm một QLTP để xem chi tiết từng siêu thị.</p>
+      <div class="tbl-wrap"><table><thead><tr><th class="l">QLTP</th><th>Siêu thị giảm 2 tháng</th><th>Giảm từ 3 tháng</th><th class="l">Siêu thị</th></tr></thead><tbody>${gs.map(([u,l])=>{const n3=l.filter(x=>x.st>=3).length;
+        return `<tr data-s="${u}" tabindex="0"><td class="l"><b>${esc(unitName(u))}</b></td><td>${l.length}/${xs(u).length}</td><td>${n3?`<span class="pill down">${n3}</span>`:'—'}</td><td class="l" style="white-space:normal"><small>${l.map(x=>esc(shopName(x.s))).join(', ')}</small></td></tr>`}).join('')}</tbody></table></div></div>`}
+     else db.innerHTML=`<div class="dbox"><h3><span class="ic" aria-hidden="true">!</span>Cảnh báo: ${DECL2.length} siêu thị giảm doanh thu tháng liên tiếp</h3>
       <p class="lhint" style="margin:0 0 8px">So sánh doanh thu cả tháng với tháng liền trước (tháng ${M} dùng doanh thu dự kiến). Đỏ đậm = giảm từ 3 tháng trở lên. Bỏ qua tháng khai trương. Bấm một dòng để xem siêu thị đó.</p>
-      <div class="tbl-wrap"><table><thead><tr><th class="l">Siêu thị</th><th>Số tháng giảm</th><th>Diễn biến từng tháng</th><th>Tổng giảm</th></tr></thead><tbody>${DECL.map(x=>{const o=D.shops[x.s];
-        return `<tr data-s="${x.s}" tabindex="0"${cur===x.s?' class="sel"':''}><td class="l"><div class="shopcell"><span>${esc(o.name)}</span><small>${x.s}</small></div></td>
+      <div class="tbl-wrap"><table><thead><tr><th class="l">Siêu thị</th><th>Số tháng giảm</th><th>Diễn biến từng tháng</th><th>Tổng giảm</th></tr></thead><tbody>${DECL2.map(x=>{const o=D.shops[x.s];
+        return `<tr data-s="${x.s}" tabindex="0"${cur===x.s?' class="sel"':''}><td class="l"><div class="shopcell"><span>${esc(o.name)}</span><small>${x.s}${qtTag(x.s)}</small></div></td>
         <td><span class="pill ${x.st>=3?'down':'warn'}">${x.st} tháng</span></td>
         <td><span class="chain">${x.ch.map(c=>`<span title="T${c.m}: ${moneyS(x.v[c.m])} vs T${c.m-1}: ${moneyS(x.v[c.m-1])}">T${c.m} ${sgn(c.c)}</span>`).join('')}</span></td>
         <td class="neg"><b>${sgn(x.drop)}</b><br><small class="muted">${moneyS(x.v[x.ms[0]])} → ${moneyS(x.v[D.cur.m])}</small></td></tr>`}).join('')}</tbody></table></div></div>`;
@@ -1164,26 +1225,29 @@ function render(){
     document.getElementById('yearTbl').innerHTML=t;
     {const yb=document.getElementById('yoyBox'),me=window.__ME||{},ed=me.role==='admin'||me.role==='editor';
      document.getElementById('lyLeg').hidden=!LY;
-     if(!LY){yb.innerHTML=ed?`<p class="lhint" style="margin:12px 0 0">Muốn so với năm ${LYY}: tải file doanh thu / số bill (có cột Doanh thu offline) của năm ${LYY} qua nút "Tải file lên". Có thể tải file cả năm ${LYY} một lần.</p>`:'';}
-     else if(cur!=='all'||!ckRows.length)yb.innerHTML='';
+     const hint=!LY&&ed?`<p class="lhint" style="margin:12px 0 0">Muốn so với năm ${LYY}: tải file doanh thu / số bill (có cột Doanh thu offline) của năm ${LYY} qua nút "Tải file lên". Có thể tải file cả năm ${LYY} một lần.</p>`:'';
+     if(!multi){yb.innerHTML=hint}
      else{const ms=ckRows.map(r=>r.m);
-      const sv=(s,m)=>m===D.cur.m?tot(sumDaily(D.sep.daily,[s],31)):(m===D.prev.m&&D.prev.y===D.cur.y)?tot(sumDaily(D.aug.daily,[s],31)):((Y.mon[m]||{})[s]||0);
-      const sl=(s,m)=>m===D.cur.m?lyPart(m,[s],d9):lyFull(m,[s]);
-      const R6=SHOPS.map(s=>{const a=tot(ms.map(m=>sv(s,m))),b=tot(ms.map(m=>sl(s,m)||0));return{s,a,b,g:b>0?a/b-1:null}}).filter(r=>r.a||r.b)
-        .sort((x,y)=>(x.g??9)-(y.g??9));
-      yb.innerHTML=`<h3 style="margin:18px 0 6px;font-size:15px">Tăng trưởng từng siêu thị so cùng kỳ năm ${LYY}</h3><p class="lhint" style="margin:0 0 8px">Lũy kế ${ms.length===rows.length?`1/1–${d9}/${M}`:`các tháng ${ms.map(m=>'T'+m).join(', ')} (tháng ${M} tính đến ngày ${d9})`}. Thấp nhất ở trên. Bấm một dòng để xem siêu thị đó.</p>
-       <div class="tbl-wrap"><table><thead><tr><th class="l">Siêu thị</th><th>Năm ${D.cur.y}</th><th>Cùng kỳ ${LYY}</th><th>Tăng trưởng</th></tr></thead><tbody>${R6.map(r=>`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(shopName(r.s))}</td><td><b>${moneyS(r.a)}</b></td><td>${r.b?moneyS(r.b):'—'}</td><td>${r.g==null?'<span class="pill">Mới</span>':`<span class="pill ${r.g>=0?'up':'down'}">${sgn(r.g)}</span>`}</td></tr>`).join('')}</tbody></table></div>`;
+      const sv0=(s,m)=>m===D.cur.m?tot(sumDaily(D.sep.daily,[s],31)):(m===D.prev.m&&D.prev.y===D.cur.y)?tot(sumDaily(D.aug.daily,[s],31)):((Y.mon[m]||{})[s]||0);
+      const sv=(u,m)=>xs(u).reduce((t,s)=>t+sv0(s,m),0);const sl=(u,m)=>m===D.cur.m?lyPart(m,xs(u),d9):lyFull(m,xs(u));
+      const AM={};ALL.forEach(a=>AM[a.s]=a);const ys=[];for(let m=1;m<=D.cur.m;m++)ys.push(m);
+      const R6=UNITS.map(u=>{const y=tot(ys.map(m=>sv(u,m))),a=tot(ms.map(m=>sv(u,m))),b=LY?tot(ms.map(m=>sl(u,m)||0)):0;
+        const pj=tot(xs(u).map(s=>(AM[s]||{}).proj||0)),ag=tot(xs(u).map(s=>(AM[s]||{}).aug||0));
+        const tg=GRP&&QTG&&isQ(u)?QTG[u.slice(2)]||null:null;return{s:u,y,a,b,g:b>0?a/b-1:null,pj,ch:ag>0?pj/ag-1:null,tg,tr:tg?y/tg:null}}).filter(r=>r.y||r.b);
+      const HT=R6.some(r=>r.tg);R6.sort(HT?(x,y)=>(x.tr??9)-(y.tr??9):LY?(x,y)=>(x.g??9)-(y.g??9):(x,y)=>(x.ch??9)-(y.ch??9));
+      yb.innerHTML=`<h3 style="margin:18px 0 6px;font-size:15px">Doanh thu năm ${D.cur.y} theo ${UH2}</h3><p class="lhint" style="margin:0 0 8px">Lũy kế 1/1–${d9}/${M}.${HT?` % hoàn thành = lũy kế năm ÷ Target năm ${D.cur.y} (xanh: nhanh hơn tiến độ thời gian ${pct(elY)}, đỏ: chậm hơn), thấp nhất ở trên.`:LY?` Cùng kỳ ${LYY}: ${ms.length===rows.length?`1/1–${d9}/${M}/${LYY}`:`các tháng ${ms.map(m=>'T'+m).join(', ')} (tháng ${M} tính đến ngày ${d9})`}, tăng trưởng thấp nhất ở trên.`:` Tăng trưởng T${M} thấp nhất ở trên.`} Bấm một dòng để xem ${GRP?'các siêu thị của QLTP đó':'siêu thị đó'}.</p>
+       <div class="tbl-wrap"><table><thead><tr><th class="l">${UH}</th><th>Lũy kế năm ${D.cur.y}</th>${HT?`<th>Target năm ${D.cur.y}</th><th>% hoàn thành</th><th class="cm-h">Cần/tháng còn lại</th>`:''}<th>Dự kiến T${M}</th><th>% so T${P}</th>${LY?`<th>Cùng kỳ ${LYY}</th><th>Tăng trưởng so ${LYY}</th>`:''}</tr></thead><tbody>${R6.map(r=>`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(unitName(r.s))}${isQ(r.s)?` <small class="muted">(${xs(r.s).length})</small>`:''}</td><td><b>${moneyS(r.y)}</b></td>${HT?(r.tg?`<td>${moneyS(r.tg)}</td><td><span class="pill ${r.tr>=elY?'up':'down'}">${pct(r.tr)}</span></td><td class="cm-h">${moneyS(Math.max(0,r.tg-r.y)/remM)}</td>`:'<td class="muted">—</td><td class="muted">—</td><td class="cm-h muted">—</td>'):''}<td>${moneyS(r.pj)}</td><td class="${r.ch==null?'':r.ch>=0?'pos':'neg'}">${r.ch==null?'—':sgn(r.ch)}</td>${LY?`<td>${r.b?moneyS(r.b):'—'}</td><td>${r.g==null?'<span class="pill">Mới</span>':`<span class="pill ${r.g>=0?'up':'down'}">${sgn(r.g)}</span>`}</td>`:''}</tr>`).join('')}</tbody></table></div>`+hint;
       yb.querySelectorAll('tr[data-s]').forEach(tr=>{const go=()=>setShop(tr.dataset.s);tr.onclick=go;tr.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}})}}}}
 
   // KPIs
   const k=(lbl,val,unit,sub,cls='')=>`<div class="kpi ${cls}"><div class="lbl">${lbl}</div><div class="val num">${val}<small>${unit}</small></div><div class="sub">${sub}</div></div>`;
   const mm=money(cum9),mp=money(proj),ml=money(fLN);
-  document.getElementById('kpiNote').textContent=`${cur==='all'?'Toàn khu vực':shopName(cur)} · số liệu đến ngày ${d9}/${M}`;
+  document.getElementById('kpiNote').textContent=`${ALBL} · số liệu đến ngày ${d9}/${M}`;
   document.getElementById('kpis').innerHTML=
     k('Doanh thu lũy kế',mm[0],mm[1],`<div class="row">${pill(cum9/cumAug-1,'cùng kỳ')}<span>1–${d9}/${M}</span></div>`,'m-hide')+
     k(`Dự kiến doanh thu tháng ${M}`,mp[0],mp[1],`<div class="row">${pill(proj/aug-1,`vs T${P}`)}<span>T${P}: ${moneyS(aug)}</span></div>`,'hl')+
     k(`Lượt khách dự kiến tháng ${M}`,f0.format(Math.round(projB)),'bill',`<div class="row">${pill(projB/b8-1,`vs T${P}`)}<span>T${P}: ${f0.format(b8)}</span></div>`)+
-    k('Doanh thu / giá vốn cơ bản',pct(ratio),'','<div class="row"><span class="pill '+(ratio>=1?'up':'down')+'">'+(ratio>=1?'Có lãi':'Dưới giá vốn')+'</span><span>Fresh, lũy kế</span></div>','hl')+
+    k('Doanh thu / giá vốn cơ bản',isFinite(ratio)?pct(ratio):'—','',isFinite(ratio)?'<div class="row"><span class="pill '+(ratio>=1?'up':'down')+'">'+(ratio>=1?'Có lãi':'Dưới giá vốn')+'</span><span>Fresh, lũy kế</span></div>':'<div class="row"><span>Chưa có file hiệu quả Fresh</span></div>','hl')+
     k('Lợi nhuận lũy kế',ml[0],ml[1],`<div class="row">${fL3rows.length?`<span class="pill ${fLNcmp>=fL3?'up':'down'}">${fLNcmp>=fL3?'▲':'▼'} ${moneyS(Math.abs(fLNcmp-fL3))}</span><span>vs TB 3 tháng trước</span>`:'<span>Chưa có dữ liệu 3 tháng trước</span>'}</div>`);
 
   // Base meters
@@ -1192,7 +1256,7 @@ function render(){
     <div class="pct num">${pct(r)}</div>
     <div><div class="bar" role="img" aria-label="${title}: ${pct(r)} ${W}"><div class="fill" style="width:${Math.min(r/max,1)*100}%;background:${color}"></div><div class="tick" style="left:calc(${1/max*100}% - 1px)"></div></div></div>
     <div class="foot"><span>Dự kiến <b class="num">${moneyS(p)}</b></span><span>${W==='target'?'Target':'Base'} <b class="num">${moneyS(b)}</b></span><span class="num ${p>=b?'pos':'neg'}">${p>=b?'+':'−'}${moneyS(Math.abs(p-b))}</span></div></div>`};
-  document.getElementById('baseGrid').innerHTML=(tgN?meter(tgN<shops.length?`Tổng doanh thu / Target (${tgN}/${shops.length} ST)`:'Tổng doanh thu / Target',tgN<shops.length?shops.filter(s=>D.shops[s].tg).reduce((a,s)=>a+shopStats(s).proj,0):proj,tg,'var(--accent)','target','tg'):'')+meter('Tổng doanh thu / Base tổng',proj,bT,'var(--accent)')+meter('FMCG / Base FMCG',projFm,bF,'var(--fmcg)')+meter('FRESH / Base FRESH',projFr,bR,'var(--fresh)');
+  document.getElementById('baseGrid').innerHTML=(tgN?meter('Tổng doanh thu / Target',proj,tg,'var(--accent)','target','tg'):'')+meter('Tổng doanh thu / Base tổng',projN,bT,'var(--accent)')+meter('FMCG / Base FMCG',projFm,bF,'var(--fmcg)')+meter('FRESH / Base FRESH',projFr,bR,'var(--fresh)');
 
   // trend
   trendData={s9,s8};if(!tEl.hidden)drawTrend();
@@ -1201,7 +1265,7 @@ function render(){
   th+=`</tbody><tfoot><tr><th>Tổng</th><th>${tr(cum9)} tr</th><th>${tr(aug)} tr</th><th></th></tr></tfoot></table>`;tTbl.innerHTML=th;
 
   // category mix
-  const cats=Object.keys({...c9,...c8}).map(n=>({n,p:(c9[n]||0)/d9*DIM9,a:c8[n]||0,fr:FRESH.has(n)})).sort((a,b)=>b.p-a.p);
+  const cats=Object.keys({...c9,...c8}).map(n=>({n,p:(c9[n]||0)/dN*DIM9,a:c8[n]||0,fr:FRESH.has(n)})).sort((a,b)=>b.p-a.p);
   const pt=tot(cats.map(c=>c.p));
   document.getElementById('split').innerHTML=`<div style="width:${projFm/pt*100}%;background:var(--fmcg)" title="FMCG"></div><div style="width:${projFr/pt*100}%;background:var(--fresh)" title="FRESH"></div>`;
   document.getElementById('shFm').textContent=pct(projFm/pt);document.getElementById('shFr').textContent=pct(projFr/pt);
@@ -1226,22 +1290,30 @@ function render(){
   mixEl.querySelectorAll('.pl .r').forEach(r=>{r.onmouseenter=()=>{mixEl.classList.add('hl');mixEl.querySelector(`path[data-i="${r.dataset.i}"]`).classList.add('on')};r.onmouseleave=()=>{mixEl.classList.remove('hl');mixEl.querySelectorAll('path.on').forEach(p=>p.classList.remove('on'))}});
 
   // category compare
-  const cc=cats.filter(c=>c.a>0&&Math.max(c.p/pt,c.a/aug)>=0.002).map(c=>({...c,ch:c.p/c.a-1,d:c.p-c.a}));
+  const cc=cats.filter(c=>c.a>0&&Math.max(c.p/pt,c.a/augN)>=0.002).map(c=>({...c,ch:c.p/c.a-1,d:c.p-c.a}));
   const cm=Math.max(.05,...cc.map(c=>Math.abs(c.ch)));
-  const cmpRow=c=>{const w=Math.abs(c.ch)/cm*50;const pos=c.d>=0;
-    return `<div class="div" title="${esc(c.n)} — Dự kiến T${M}: ${moneyS(c.p)} · T${P}: ${moneyS(c.a)}"><div class="nm" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.n)}</div><div class="tr"><div style="left:${pos?50:50-w}%;width:${w}%;background:${pos?'var(--good)':'var(--bad)'};border-radius:${pos?'0 4px 4px 0':'4px 0 0 4px'};opacity:.85"></div></div><div class="v num ${pos?'pos':'neg'}"><span class="dv">${sgnM(c.d)}</span><span class="dp">${sgn(c.ch)}</span></div></div>`};
+  // bấm 1 ngành hàng: QLTP (xem toàn miền) hoặc siêu thị (xem 1 QLTP) giảm nhiều nhất ở trên
+  const CCD=shops.length>1;if(ccOpen&&!cats.some(c=>c.n===ccOpen))ccOpen=null;
+  const ccDet=n=>{const rs=UNITS.map(u=>{let p=0,a=0;xs(u).forEach(s=>{p+=(((D.sep.cat||{})[s]||{})[n]||0)/dN*DIM9;a+=((D.aug.cat||{})[s]||{})[n]||0});return{u,p,a,d:p-a}}).filter(r=>r.p||r.a).sort((x,y)=>x.d-y.d);
+    return `<div class="ccd"><div class="ccd-h">${esc(n)} theo ${UH2} · giảm nhiều nhất ở trên${GRP?' · bấm một QLTP để xem các siêu thị':''}</div><table class="ltop"><thead><tr><th class="l">#</th><th class="l">${UH}</th><th>Dự kiến T${M}</th><th>T${P}</th><th>Chênh lệch</th><th>%</th></tr></thead><tbody>${rs.map((r,i)=>`<tr data-ccu="${esc(r.u)}" tabindex="0" style="cursor:pointer"><td class="l">${i+1}</td><td class="l ltop-nm">${esc(unitName(r.u))}${isQ(r.u)?` <small class="muted">(${xs(r.u).length})</small>`:''}</td><td>${moneyS(r.p)}</td><td>${moneyS(r.a)}</td><td class="${r.d>=0?'pos':'neg'}"><b>${sgnM(r.d)}</b></td><td class="${r.d>=0?'pos':'neg'}">${r.a?sgn(r.p/r.a-1):'—'}</td></tr>`).join('')}</tbody></table></div>`};
+  const cmpRow=c=>{const w=Math.abs(c.ch)/cm*50;const pos=c.d>=0;const op=CCD&&ccOpen===c.n;
+    return `<div class="div${CCD?' ccr':''}${op?' open':''}"${CCD?` data-cc="${esc(c.n)}" tabindex="0" role="button" aria-expanded="${op}"`:''} title="${esc(c.n)} — Dự kiến T${M}: ${moneyS(c.p)} · T${P}: ${moneyS(c.a)}"><div class="nm" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.n)}</div><div class="tr"><div style="left:${pos?50:50-w}%;width:${w}%;background:${pos?'var(--good)':'var(--bad)'};border-radius:${pos?'0 4px 4px 0':'4px 0 0 4px'};opacity:.85"></div></div><div class="v num ${pos?'pos':'neg'}"><span class="dv">${sgnM(c.d)}</span><span class="dp">${sgn(c.ch)}</span></div></div>${op?ccDet(c.n):''}`};
   const grpHead=(lbl,cls,p,a)=>`<div class="div grp"><div class="nm"><span class="tag ${cls}" style="margin-left:0">${lbl}</span></div><div class="tr"></div><div class="v num ${p>=a?'pos':'neg'}"><span class="dv">${sgnM(p-a)}</span><span class="dp">${a?sgn(p/a-1):''}</span></div></div>`;
-  const fm8=aug-fr8;
+  const fm8=augN-fr8;
   document.getElementById('catCmp').innerHTML=
     grpHead('FMCG','fm',projFm,fm8)+cc.filter(c=>!c.fr).sort((a,b)=>a.d-b.d).map(cmpRow).join('')+
     grpHead('FRESH','fr',projFr,fr8)+cc.filter(c=>c.fr).sort((a,b)=>a.d-b.d).map(cmpRow).join('')+
-    `<div class="div" style="margin-top:4px;border-top:1px solid var(--grid);padding-top:10px"><div class="nm" style="font-weight:600">Tổng</div><div class="tr"></div><div class="v num ${proj>=aug?'pos':'neg'}"><span class="dv">${sgnM(proj-aug)}</span><span class="dp">${sgn(proj/aug-1)}</span></div></div>`;
+    `<div class="div" style="margin-top:4px;border-top:1px solid var(--grid);padding-top:10px"><div class="nm" style="font-weight:600">Tổng</div><div class="tr"></div><div class="v num ${projN>=augN?'pos':'neg'}"><span class="dv">${sgnM(projN-augN)}</span><span class="dp">${sgn(projN/augN-1)}</span></div></div>`;
+  {const cc=document.getElementById('catCmp');const h=e=>{const u=e.target.closest('tr[data-ccu]');if(u){setShop(u.dataset.ccu);return}const r=e.target.closest('[data-cc]');if(!r)return;const n=r.dataset.cc;ccOpen=ccOpen===n?null:n;render();const x=document.querySelector(`#catCmp [data-cc="${CSS.escape(n)}"]`);x&&x.focus()};
+   cc.onclick=h;cc.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();h(e)}}}
 
   // rank table
-  const rows=[...ALL].sort((a,b)=>a.ch-b.ch);const rm=Math.max(...rows.map(r=>Math.abs(r.ch)));
-  let rt=`<thead><tr><th>#</th><th class="l">Siêu thị</th><th>DT dự kiến T${M}</th><th>DT tháng ${P}</th><th>% so T${P}</th><th>Dự kiến / Target</th><th>Dự kiến / Base</th></tr></thead><tbody>`;
+  const AM={};ALL.forEach(a=>AM[a.s]=a);
+  const rows=UNITS.map(u=>{if(!isQ(u))return AM[u];const ss=xs(u).map(x=>AM[x]).filter(Boolean);const proj=tot(ss.map(a=>a.proj)),aug=tot(ss.map(a=>a.aug)),bT=tot(ss.map(a=>D.shops[a.s].bT||0));
+    const tS=ss.filter(a=>D.shops[a.s].tg),tg=tot(tS.map(a=>D.shops[a.s].tg)),pt=tot(tS.map(a=>a.proj));return{s:u,proj,aug,ch:aug>0?proj/aug-1:0,baseT:bT?proj/bT:0,tgT:tg?pt/tg:null}}).filter(Boolean).sort((a,b)=>a.ch-b.ch);const rm=Math.max(...rows.map(r=>Math.abs(r.ch)));
+  let rt=`<thead><tr><th>#</th><th class="l">${UH}</th><th>DT dự kiến T${M}</th><th>DT tháng ${P}</th><th>% so T${P}</th><th>Dự kiến / Target</th><th>Dự kiến / Base</th></tr></thead><tbody>`;
   rows.forEach((r,i)=>{const w=Math.abs(r.ch)/rm*50,pos=r.ch>=0;
-    rt+=`<tr tabindex="0" data-s="${r.s}" class="${cur===r.s?'sel':''}"><td><span class="rk ${!pos&&i<5?'hot':''}">${i+1}</span></td><td class="l"><div class="shopcell"><span>${esc(D.shops[r.s].name)}</span><small>${r.s}</small></div></td><td>${tr(r.proj)} tr</td><td>${tr(r.aug)} tr</td>
+    rt+=`<tr tabindex="0" data-s="${r.s}" class="${cur===r.s?'sel':''}"><td><span class="rk ${!pos&&i<5?'hot':''}">${i+1}</span></td><td class="l"><div class="shopcell"><span>${esc(unitName(r.s))}</span><small>${esc(unitSub(r.s))}${isQ(r.s)?'':qtTag(r.s)}</small></div></td><td>${tr(r.proj)} tr</td><td>${tr(r.aug)} tr</td>
     <td><b class="${pos?'pos':'neg'}">${sgn(r.ch)}</b></td>
     <td>${r.tgT==null?'<span class="muted">—</span>':`<span class="pill ${r.tgT>=1?'up':r.tgT>=.95?'warn':'down'}">${pct(r.tgT)}</span>`}</td>
     <td><span class="pill ${r.baseT>=1?'up':r.baseT>=.95?'warn':'down'}">${pct(r.baseT)}</span></td></tr>`});
@@ -1249,44 +1321,59 @@ function render(){
 
   // competition
   {const W1=40,W2=35,W3=25,LOSS_MAX=.25,RATIO_MIN=.95;const L=D.loss;
-    // điều kiện nhận thưởng: DT dự kiến tăng trưởng so tháng trước đạt mục tiêu (% mục tiêu ở tab Mục tiêu ngày)
-    const GOALG=(+D.goalPct||0)/100,PRZ=[1500000,1000000,500000],przTxt=v=>nf(0).format(v)+'đ',gLbl=(GOALG>0?'+':'')+nf(0).format(GOALG*100)+'%';
     const area={};if(L)for(const s in L.rows)for(const c in L.rows[s]){const v=L.rows[s][c];const a=area[c]||(area[c]=[0,0]);a[0]+=v[0];a[1]+=v[1]+v[2]}
     const cs=ALL.map(a=>{const s=a.s;const fr=D.fresh.filter(r=>r[0]===s);const dt=tot(fr.map(r=>r[2])),gv=tot(fr.map(r=>r[3]));
-      let li=null,lr=null;if(L&&L.rows[s]){let exp=0,act=0,n=0;for(const c in L.rows[s]){const v=L.rows[s][c];if(area[c]&&area[c][0]>0)exp+=v[0]*area[c][1]/area[c][0];act+=v[1]+v[2];n+=v[0]}li=exp>0?act/exp:null;lr=n>0?act/n:null}
+      let li=null,lr=null,lx=0,la=0,ln0=0;if(L&&L.rows[s]){let exp=0,act=0,n=0;for(const c in L.rows[s]){const v=L.rows[s][c];if(area[c]&&area[c][0]>0)exp+=v[0]*area[c][1]/area[c][0];act+=v[1]+v[2];n+=v[0]}li=exp>0?act/exp:null;lr=n>0?act/n:null;lx=exp;la=act;ln0=n}
       const pd=Object.keys(D.aug.daily[s]||{}).length;
-      return {s,ch:a.ch,ratio:gv>0?dt/gv:null,li,lr,isNew:pd<DIM8}});
+      return {s,ch:a.ch,ratio:gv>0?dt/gv:null,li,lr,isNew:pd<DIM8,dt,gv,lx,la,ln0,proj:a.proj,aug:a.aug,bT:(D.shops[s]||{}).bT||0}});
     const rk=cs.filter(c=>!c.isNew&&c.ratio!=null);
     const sc=(k,v,hi)=>{const vs=rk.map(c=>c[k]).filter(x=>x!=null&&x>0);if(v==null||v<=0||!vs.length)return 0;return hi?v/Math.max(...vs):Math.min(...vs)/v};
-    rk.forEach(c=>{c.gi=1+c.ch});rk.forEach(c=>{c.p1=W1*sc('gi',c.gi,true);c.p2=W2*sc('ratio',c.ratio,true);c.p3=L?W3*sc('li',c.li,false):0;c.tot=c.p1+c.p2+c.p3;c.ok=c.ch>=GOALG-1e-9});
-    rk.sort((a,b)=>b.tot-a.tot);if(rk.length>6)rk.slice(-3).forEach((c,i)=>{c.bot=3-i});rk.forEach((c,i)=>{if(c.ok&&i<3)c.prize=i+1});
+    rk.forEach(c=>{c.gi=1+c.ch});rk.forEach(c=>{c.p1=W1*sc('gi',c.gi,true);c.p2=W2*sc('ratio',c.ratio,true);c.p3=L?W3*sc('li',c.li,false):0;c.tot=c.p1+c.p2+c.p3;c.ok=true});
+    rk.sort((a,b)=>b.tot-a.tot);if(rk.length>6)rk.slice(-3).forEach((c,i)=>{c.bot=3-i});let prize=0;rk.forEach(c=>{if(c.ok&&prize<3){c.prize=++prize}});
     // bảng tính sẵn: lưu kèm số liệu để tài khoản chỉ xem (chỉ có số liệu 1 siêu thị) vẫn xem được xếp hạng
     const snapRow=c=>{const i=D.shops[c.s]||{};return{s:c.s,n:shopName(c.s),qn:i.qlName||'',ql:i.ql||'',ch:c.ch,ratio:c.ratio,li:c.li,lr:c.lr,isNew:!!c.isNew,p1:c.p1||0,p2:c.p2||0,p3:c.p3||0,tot:c.tot||0,prize:c.prize||0,bot:c.bot||0,ok:c.ok!==false}};
-    if(!VIEW_SHOP)window.__RANK={rk:rk.map(snapRow),ot:cs.filter(c=>c.isNew||c.ratio==null).map(snapRow)};
+    // xếp hạng QLTP: cộng số liệu các siêu thị của từng QLTP rồi chấm như bảng quản lý
+    let QR=null;if(!VIEW_SHOP&&QKEYS.length){QR=QKEYS.map(k=>{const xs=cs.filter(c=>D.shops[c.s].qt===k);const old=xs.filter(c=>!c.isNew);
+        const S=f=>xs.reduce((a,c)=>a+(f(c)||0),0),So=f=>old.reduce((a,c)=>a+(f(c)||0),0);
+        const proj=S(c=>c.proj),base=S(c=>c.bT),pO=So(c=>c.proj),aO=So(c=>c.aug),dt=S(c=>c.dt),gv=S(c=>c.gv),lx=S(c=>c.lx),la=S(c=>c.la),n=S(c=>c.ln0);
+        return{k,n:QT[k].name,ns:xs.length,proj,aug:S(c=>c.aug),ch:aO>0?pO/aO-1:null,bt:base>0?proj/base:null,ratio:gv>0?dt/gv:null,li:lx>0?la/lx:null,lr:n>0?la/n:null}});
+      const qsc=(k,v,hi)=>{const vs=QR.map(c=>c[k]).filter(x=>x!=null&&x>0);if(v==null||v<=0||!vs.length)return 0;return hi?v/Math.max(...vs):Math.min(...vs)/v};
+      QR.forEach(c=>{c.gi=c.ch==null?null:1+c.ch});QR.forEach(c=>{c.p1=W1*qsc('gi',c.gi,true);c.p2=W2*qsc('ratio',c.ratio,true);c.p3=L?W3*qsc('li',c.li,false):0;c.tot=c.p1+c.p2+c.p3});
+      QR.sort((a,b)=>b.tot-a.tot);QR.forEach((c,i)=>{c.prize=i<3?i+1:0;c.bot=QR.length>6&&i>=QR.length-3?QR.length-i:0})}
+    if(!VIEW_SHOP)window.__RANK={rk:rk.map(snapRow),ot:cs.filter(c=>c.isNew||c.ratio==null).map(snapRow),qt:(QR||[]).map(c=>({k:c.k,n:c.n,ns:c.ns,proj:c.proj,ch:c.ch,bt:c.bt,ratio:c.ratio,li:c.li,p1:c.p1,p2:c.p2,p3:c.p3,tot:c.tot,prize:c.prize,bot:c.bot}))};
+    {const QS=VIEW_SHOP?((D.rankSnap||{}).qt||[]):(QR||[]);const qs=document.getElementById('qtSec');qs.hidden=!QS.length;
+     if(QS.length){const myQ=VIEW_SHOP?(D.shops[VIEW_SHOP]||{}).qt:(cur.startsWith('q:')?cur.slice(2):null);
+      const cl=(val,pts,max,cls)=>`<td class="cm-h"><span class="${cls||''}">${val}</span><small class="pts">${f1.format(pts)}/${max}</small></td>`;
+      let q=`<thead><tr><th>#</th><th class="l">QLTP</th><th>DT dự kiến T${M}</th><th>DT so T${P}</th><th class="cm-h">Dự kiến / Base</th><th class="cm-h">DT / giá vốn</th><th class="cm-h">Chỉ số hủy</th><th class="l">Tổng điểm</th></tr></thead><tbody>`;
+      QS.forEach((c,i)=>{q+=`<tr${VIEW_SHOP?'':` tabindex="0" data-q="${esc(c.k)}"`} class="${myQ===c.k?'sel':''}"><td><span class="rk ${c.prize?'top top'+c.prize:(c.bot?'hot':'')}">${i+1}</span></td><td class="l qn"><b>${esc(c.n)}</b><small>${c.ns} siêu thị</small></td><td>${moneyS(c.proj)}</td>`+
+        `<td><b class="${c.ch==null?'':c.ch>=0?'pos':'neg'}">${c.ch==null?'—':sgn(c.ch)}</b><small class="pts">${f1.format(c.p1)}/${W1}</small></td>`+
+        `<td class="cm-h">${c.bt==null?'—':`<span class="pill ${c.bt>=1?'up':c.bt>=.95?'warn':'down'}">${pct(c.bt)}</span>`}</td>`+
+        cl(c.ratio==null?'—':pct(c.ratio),c.p2,W2,c.ratio>=1?'pos':'neg')+cl(c.li==null?'—':f2.format(c.li),c.p3,W3,c.li==null?'':(c.li<=1?'pos':'neg'))+
+        `<td class="l"><span class="cbar"><i style="width:${c.tot}%"></i></span><b>${f1.format(c.tot)}</b></td></tr>`});
+      const qt=document.getElementById('qtTbl');qt.innerHTML=q+'</tbody>';
+      qt.querySelectorAll('tr[data-q]').forEach(tr=>{const go=()=>setShop(cur==='q:'+tr.dataset.q?'all':'q:'+tr.dataset.q);tr.onclick=go;tr.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}})}}
     const SN=VIEW_SHOP?D.rankSnap:window.__RANK;const NM={};if(SN)[...SN.rk,...SN.ot].forEach(r=>NM[r.s]=r);
     if(VIEW_SHOP){rk.length=0;cs.length=0;if(SN){SN.rk.forEach(r=>rk.push(r));SN.ot.forEach(r=>cs.push(r))}}
     const shopName0=shopName,shopNameR=s=>(NM[s]&&NM[s].n)||shopName0(s);
     const rowS=s=>!VIEW_SHOP||s===VIEW_SHOP?` tabindex="0" data-s="${s}"`:'';
     const mgrCell=s=>{const i=NM[s]?{qlName:NM[s].qn,ql:NM[s].ql}:(D.shops[s]||{});return i.qlName?`<div class="shopcell"><span style="font-weight:600">${esc(i.qlName)}</span><small>User ${esc(i.ql||'')}</small></div>`:`<div class="shopcell"><span class="muted">Chưa có tên QL</span><small>${esc(shopNameR(s))}</small></div>`};
     const cell=(val,pts,max,cls)=>`<td><span class="${cls||''}">${val}</span><small class="pts">${f1.format(pts)}/${max}</small></td>`;
-    let h=`<thead><tr><th>#</th><th class="l">Quản lý</th><th>DT so T${P}</th><th>DT / giá vốn</th><th>Chỉ số hủy</th><th class="l">Tổng điểm</th><th class="l" title="Top 1: ${przTxt(PRZ[0])} · Top 2: ${przTxt(PRZ[1])} · Top 3: ${przTxt(PRZ[2])}. Điều kiện: DT dự kiến so T${P} từ ${gLbl} trở lên">Thưởng</th></tr></thead><tbody>`;
-    const przCell=c=>c.prize?`<td class="l"><span class="pill up">${['🥇','🥈','🥉'][c.prize-1]} ${przTxt(PRZ[c.prize-1])}</span></td>`:c.ok===false?`<td class="l"><span class="pill down" title="Cần DT dự kiến so T${P} từ ${gLbl}">Chưa đạt MT DT</span></td>`:'<td class="l muted">—</td>';
-    if(VIEW_SHOP&&!SN)h+=`<tr><td colspan="7" class="l muted" style="white-space:normal">Bảng xếp hạng sẽ có sau lần cập nhật số liệu tới.</td></tr>`;
-    rk.forEach((c,i)=>{h+=`<tr${rowS(c.s)} class="${cur===c.s?'sel':''}"><td><span class="rk ${c.prize?'top top'+c.prize:(c.bot?'hot':'')}">${i+1}</span></td><td class="l">${mgrCell(c.s)}</td>`+
+    let h=`<thead><tr><th>#</th><th class="l">Quản lý</th><th>DT so T${P}</th><th>DT / giá vốn</th><th>Chỉ số hủy</th><th class="l">Tổng điểm</th></tr></thead><tbody>`;
+    if(VIEW_SHOP&&!SN)h+=`<tr><td colspan="6" class="l muted" style="white-space:normal">Bảng xếp hạng sẽ có sau lần cập nhật số liệu tới.</td></tr>`;
+    const inQ=s=>VIEW_SHOP||!cur.startsWith('q:')||SC.has(s);
+    rk.forEach((c,i)=>{if(!inQ(c.s))return;h+=`<tr${rowS(c.s)} class="${cur===c.s?'sel':''}"><td><span class="rk ${c.prize?'top top'+c.prize:(c.bot?'hot':'')}">${i+1}</span></td><td class="l">${mgrCell(c.s)}</td>`+
       cell(sgn(c.ch),c.p1,W1,c.ch>=0?'pos':'neg')+cell(pct(c.ratio),c.p2,W2,c.ratio>=1?'pos':'neg')+cell(c.li==null?'—':f2.format(c.li),c.p3,W3,c.li==null?'':(c.li<=1?'pos':'neg'))+
-      `<td class="l"><span class="cbar"><i style="width:${c.tot}%"></i></span><b>${f1.format(c.tot)}</b></td>${przCell(c)}</tr>`});
-    cs.filter(c=>c.isNew||c.ratio==null).forEach(c=>{h+=`<tr${rowS(c.s)} class="muted-row ${cur===c.s?'sel':''}"><td><span class="rk">–</span></td><td class="l">${mgrCell(c.s)}</td><td>${sgn(c.ch)}</td><td>${c.ratio==null?'—':pct(c.ratio)}</td><td>${c.li==null?'—':f2.format(c.li)}</td><td class="l"><span class="pill warn">${c.isNew?'Shop mới, chưa đủ tháng '+P:'Thiếu dữ liệu Fresh'}</span></td><td class="l muted">—</td></tr>`});
-    document.getElementById('compTbl').innerHTML=h+'</tbody>';
-    document.getElementById('compPrize').innerHTML=`<b>Thưởng:</b> Top 1 ${przTxt(PRZ[0])} · Top 2 ${przTxt(PRZ[1])} · Top 3 ${przTxt(PRZ[2])}. <b>Điều kiện nhận thưởng:</b> doanh thu dự kiến tháng ${M} tăng trưởng so tháng ${P} đạt mục tiêu (từ ${gLbl} trở lên). Thưởng theo đúng vị trí xếp hạng: quản lý ở vị trí nào và đạt điều kiện thì nhận mức thưởng của vị trí đó; vị trí chưa đạt điều kiện thì bỏ trống, không chuyển cho người kế tiếp.`;}
+      `<td class="l"><span class="cbar"><i style="width:${c.tot}%"></i></span><b>${f1.format(c.tot)}</b></td></tr>`});
+    cs.filter(c=>(c.isNew||c.ratio==null)&&inQ(c.s)).forEach(c=>{h+=`<tr${rowS(c.s)} class="muted-row ${cur===c.s?'sel':''}"><td><span class="rk">–</span></td><td class="l">${mgrCell(c.s)}</td><td>${sgn(c.ch)}</td><td>${c.ratio==null?'—':pct(c.ratio)}</td><td>${c.li==null?'—':f2.format(c.li)}</td><td class="l"><span class="pill warn">${c.isNew?'Shop mới, chưa đủ tháng '+P:'Thiếu dữ liệu Fresh'}</span></td></tr>`});
+    document.getElementById('compTbl').innerHTML=h+'</tbody>';}
 
   // Thi đua ngành hàng (chương trình tải lên từ file Excel)
   {const box=document.getElementById('catBody'),note=document.getElementById('catNote');
-   // thi đua Cá - Trứng (bán / nhập): chỉ tài khoản Quản trị xem
-   const CT=(D.contests||[]).filter(c=>IS_ADMIN||!/b[aá]n\s*\/\s*nh[aậ]p/i.test(c.cond||''));const NEAR=[];window.__NEAR=NEAR;
-   const GRP=false,UH='Siêu thị',ALBL='Toàn khu vực',UNITS=[],xs=u=>u==='all'?SHOPS:[u],isQ=u=>u==='all',unitName=u=>u==='all'?'Toàn khu vực':shopName(u);
+   // QL siêu thị không xem thi đua tính theo khu vực QLTP (Cá - Trứng: bán / nhập)
+   const CT=(D.contests||[]).filter(c=>!(__R==='ql'&&/b[aá]n\s*\/\s*nh[aậ]p/i.test(c.cond||'')));const NEAR=[];window.__NEAR=NEAR;
    const nk=t=>String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[đĐ]/g,'d').toLowerCase().replace(/[^a-z0-9]/g,'');
    const allCats=new Set();[D.sep.cat,D.aug.cat,...Object.values(D.catm||{}).map(x=>x.c)].forEach(o=>{for(const s in o||{})for(const k in o[s])allCats.add(k)});
-   const scope=cur==='all'?SHOPS:[cur];const left=Math.max(0,DIM9-d9);
+   const scope=shops;const left=Math.max(0,DIM9-dN);
    // cột QLTP trong file thi đua: mức thưởng theo % DT bán hoặc số tiền / siêu thị (có thể chia theo size)
    const parseRule=t=>{if(!t)return null;const R={pct:{},fix:{},th:2e9,txt:String(t).trim()};let b='all',any=false;
      String(t).normalize('NFC').split(/\n|(?=size\s*(?:<|>=|≥|>))|(?=[-+*•]?\s*m[uứ]c\s*\d+\s*:)/i).forEach(l=>{const z=l.match(/size\s*(<|>=|≥|>)\s*([\d.,]+)\s*t[ỷy]/i);if(z){b=z[1]==='<'?'lt':'ge';R.th=parseFloat(z[2].replace(',','.'))*1e9;return}
@@ -1296,13 +1383,13 @@ function render(){
    const szV=s=>{const t=String((D.sz||{})[s]||'');const m=t.match(/([\d]+(?:[.,]\d+)?)\s*t[ỷy]/i);return m?parseFloat(m[1].replace(',','.'))*1e9:((D.shops[s]||{}).bT||0)};
    const vnd=v=>nf(0).format(Math.round(v))+'đ';
    const LR=D.loss&&D.loss.rows&&D.loss.y===D.cur.y&&D.loss.m===D.cur.m&&D.loss.hasX?D.loss:null;
-   note.textContent=CT.length?`Tháng ${M}/${D.cur.y}, số liệu ngành hàng đến ngày ${d9}/${M} · dự kiến = lũy kế ÷ ${d9} ngày × ${DIM9} ngày · thưởng QLTP tính trên doanh thu dự kiến`:'';
+   note.textContent=CT.length?`Tháng ${M}/${D.cur.y}, số liệu ngành hàng đến ngày ${dN}/${M} · dự kiến = lũy kế ÷ ${dN} ngày × ${DIM9} ngày · thưởng QLTP tính trên doanh thu dự kiến`:'';
    if(!CT.length){box.innerHTML=`<p class="hint">Chưa có chương trình thi đua. ${CAN_EDIT?'Bấm <b>Tải file lên</b> và chọn file thi đua ngành hàng (có cột "Chương trình Thi đua").':'Quản trị sẽ tải file chương trình lên.'}</p>`}
    else box.innerHTML=CT.map((c,ci)=>{
      const AL={thuyhaisancacloai:'cahaisan',thuyhaisan:'cahaisan'};const AC=[...allCats];
      const findCat=n=>{const k=nk(n),k2=AL[k]||k;return AC.find(x=>nk(x)===k)||AC.find(x=>nk(x)===k2)||AC.find(x=>nk(x).length>=4&&k.startsWith(nk(x)))||AC.find(x=>k.length>=6&&nk(x).startsWith(k))};
      const keys=[],miss=[];c.cats.forEach(n=>{const k=findCat(n);if(k&&!keys.includes(k))keys.push(k);else if(!k)miss.push(n)});
-     const lv=c.levels.length?c.levels:[{n:1,r:1}];const RU=IS_ADMIN?parseRule(c.qtRule):null; // thưởng QLTP: chỉ tài khoản QLTP (và quản trị) xem
+     const lv=c.levels.length?c.levels:[{n:1,r:1}];const RU=(__R==='qltp'||__R==='admin')?parseRule(c.qtRule):null; // thưởng QLTP: chỉ tài khoản QLTP (và quản trị) xem
      const sum=(o,s)=>keys.reduce((t,k)=>t+(+(((o||{})[s]||{})[k])||0),0);
      // loại chương trình: theo tỷ lệ bán / nhập (file nhập xuất) hoặc tăng trưởng doanh thu so với tháng ghi trong file
      const SELL=/b[aá]n\s*\/\s*nh[aậ]p/i.test(c.cond||'');
@@ -1314,7 +1401,7 @@ function render(){
      const bmK=bm.y+'-'+String(bm.m).padStart(2,'0'),bmH=(D.catm||{})[bmK];
      const baseCat=bm.m===P&&bm.y===PY?D.aug.cat:bm.m===M&&bm.y===D.cur.y?null:bmH?bmH.c:null;const BT='T'+bm.m;
      const bmNote=SELL&&!LR?`Chưa có tỷ lệ bán / nhập tháng ${M}: tải file nhập xuất Fresh tháng ${M} (có cột SL thực xuất).`:SELL&&!GROW?'':!baseCat?`Chưa có doanh thu ngành hàng tháng ${bm.m}/${bm.y} để so sánh. ${CAN_EDIT?`Bấm <b>Tải file lên</b> và chọn file doanh thu ngành hàng tháng ${bm.m}/${bm.y} (cả tháng).`:'Quản trị sẽ tải file tháng này lên.'}`:bmH&&bmH.d<new Date(bm.y,bm.m,0).getDate()&&!(bm.m===P&&bm.y===PY)?`Doanh thu ngành hàng tháng ${bm.m}/${bm.y} mới có đến ngày ${bmH.d}, cần file đủ cả tháng.`:'';
-     const mk=u=>{const ss=xs(u);const base=ss.reduce((t,s)=>t+sum(baseCat,s),0),cum=ss.reduce((t,s)=>t+sum(D.sep.cat,s),0),proj=d9?cum/d9*DIM9:0;
+     const mk=u=>{const ss=xs(u);const base=ss.reduce((t,s)=>t+sum(baseCat,s),0),cum=ss.reduce((t,s)=>t+sum(D.sep.cat,s),0),proj=dN?cum/dN*DIM9:0;
        let sn=0,sx=0;if(SELL)ss.forEach(s=>{const v=sell(s);sn+=v.n;sx+=v.x});
        const r=SELL?(sn>0?sx/sn:null):(base>0?proj/base:null);
        let li=-1;lv.forEach((l,i)=>{if(r!=null&&r>=l.r)li=i});const rawLi=li,gr=base>0?proj/base:null,gfail=GROW&&!(gr!=null&&gr>1);if(gfail)li=-1;
@@ -1327,16 +1414,20 @@ function render(){
      const fixOf=(s,n)=>{const b=c.sz&&c.sz[s]?c.sz[s]:(szV(s)>=RU.th?'ge':'lt');const f=RU.fix.all||RU.fix[b]||{};return f[n]||0};
      const rwS=x=>{if(!RU||!ok(x))return 0;const n=lv[x.li].n;return RU.pct[n]!=null?RU.pct[n]*x.proj:fixOf(x.s,n)};
      const rwQ=x=>{if(!RU||!x||!isQ(x.s)||!ok(x))return 0;const n=lv[x.li].n;if(RU.pct[n]!=null)return RU.pct[n]*x.proj;return xs(x.s).reduce((t,s)=>t+fixOf(s,n),0)};
-     const Rs=scope.map(mk).filter(x=>x.base>0||x.cum>0||x.sn>0);const RWS={};if(!AREA)Rs.forEach(x=>RWS[x.s]=rwS(x));
+     const Rs=scope.map(mk).filter(x=>x.base>0||x.cum>0||x.sn>0);const RWS={};
+     // thưởng đ/ST: QLTP chỉ nhận khi tổng DT cả khu vực QLTP đạt từ Mức 1 trở lên
+     const QP={},qpass=s=>{const q=(D.shops[s]||{}).qt;if(!q)return true;if(!(q in QP))QP[q]=mk('q:'+q).li>=0;return QP[q]};
+     if(!AREA)Rs.forEach(x=>RWS[x.s]=qpass(x.s)?rwS(x):0);
      const rwU=x=>AREA?rwQ(x):xs(x.s).reduce((t,s)=>t+(RWS[s]||0),0);
      const R=(GRP?UNITS.map(mk).filter(x=>x.base>0||x.cum>0||x.sn>0):Rs.slice()).sort((a,b)=>(b.r??-1)-(a.r??-1));
-     const QX=cur==='all'?mk('all'):null; // đang xem toàn khu vực
-     const T={base:R.reduce((t,x)=>t+x.base,0),cum:R.reduce((t,x)=>t+x.cum,0),sn:R.reduce((t,x)=>t+x.sn,0),sx:R.reduce((t,x)=>t+x.sx,0)};T.proj=d9?T.cum/d9*DIM9:0;T.r=SELL?(T.sn?T.sx/T.sn:null):(T.base?T.proj/T.base:null);
+     const QX=cur.startsWith('q:')?mk(cur):null; // đang xem 1 QLTP
+     const T={base:R.reduce((t,x)=>t+x.base,0),cum:R.reduce((t,x)=>t+x.cum,0),sn:R.reduce((t,x)=>t+x.sn,0),sx:R.reduce((t,x)=>t+x.sx,0)};T.proj=dN?T.cum/dN*DIM9:0;T.r=SELL?(T.sn?T.sx/T.sn:null):(T.base?T.proj/T.base:null);
      const TRW=GRP?R.reduce((t,x)=>t+rwU(x),0):AREA?(QX?rwQ(QX):0):Rs.reduce((t,x)=>t+(RWS[x.s]||0),0);const SHOWRW=RU&&(GRP||QX||!AREA);const RWCOL=RU&&(GRP||!AREA);
-     const cnt=i=>Rs.filter(x=>x.li>=i).length;
+     const cnt=i=>Rs.filter(x=>x.li===i).length; // đếm đúng mức đạt (không cộng dồn)
+     const rwL=i=>AREA?0:Rs.filter(x=>x.li===i).reduce((t,x)=>t+(RWS[x.s]||0),0);
      const lvName=i=>i<0?'Chưa đạt':`Mức ${lv[i].n}`;
      const rwH=RWCOL?`<th title="${esc(RU.txt)}">${GRP?'Thưởng QLTP':'Thưởng QLTP (từ siêu thị)'}</th>`:'';
-     const rwC=x=>{if(!RWCOL)return '';const v=isQ(x.s)?rwU(x):RWS[x.s]||0;const why=x.li>=0&&!ok(x)?' <small class="neg">chưa đạt Target</small>':'';return `<td>${v?`<b class="pos">${vnd(v)}</b>`:'<span class="muted">—</span>'}${why}</td>`};
+     const rwC=x=>{if(!RWCOL)return '';const v=isQ(x.s)?rwU(x):RWS[x.s]||0;const kvF=!AREA&&!(isQ(x.s)?x.li>=0:qpass(x.s));const why=kvF&&(isQ(x.s)?Rs.some(y=>xs(x.s).includes(y.s)&&ok(y)):ok(x))?' <small class="neg">KV chưa đạt Mức 1</small>':x.li>=0&&!ok(x)?' <small class="neg">chưa đạt Target</small>':'';return `<td>${v?`<b class="pos">${vnd(v)}</b>`:'<span class="muted">—</span>'}${why}</td>`};
      let t=`<table class="ct-tbl"><thead><tr><th class="cm-h">#</th><th class="l">${UH}</th>${SELL?`<th>SL nhập</th><th class="cm-h">SL bán</th><th>Bán / nhập</th>${GROW?`<th class="cm-h">DT ${BT}</th><th>Dự kiến T${M}</th><th>% so ${BT}</th>`:''}`:`<th>DT ${BT}</th><th class="cm-h">Lũy kế T${M}</th><th>Dự kiến T${M}</th><th>Dự kiến / ${BT}</th>`}<th class="l">Mức đạt</th>${SELL?(GROW?'':`<th class="cm-h">DT dự kiến T${M}</th>`):`<th class="cm-h">Cần/ngày lên mức kế</th>`}${rwH}</tr></thead><tbody>`;
      const q0=v=>nf(0).format(v);
      R.forEach((x,i)=>{t+=`<tr${!VIEW_SHOP?` tabindex="0" data-s="${x.s}"`:''} class="${cur===x.s?'sel':''}"><td class="cm-h"><span class="rk">${i+1}</span></td><td class="l">${esc(unitName(x.s))}${isQ(x.s)?` <small class="muted">(${xs(x.s).length})</small>`:''}</td>`+
@@ -1346,26 +1437,34 @@ function render(){
        (SELL?(GROW?'':`<td class="cm-h">${tr(x.proj)} tr</td>`):`<td class="cm-h">${x.nx?(x.need==null?'—':`${tr1(x.need)} tr <small class="muted">→ ${lvName(lv.indexOf(x.nx))}</small>`):'<span class="pos">Mức cao nhất</span>'}</td>`)+rwC(x)+`</tr>`});
      if(R.length>1)t+=`</tbody><tfoot><tr><th class="cm-h"></th><th class="l">${esc(ALBL)}</th>`+(SELL?`<th>${q0(T.sn)}</th><th class="cm-h">${q0(T.sx)}</th><th>${T.r==null?'—':pct(T.r)}</th>`+(GROW?`<th class="cm-h">${tr(T.base)} tr</th><th>${tr(T.proj)} tr</th><th>${T.base?sgn(T.proj/T.base-1):'—'}</th>`:''):`<th>${tr(T.base)} tr</th><th class="cm-h">${tr(T.cum)} tr</th><th>${tr(T.proj)} tr</th><th>${T.r==null?'—':pct(T.r)}</th>`)+`<th class="l"></th>${SELL&&GROW?'':`<th class="cm-h">${SELL?tr(T.proj)+' tr':''}</th>`}${RWCOL?`<th>${TRW?vnd(TRW):'—'}</th>`:''}</tr></tfoot>`;else t+='</tbody>';
      t+='</table>';
-     // siêu thị sắp lên mức: chỉ cần tăng ≤ 15% doanh thu/ngày so với nhịp hiện tại là lên mức kế
-     const NEARX=.15;const nr=[];if(!SELL&&baseCat&&d9>0&&left>0)Rs.forEach(x=>{if(!x.nx||x.need==null||!(x.cum>0))return;const avg=x.cum/d9,inc=x.need/avg-1;if(!(inc<=NEARX))return;
+     // siêu thị sắp lên mức: chỉ cần tăng ≤ 10% doanh thu/ngày so với nhịp hiện tại là lên mức kế
+     const NEARX=.10;const nr=[];if(!SELL&&baseCat&&dN>0&&left>0)Rs.forEach(x=>{if(!x.nx||x.need==null||!(x.cum>0))return;const avg=x.cum/dN,inc=x.need/avg-1;if(!(inc<=NEARX))return;
        const gain=RU&&!AREA?fixOf(x.s,x.nx.n)-(ok(x)?fixOf(x.s,lv[x.li].n):0):0;nr.push({s:x.s,inc,need:x.need,n:x.nx.n,gain})});
-     nr.sort((a,b)=>a.inc-b.inc);nr.forEach(y=>NEAR.push({s:y.s,v:y.inc,t:`${c.name}: cần ${tr1(y.need)} tr/ngày (+${nf(0).format(Math.max(0,y.inc)*100)}%) → Mức ${y.n}${y.gain>0?` · thưởng QLTP +${vnd(y.gain)}`:''}`}));
-     const kvL=(()=>{if(!RU||SELL||!QX||!QX.nx||QX.need==null||!(QX.cum>0)||!baseCat||left<=0)return '';const inc=QX.need/(QX.cum/d9)-1;
-       const g=AREA?(RU.pct[QX.nx.n]||0)*QX.nx.r*QX.base-rwQ(QX):0;
-       return `<p class="kv"><b>Khu vực:</b> cần ${tr1(QX.need)} tr/ngày (${inc>=0?'+':''}${nf(0).format(inc*100)}% so nhịp hiện tại) để lên Mức ${QX.nx.n}${AREA&&g>0?` → thưởng QLTP thêm khoảng ${vnd(g)}`:''}.</p>`})();
-     const nearH=nr.length||kvL?`<div class="ct-near">${kvL}${nr.length?`<b>Siêu thị sắp lên mức</b> <span class="muted">· chỉ cần tăng tối đa ${NEARX*100}% doanh thu/ngày so với nhịp hiện tại</span><ul>${nr.slice(0,8).map(y=>`<li data-ns="${y.s}" tabindex="0">${esc(shopName(y.s))} → Mức ${y.n}: <b>${tr1(y.need)} tr/ngày</b> <small class="muted">(+${nf(0).format(Math.max(0,y.inc)*100)}%)</small>${y.gain>0?` <small class="pos">+${vnd(y.gain)}</small>`:''}</li>`).join('')}</ul>${nr.length>8?`<small class="muted">và ${nr.length-8} siêu thị khác</small>`:''}`:''}</div>`:'';
+     nr.sort((a,b)=>a.inc-b.inc);
+     // khu vực QLTP: cần bao nhiêu / ngày để lên mức kế (toàn miền: liệt kê từng QLTP, không liệt kê siêu thị)
+     const RsM={};Rs.forEach(y=>RsM[y.s]=y);
+     const kvInfo=x=>{if(SELL||!x||!x.nx||x.need==null||!(x.cum>0)||!baseCat||left<=0)return null;const inc=x.need/(x.cum/dN)-1;let g=0,unl=0;
+       if(RU){if(AREA)g=(RU.pct[x.nx.n]||0)*x.nx.r*x.base-rwQ(x);else if(x.li<0)unl=xs(x.s).reduce((t,s)=>t+(RsM[s]?rwS(RsM[s]):0),0)}return{inc,g,unl}};
+     const kvTxt=(x,k)=>`cần ${tr1(x.need)} tr/ngày (${k.inc>=0?'+':''}${nf(0).format(k.inc*100)}% so nhịp hiện tại) để lên Mức ${x.nx.n}${k.g>0?` → thưởng QLTP thêm khoảng ${vnd(k.g)}`:''}${RU&&!AREA&&x.li<0?` (điều kiện để QLTP nhận thưởng${k.unl>0?`, mở khóa ${vnd(k.unl)}`:''})`:''}`;
+     let nearH='';
+     if(GRP){const qr=R.map(x=>({x,k:kvInfo(x)})).filter(o=>o.k).sort((a,b)=>a.k.inc-b.k.inc);
+       qr.filter(o=>o.k.inc<=NEARX).forEach(o=>NEAR.push({s:o.x.s,v:o.k.inc,t:`${c.name}: ${kvTxt(o.x,o.k)}`}));
+       if(qr.length)nearH=`<div class="ct-near">${qr.map(o=>`<p class="kv" data-ns="${o.x.s}" tabindex="0" role="button"><b>${esc(unitName(o.x.s))}:</b> ${kvTxt(o.x,o.k)}.</p>`).join('')}</div>`}
+     else{nr.forEach(y=>NEAR.push({s:y.s,v:y.inc,t:`${c.name}: cần ${tr1(y.need)} tr/ngày (+${nf(0).format(Math.max(0,y.inc)*100)}%) → Mức ${y.n}${y.gain>0?` · thưởng QLTP +${vnd(y.gain)}`:''}`}));
+       const kq=kvInfo(QX);const kvL=kq?`<p class="kv"><b>Khu vực:</b> ${kvTxt(QX,kq)}.</p>`:'';
+       nearH=nr.length||kvL?`<div class="ct-near">${kvL}${nr.length?`<b>Siêu thị sắp lên mức</b> <span class="muted">· chỉ cần tăng tối đa ${NEARX*100}% doanh thu/ngày so với nhịp hiện tại</span><ul>${nr.slice(0,8).map(y=>`<li data-ns="${y.s}" tabindex="0">${esc(shopName(y.s))} → Mức ${y.n}: <b>${tr1(y.need)} tr/ngày</b> <small class="muted">(+${nf(0).format(Math.max(0,y.inc)*100)}%)</small>${y.gain>0?` <small class="pos">+${vnd(y.gain)}</small>`:''}</li>`).join('')}</ul>${nr.length>8?`<small class="muted">và ${nr.length-8} siêu thị khác</small>`:''}`:''}</div>`:''}
      const rwTxt=RU?(()=>{const p=Object.entries(RU.pct).map(([n,v])=>`Mức ${n}: ${nf(2).format(v*100).replace(/,?0+$/,'')}% DT bán`);const f=Object.entries(RU.fix).map(([b,o])=>(b==='all'?'':b==='lt'?`ST < ${nf(0).format(RU.th/1e9)} tỷ: `:`ST ≥ ${nf(0).format(RU.th/1e9)} tỷ: `)+Object.entries(o).map(([n,v])=>`Mức ${n} ${vnd(v)}`).join(', '));return [...p,...f].join(' · ')})():'';
      return `<div class="ct-card"><div class="ct-h"><h3 title="${esc(c.time)} · ${esc(c.scope)} · ${esc(c.goal)} · ${esc(c.cats.join(', '))}">${esc(c.name)}</h3>
        <div class="ct-chips">${lv.map(l=>`<span class="lv">Mức ${l.n}: ≥ ${nf(0).format(l.r*100)}%<span class="ct-lg"> ${SELL?'bán / nhập':'DT '+BT}</span></span>`).join('')}</div>
-       ${RU?`<p class="ct-rw"><b>Thưởng QLTP:</b> ${esc(rwTxt)}${c.needTarget?' · siêu thị phải đạt Target DT':''}${GROW?` · DT nhóm ngành dự kiến T${M} phải cao hơn ${BT}`:''}. ${AREA?'Thưởng QLTP xét theo tổng doanh thu cả khu vực đạt mức.':`Thưởng QLTP = tổng thưởng của các siêu thị đạt mức${c.sz?' (size siêu thị theo sheet đính kèm)':''}.`}</p>`:''}
+       ${RU?`<p class="ct-rw"><b>Thưởng QLTP:</b> ${esc(rwTxt)}${c.needTarget?' · siêu thị phải đạt Target DT':''}${GROW?` · DT nhóm ngành dự kiến T${M} phải cao hơn ${BT}`:''}. ${AREA?'Thưởng QLTP xét theo tổng doanh thu cả khu vực QLTP đạt mức.':`Mỗi siêu thị đạt mức nào nhận thưởng đúng mức đó (không cộng dồn các mức thấp hơn); thưởng QLTP = tổng thưởng của các siêu thị${c.sz?' (size siêu thị theo sheet đính kèm)':''}, chỉ nhận khi tổng DT cả khu vực QLTP đạt từ Mức 1 (≥ ${nf(0).format(lv[0].r*100)}% ${BT}) trở lên.`}</p>`:''}
        ${bmNote?`<p class="msg-err" style="margin:8px 0 0;font-size:12px">${bmNote}</p>`:''}
        ${(()=>{const mm=c.time.match(/\/(\d{1,2})(?:\/\d+)?\s*$/);const cm=mm?+mm[1]:null;return cm&&cm!==M?`<p class="msg-err" style="margin:8px 0 0;font-size:12px">Chương trình áp dụng tháng ${cm}, số liệu đang là tháng ${M}/${D.cur.y}.</p>`:''})()}
        ${miss.length?`<p class="msg-err" style="margin:8px 0 0;font-size:12px">Chưa khớp ngành hàng: ${miss.map(esc).join(', ')}.</p>`:''}</div>
        <div class="ct-b"><div class="ct-kpis" style="--n:${lv.length+(SHOWRW?1:0)}">
-         ${lv.map((l,i)=>`<div class="fk"><span class="lbl"><span class="ct-lg">Siêu thị đạt </span>Mức ${l.n}${i<lv.length-1?'<span class="ct-lg"> trở lên</span><span class="ct-sm"> trở lên</span>':''}</span><span class="val num">${cnt(i)}/${Rs.length}</span></div>`).join('')}
-         ${SHOWRW?`<div class="fk"><span class="lbl">Thưởng QLTP<span class="ct-lg"> dự kiến</span></span><span class="val num ${TRW?'pos':''}">${TRW?vnd(TRW):'0đ'}</span>${QX&&AREA&&!TRW?`<small class="muted">KV ${QX.li>=0&&!ok(QX)?'chưa đạt Target':QX.gfail?'DT chưa tăng':'chưa đạt mức'}</small>`:''}</div>`:''}</div>
+         ${lv.map((l,i)=>`<div class="fk"><span class="lbl"><span class="ct-lg">Siêu thị đạt </span>Mức ${l.n}</span><span class="val num">${cnt(i)}/${Rs.length}</span>${RU&&!AREA&&rwL(i)?`<small class="muted">Thưởng ${vnd(rwL(i))}</small>`:''}</div>`).join('')}
+         ${SHOWRW?`<div class="fk"><span class="lbl">Thưởng QLTP<span class="ct-lg"> dự kiến</span></span><span class="val num ${TRW?'pos':''}">${TRW?vnd(TRW):'0đ'}</span>${QX&&!TRW&&(AREA||QX.li<0)?`<small class="muted">KV ${QX.li>=0&&!ok(QX)?'chưa đạt Target':QX.gfail?'DT chưa tăng':AREA?'chưa đạt mức':'chưa đạt Mức 1'}</small>`:''}</div>`:''}</div>
        ${nearH}<div class="tbl-wrap">${t}</div></div></div>`}).join('');
-   box.querySelectorAll('tr[data-s],li[data-ns]').forEach(tr=>{const go=()=>setShop(tr.dataset.s||tr.dataset.ns);tr.onclick=go;tr.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}})}
+   box.querySelectorAll('tr[data-s],[data-ns]').forEach(tr=>{const go=()=>setShop(tr.dataset.s||tr.dataset.ns);tr.onclick=go;tr.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}})}
 
   // Việc cần làm hôm nay (đầu tab Mục tiêu ngày)
   {const T=window.__TODO,box=document.getElementById('goalTodo');if(!T){box.hidden=true;box.innerHTML=''}else{
@@ -1376,7 +1475,7 @@ function render(){
       {k:'D',h:'Sắp lên mức thi đua',it:window.__NEAR||[],ok:'Chưa có siêu thị sát mức kế.'}];
     const LIM=4,open=JSON.parse(box.dataset.open||"{}");const nT=new Set([...T.A,...T.B,...T.C].map(x=>x.s)).size;
     box.hidden=false;box.innerHTML=`<div class="td-h"><b>Việc cần làm hôm nay</b><small>${esc(T.nm)} · ${nT?(T.single?'cần chú ý':`${nT} siêu thị cần chú ý`):'không có việc gấp'}${T.single?'':' · bấm tên siêu thị để xem riêng'}</small></div><div class="td-g">${G.map(g=>{const sh=open[g.k]?g.it:g.it.slice(0,LIM);
-      return `<div class="td-c ${g.k}${g.it.length?'':' ok'}"><div class="td-ch">${g.h}${g.it.length?`<span class="n">${g.it.length}</span>`:''}</div>${g.it.length?`<ul>${sh.map(x=>`<li${T.single?'':` data-s="${x.s}" data-k="${g.k}" tabindex="0" role="button"`}>${T.single?'':`<b>${esc(shopName(x.s))}</b>`}${esc(x.t)}</li>`).join('')}</ul>${g.it.length>LIM?`<button class="btn" type="button" data-more="${g.k}">${open[g.k]?'Thu gọn':`Xem tất cả (${g.it.length})`}</button>`:''}`:`<div class="ok">✓ ${g.ok}</div>`}</div>`}).join('')}</div>`;
+      return `<div class="td-c ${g.k}${g.it.length?'':' ok'}"><div class="td-ch">${g.h}${g.it.length?`<span class="n">${g.it.length}</span>`:''}</div>${g.it.length?`<ul>${sh.map(x=>`<li${T.single?'':` data-s="${x.s}" data-k="${g.k}" tabindex="0" role="button"`}>${T.single?'':`<b>${esc(unitName(x.s))}</b>`}${esc(x.t)}</li>`).join('')}</ul>${g.it.length>LIM?`<button class="btn" type="button" data-more="${g.k}">${open[g.k]?'Thu gọn':`Xem tất cả (${g.it.length})`}</button>`:''}`:`<div class="ok">✓ ${g.ok}</div>`}</div>`}).join('')}</div>`;
     box.querySelectorAll('[data-more]').forEach(b=>b.onclick=()=>{const o=JSON.parse(box.dataset.open||'{}');o[b.dataset.more]=!o[b.dataset.more];box.dataset.open=JSON.stringify(o);render()});
     box.querySelectorAll('li[data-s]').forEach(li=>{const go=()=>{const k=li.dataset.k;setShop(li.dataset.s);if(k==='D')setView('cat')};li.onclick=go;li.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}})}}
 
@@ -1389,23 +1488,23 @@ function render(){
     `<div class="fk"><span class="lbl">Lợi nhuận lũy kế</span><span class="val num ${fLN>=0?'pos':'neg'}">${moneyS(fLN)}</span></div>`;
   const byCat={};fr.forEach(r=>{const o=byCat[r[1]]||(byCat[r[1]]={dt:0,gv:0,ln:0,l3:0,has3:false});o.dt+=r[2];o.gv+=r[3];o.ln+=r[4];if(r[5]!=null){o.l3+=r[5];o.has3=true}});
   let ft='<thead><tr><th class="l">Ngành hàng Fresh</th><th>DT tính giá vốn</th><th>Giá vốn CB lũy kế</th><th>DT / giá vốn</th><th>LN lũy kế</th><th>LN TB 3 tháng trước</th><th>Chênh lệch</th></tr></thead><tbody>';
-  // quản trị / cập nhật dữ liệu xem toàn khu vực: bấm 1 ngành hàng để xem ngành đó ở từng siêu thị
-  const fxOK=CAN_EDIT&&cur==='all'&&!VIEW_SHOP;if(!fxOK||(freshOpen&&!byCat[freshOpen]))freshOpen=null;
-  const fdet=n=>{const m={};D.fresh.filter(r=>r[1]===n).forEach(r=>{const o=m[r[0]]||(m[r[0]]={dt:0,gv:0,ln:0,l3:0,has3:false});o.dt+=r[2];o.gv+=r[3];o.ln+=r[4];if(r[5]!=null){o.l3+=r[5];o.has3=true}});
+  // quản trị / cập nhật dữ liệu xem toàn miền: bấm 1 ngành hàng để xem ngành đó ở từng siêu thị
+  const fxOK=multi&&!VIEW_SHOP;if(!fxOK||(freshOpen&&!byCat[freshOpen]))freshOpen=null;
+  const fdet=n=>{const m={};D.fresh.filter(r=>r[1]===n&&SC.has(r[0])).forEach(r=>{const u=unitOf(r[0]);const o=m[u]||(m[u]={dt:0,gv:0,ln:0,l3:0,has3:false});o.dt+=r[2];o.gv+=r[3];o.ln+=r[4];if(r[5]!=null){o.l3+=r[5];o.has3=true}});
     const rows=Object.entries(m).sort((a,b)=>a[1].ln-b[1].ln);
-    return `<tr class="ldet"><td colspan="7"><div class="ldet-in"><div class="ldet-h">${esc(n)} theo siêu thị · ${rows.length} siêu thị · LN lũy kế thấp nhất ở trên · bấm tên siêu thị để xem riêng</div>
-      <table class="ltop fxd"><thead><tr><th class="l fx-n">#</th><th class="l">Siêu thị</th><th>DT tính giá vốn</th><th class="fx-gv">Giá vốn CB</th><th>DT / giá vốn</th><th>LN lũy kế</th><th>LN TB 3 tháng trước</th><th>Chênh lệch</th></tr></thead><tbody>`+
-      rows.map(([sh,o],i)=>{const r=o.gv?o.dt/o.gv:null,d=o.ln-o.l3;return `<tr tabindex="0" data-fs="${sh}" style="cursor:pointer"><td class="l fx-n">${i+1}</td><td class="l ltop-nm">${esc(shopName(sh))}<small>${sh}</small></td><td>${tr(o.dt)} tr</td><td class="fx-gv">${tr(o.gv)} tr</td><td>${r==null?'—':`<span class="pill ${r>=1?'up':'down'}">${pct(r)}</span>`}</td><td class="${o.ln>=0?'pos':'neg'}"><b>${tr1(o.ln)} tr</b></td><td>${o.has3?tr1(o.l3)+' tr':'—'}</td><td class="${o.has3?(d>=0?'pos':'neg'):''}">${o.has3?(d>=0?'+':'')+tr1(d)+' tr':'—'}</td></tr>`}).join('')+
+    return `<tr class="ldet"><td colspan="7"><div class="ldet-in"><div class="ldet-h">${esc(n)} theo ${UH2} · ${rows.length} ${UH2} · LN lũy kế thấp nhất ở trên · bấm tên ${UH2} để xem riêng</div>
+      <table class="ltop fxd"><thead><tr><th class="l fx-n">#</th><th class="l">${UH}</th><th>DT tính giá vốn</th><th class="fx-gv">Giá vốn CB</th><th>DT / giá vốn</th><th>LN lũy kế</th><th>LN TB 3 tháng trước</th><th>Chênh lệch</th></tr></thead><tbody>`+
+      rows.map(([sh,o],i)=>{const r=o.gv?o.dt/o.gv:null,d=o.ln-o.l3;return `<tr tabindex="0" data-fs="${sh}" style="cursor:pointer"><td class="l fx-n">${i+1}</td><td class="l ltop-nm">${esc(unitName(sh))}<small>${esc(unitSub(sh))}</small></td><td>${tr(o.dt)} tr</td><td class="fx-gv">${tr(o.gv)} tr</td><td>${r==null?'—':`<span class="pill ${r>=1?'up':'down'}">${pct(r)}</span>`}</td><td class="${o.ln>=0?'pos':'neg'}"><b>${tr1(o.ln)} tr</b></td><td>${o.has3?tr1(o.l3)+' tr':'—'}</td><td class="${o.has3?(d>=0?'pos':'neg'):''}">${o.has3?(d>=0?'+':'')+tr1(d)+' tr':'—'}</td></tr>`}).join('')+
       `</tbody></table></div></td></tr>`};
   Object.entries(byCat).sort((a,b)=>a[1].ln-b[1].ln).forEach(([n,o])=>{const r=o.dt/o.gv;const d=o.ln-o.l3;const open=freshOpen===n;
     ft+=`<tr${fxOK?` class="lrow${open?' open':''}" tabindex="0" data-fcat="${esc(n)}" aria-expanded="${open}"`:''}><td class="l">${fxOK?'<span class="chev" aria-hidden="true"></span>':''}${esc(n)}</td><td>${tr(o.dt)} tr</td><td>${tr(o.gv)} tr</td><td class="${r>=1?'pos':'neg'}"><b>${pct(r)}</b></td><td class="${o.ln>=0?'pos':'neg'}">${tr1(o.ln)} tr</td><td>${o.has3?tr1(o.l3)+' tr':'—'}</td><td class="${o.has3?(d>=0?'pos':'neg'):''}">${o.has3?(d>=0?'+':'')+tr1(d)+' tr':'—'}</td></tr>`;if(open)ft+=fdet(n)});
   ft+=`</tbody><tfoot><tr><th class="l">Tổng</th><th>${tr(fDT)} tr</th><th>${tr(fGV)} tr</th><th>${pct(ratio)}</th><th>${tr1(fLN)} tr</th><th>${fL3rows.length?tr1(fL3)+' tr':'—'}</th><th></th></tr></tfoot>`;
   document.getElementById('freshCatTbl').innerHTML=ft;
-  const bs={};D.fresh.forEach(r=>{const o=bs[r[0]]||(bs[r[0]]={dt:0,gv:0,ln:0,l3:0,has3:false});o.dt+=r[2];o.gv+=r[3];o.ln+=r[4];if(r[5]!=null){o.l3+=r[5];o.has3=true}});
-  let st='<thead><tr><th class="l">Siêu thị</th><th>DT tính giá vốn</th><th>DT / giá vốn</th><th>LN lũy kế</th><th>LN TB 3 tháng trước</th><th>Chênh lệch</th></tr></thead><tbody>';
+  const bs={};D.fresh.forEach(r=>{if(!SC.has(r[0]))return;const u=unitOf(r[0]);const o=bs[u]||(bs[u]={dt:0,gv:0,ln:0,l3:0,has3:false});o.dt+=r[2];o.gv+=r[3];o.ln+=r[4];if(r[5]!=null){o.l3+=r[5];o.has3=true}});
+  let st=`<thead><tr><th class="l">${UH}</th><th>DT tính giá vốn</th><th>DT / giá vốn</th><th>LN lũy kế</th><th>LN TB 3 tháng trước</th><th>Chênh lệch</th></tr></thead><tbody>`;
   Object.entries(bs).sort((a,b)=>a[1].ln-b[1].ln).forEach(([s,o])=>{const r=o.dt/o.gv,d=o.ln-o.l3;
-    st+=`<tr tabindex="0" data-s="${s}" class="${cur===s?'sel':''}"><td class="l"><div class="shopcell"><span>${esc(shopName(s))}</span><small>${s}</small></div></td><td>${tr(o.dt)} tr</td><td><span class="pill ${r>=1?'up':'down'}">${pct(r)}</span></td><td class="${o.ln>=0?'pos':'neg'}"><b>${tr1(o.ln)} tr</b></td><td>${o.has3?tr1(o.l3)+' tr':'—'}</td><td class="${o.has3?(d>=0?'pos':'neg'):''}">${o.has3?(d>=0?'+':'')+tr1(d)+' tr':'Shop mới'}</td></tr>`});
-  document.getElementById('freshShopTbl').innerHTML=st+'</tbody>';
+    st+=`<tr tabindex="0" data-s="${s}" class="${cur===s?'sel':''}"><td class="l"><div class="shopcell"><span>${esc(unitName(s))}</span><small>${esc(unitSub(s))}</small></div></td><td>${tr(o.dt)} tr</td><td><span class="pill ${r>=1?'up':'down'}">${pct(r)}</span></td><td class="${o.ln>=0?'pos':'neg'}"><b>${tr1(o.ln)} tr</b></td><td>${o.has3?tr1(o.l3)+' tr':'—'}</td><td class="${o.has3?(d>=0?'pos':'neg'):''}">${o.has3?(d>=0?'+':'')+tr1(d)+' tr':'Shop mới'}</td></tr>`});
+  document.getElementById('freshShopTbl').innerHTML=st+'</tbody>';document.getElementById('freshShopH').textContent='Theo '+UH2;
 
   // loss: SL hủy (hủy tồn + mất mát kiểm kê) / SL nhập
   const L=D.loss;const lk=document.getElementById('lossKpis'),lt=document.getElementById('lossTbl'),ln=document.getElementById('lossNote');
@@ -1427,14 +1526,14 @@ function render(){
       shops.forEach(s=>{(L.pr[s]||[]).forEach(([p,n,x])=>{const info=L.prod[p];if(!info||LGRP(info[1])!==grp)return;const a=acc[p]||(acc[p]=[0,0]);a[0]+=n;a[1]+=x})});
       return Object.entries(acc).filter(([p,a])=>a[0]>=LOSS_MIN&&a[1]>0).map(([p,a])=>({p,nm:L.prod[p][0],n:a[0],x:a[1],r:a[1]/a[0]})).sort((a,b)=>b.r-a.r||b.x-a.x).slice(0,5)};
     const nf2=v=>Math.abs(v-Math.round(v))<1e-9?f0.format(v):f1.format(v);
-    // xem toàn khu vực: bấm 1 ngành hàng -> tỷ lệ của từng siêu thị; xem 1 siêu thị -> top 5 sản phẩm hủy cao
-    const shopDetail=(grp)=>{const rs=shops.map(s=>{const o=L.rows[s]||{};let n=0,h=0,x=0;for(const c0 in o){if(LGRP(c0)!==grp)continue;n+=o[c0][0];h+=o[c0][1]+o[c0][2];x+=o[c0][3]||0}return{s,n,h,x}}).filter(r=>r.n>0);
+    // xem toàn miền: bấm 1 ngành hàng -> tỷ lệ của từng siêu thị; xem 1 siêu thị -> top 5 sản phẩm hủy cao
+    const shopDetail=(grp)=>{const rs=UNITS.map(u=>{let n=0,h=0,x=0;xs(u).forEach(s=>{const o=L.rows[s]||{};for(const c0 in o){if(LGRP(c0)!==grp)continue;n+=o[c0][0];h+=o[c0][1]+o[c0][2];x+=o[c0][3]||0}});return{s:u,n,h,x}}).filter(r=>r.n>0);
       // ngành trứng: xếp theo bán / nhập thấp → cao; ngành khác: hủy / nhập cao → thấp
       const egg=HX&&/^tr[uứ]ng/i.test(grp.normalize('NFC'));rs.sort(egg?(a,b)=>a.x/a.n-b.x/b.n:(a,b)=>b.h/b.n-a.h/a.n);
       if(!rs.length)return `<tr class="ldet"><td colspan="6"><div class="ldet-in">Không có siêu thị nào nhập ngành hàng này.</div></td></tr>`;
-      return `<tr class="ldet"><td colspan="6"><div class="ldet-in"><div class="ldet-h">${esc(grp)} theo siêu thị · ${rs.length} siêu thị · ${egg?'bán / nhập thấp nhất':'hủy / nhập cao nhất'} ở trên · bấm tên siêu thị để xem top 5 sản phẩm hủy</div>
-        <table class="ltop fxd"><thead><tr><th class="l fx-n">#</th><th class="l">Siêu thị</th><th>SL nhập</th><th>SL bán</th><th>SL hủy</th><th>Bán / nhập</th><th>Hủy / nhập</th></tr></thead><tbody>`+
-        rs.map((r,i)=>`<tr tabindex="0" data-ls2="${r.s}" style="cursor:pointer"><td class="l fx-n">${i+1}</td><td class="l ltop-nm">${esc(shopName(r.s))}<small>${r.s}</small></td><td>${f0.format(r.n)}</td><td>${HX?f0.format(r.x):'—'}</td><td>${f0.format(r.h)}</td><td>${HX?pct(r.x/r.n):'—'}</td><td class="neg"><b>${pct(r.h/r.n)}</b></td></tr>`).join('')+
+      return `<tr class="ldet"><td colspan="6"><div class="ldet-in"><div class="ldet-h">${esc(grp)} theo ${UH2} · ${rs.length} ${UH2} · ${egg?'bán / nhập thấp nhất':'hủy / nhập cao nhất'} ở trên · ${GRP?'bấm một QLTP để xem các siêu thị':'bấm tên siêu thị để xem top 5 sản phẩm hủy'}</div>
+        <table class="ltop fxd"><thead><tr><th class="l fx-n">#</th><th class="l">${UH}</th><th>SL nhập</th><th>SL bán</th><th>SL hủy</th><th>Bán / nhập</th><th>Hủy / nhập</th></tr></thead><tbody>`+
+        rs.map((r,i)=>`<tr tabindex="0" data-ls2="${r.s}" style="cursor:pointer"><td class="l fx-n">${i+1}</td><td class="l ltop-nm">${esc(unitName(r.s))}<small>${esc(unitSub(r.s))}</small></td><td>${f0.format(r.n)}</td><td>${HX?f0.format(r.x):'—'}</td><td>${f0.format(r.h)}</td><td>${HX?pct(r.x/r.n):'—'}</td><td class="neg"><b>${pct(r.h/r.n)}</b></td></tr>`).join('')+
         `</tbody></table></div></td></tr>`};
     const detail=(grp)=>{if(shops.length>1)return shopDetail(grp);const tp=topProducts(grp);
       if(tp===null)return `<tr class="ldet"><td colspan="6"><div class="ldet-in">Chưa có dữ liệu theo sản phẩm. Tải lại file báo cáo nhập xuất Fresh để xem top sản phẩm.</div></td></tr>`;
@@ -1450,10 +1549,10 @@ function render(){
     h+=`</tbody><tfoot><tr><th class="l">Tổng</th><th>${f0.format(TN)}</th><th>${HX?f0.format(TB):'—'}</th><th>${f0.format(TX)}</th>${rbCell(TN?TB/TN:0,'th')}<th class="l">${TN?pct(TX/TN):'—'}</th></tr></tfoot>`;
     lt.innerHTML=h;
   }
-  const one=cur!=='all';['rankSec','freshShopHead','freshShopWrap'].forEach(id=>document.getElementById(id).hidden=one);
-  document.getElementById('freshNote').textContent=cur==='all'?`Lợi nhuận và tỷ lệ doanh thu / giá vốn cơ bản, lũy kế tháng ${M}`:'Đang xem: '+shopName(cur);
+  const one=!multi;['rankSec','freshShopHead','freshShopWrap'].forEach(id=>document.getElementById(id).hidden=one);
+  document.getElementById('freshNote').textContent=multi?(cur==='all'?'':ALBL+' · ')+`Lợi nhuận và tỷ lệ doanh thu / giá vốn cơ bản, lũy kế tháng ${M}`:'Đang xem: '+shopName(cur);
 }
-function rowClick(e){const tr=e.target.closest('tr[data-s]');if(!tr)return;setShop(cur===tr.dataset.s?'all':tr.dataset.s)}
+function rowClick(e){const tr=e.target.closest('tr[data-s]');if(!tr)return;setShop(cur===tr.dataset.s?lastMulti:tr.dataset.s)}
 {const ft0=document.getElementById('freshCatTbl');const tog=e=>{const sr=e.target.closest('tr[data-fs]');if(sr){setShop(sr.dataset.fs);return}
   const tr=e.target.closest('tr[data-fcat]');if(!tr)return;const c=tr.dataset.fcat;freshOpen=freshOpen===c?null:c;render();const n=document.querySelector(`#freshCatTbl tr[data-fcat="${CSS.escape(c)}"]`);n&&n.focus()};
   ft0.addEventListener('click',tog);ft0.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog(e)}})}
@@ -1463,7 +1562,7 @@ function rowClick(e){const tr=e.target.closest('tr[data-s]');if(!tr)return;setSh
   ct.addEventListener('click',go);ct.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go(e)}})}
 ['rankTbl','freshShopTbl'].forEach(id=>{const t=document.getElementById(id);t.addEventListener('click',rowClick);t.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();rowClick(e)}})});
 
-document.getElementById('method').textContent='Thắc mắc liên hệ QLTP - Thành Luân - 56605';
+document.getElementById('method').textContent='Mọi thắc mắc về Dashboard liên hệ QLTP - Thành Luân - 56605';
 render();
 }
 // ---- upload & self-update
@@ -1504,7 +1603,7 @@ const colIdx=ref=>{let n=0;for(const ch of ref){const c=ch.charCodeAt(0);if(c<65
 async function readSheet(buf,pick){
   const get=await unzip(buf);
   const wb=await get('xl/workbook.xml');if(!wb)throw new Error('File không phải định dạng .xlsx hợp lệ.');
-  // pick: chọn trang tính theo tên; không có thì lấy trang đầu
+  // pick: chọn trang tính theo tên (vd 'base qltp'); không có thì lấy trang đầu
   const sheets=[...tags(xmlDoc(wb),'sheet')];const first=pick?sheets.find(x=>pick(x.getAttribute('name')||'')):sheets[0];if(pick&&!first)return null;let path='xl/worksheets/sheet1.xml';
   const rid=first&&(first.getAttribute('r:id')||[...first.attributes].find(a=>a.localName==='id')?.value);
   const rels=await get('xl/_rels/workbook.xml.rels');
@@ -1529,6 +1628,7 @@ async function readSheet(buf,pick){
     out[ri]=arr;ri++}
   return Array.from(out,r=>r||[]);
 }
+window.__readSheet=readSheet;
 async function readFile(f){
   const fbuf=await f.arrayBuffer();const aoa=await readSheet(fbuf);
   const KEYS=['nganh hang bhx','tong so bill','ln luy ke','ma st','sl huy ton','chuong trinh thi dua'];
@@ -1556,9 +1656,9 @@ async function readFile(f){
   if(ix('SL hủy tồn')>=0){
     const [cD,cS,cC,cN,cH,cM]=need('Ngày','Mã siêu thị','Ngành hàng - Phân tích','SL thực nhập','SL hủy tồn','SL mất mát kiểm kê');
     const cP=ix('Mã sản phẩm'),cPN=ix('Tên sản phẩm'),cX=ix('SL thực xuất');
-    let rowsL={},prA={},prod={},dl={},pdA={};let days=0,y=0,m=0,n=0;
+    let rowsL={},prA={},prod={},dl={},pdA={};let days=0,y=0,m=0,n=0,mn=99;
     rows.forEach(r=>{const d=toYMD(r[cD]);if(!d)return;const code=nz(r[cS]).split(' - ')[0].trim();if(!code)return;const cat=nz(r[cC]);
-      const k=d.y*100+d.m;if(k>y*100+m){y=d.y;m=d.m;days=0;rowsL={};prA={};prod={};dl={};pdA={};n=0}if(k<y*100+m)return;if(d.d>days)days=d.d;
+      const k=d.y*100+d.m;if(k>y*100+m){y=d.y;m=d.m;days=0;mn=99;rowsL={};prA={};prod={};dl={};pdA={};n=0}if(k<y*100+m)return;if(d.d>days)days=d.d;if(d.d<mn)mn=d.d;
       const vn=numU(r[cN]),vh=numU(r[cH]),vm=numU(r[cM]),vx=cX>=0?numU(r[cX]):0;
       const o=rowsL[code]||(rowsL[code]={});const a=o[cat]||(o[cat]=cX>=0?[0,0,0,0]:[0,0,0]);a[0]+=vn;a[1]+=vh;a[2]+=vm;if(cX>=0)a[3]+=vx;n++;const ds=dl[code]||(dl[code]={});const dd=ds[d.d]||(ds[d.d]={});const dc=dd[cat]||(dd[cat]=cX>=0?[0,0,0]:[0,0]);dc[0]+=vn;dc[1]+=vh+vm;if(cX>=0)dc[2]+=vx;
       if(cP>=0){const pc=nz(r[cP]);if(pc){if(!prod[pc])prod[pc]=[cPN>=0?nz(r[cPN]):pc,cat];const sp=prA[code]||(prA[code]={});const b=sp[pc]||(sp[pc]=[0,0]);b[0]+=vn;b[1]+=vh+vm;const pd=(pdA[code]||(pdA[code]={}));const pdd=pd[d.d]||(pd[d.d]={});const q=pdd[pc]||(pdd[pc]=[0,0]);q[0]+=vn;q[1]+=vh+vm}}});
@@ -1570,31 +1670,33 @@ async function readFile(f){
     // SP hủy nhiều nhất trong ngày cuối của file (mỗi siêu thị giữ 40 SP)
     const isTHS=pc=>/^th[uủ]y h[aả]i s[aả]n/i.test(String((prod[pc]||[])[1]||'').normalize('NFC'));
     const prd={day:days,s:{}};for(const s in pdA){const o=pdA[s][days];if(!o)continue;const all=Object.entries(o).filter(([p,b])=>b[1]>0).sort((a,b)=>b[1][1]-a[1][1]);const top=all.slice(0,40);all.filter(([p])=>isTHS(p)).slice(0,5).forEach(e=>{if(!top.includes(e))top.push(e)});prd.s[s]=top.map(([p,b])=>[p,r3(b[0]),r3(b[1])])}
-    const LO=cP>=0?{y,m,days,rows:rowsL,prod,pr,prd,daily:dl}:{y,m,days,rows:rowsL,daily:dl};if(cX>=0)LO.hasX=true;
-    return{kind:'loss',loss:LO,label:'Nhập xuất Fresh (hủy)',desc:`tháng ${m}/${y}, đến ngày ${days}, ${fmtN.format(n)} dòng`}}
+    const LO=cP>=0?{y,m,days,rows:rowsL,prod,pr,prd,daily:dl}:{y,m,days,rows:rowsL,daily:dl};if(cX>=0)LO.hasX=true;if(mn>1)LO.min=mn;
+    return{kind:'loss',loss:LO,label:'Nhập xuất Fresh (hủy)',desc:`tháng ${m}/${y}, ${mn>1?`ngày ${mn}–${days}`:`đến ngày ${days}`}, ${fmtN.format(n)} dòng`}}
   const FRESH_CATS=new Set(['Thịt','Cá (Hải sản)','Rau Củ Quả CL','Trái cây','Trứng']);
   if(ix('Ngành hàng BHX')>=0){
     const [cD,cS,cC,cV]=need('Ngày xuất','Mã siêu thị','Ngành hàng BHX','Doanh thu');
     const months={};
     rows.forEach(r=>{const d=toYMD(r[cD]);if(!d)return;const k=ymKey(d.y,d.m);
-      const o=months[k]||(months[k]={y:d.y,m:d.m,daily:{},cat:{},fday:{},days:0,n:0});
+      const o=months[k]||(months[k]={y:d.y,m:d.m,daily:{},cat:{},fday:{},days:0,min:99,n:0,cdl:{}});
       const code=nz(r[cS]).split(' - ')[0].trim();if(!code)return;const cat=nz(r[cC]);const v=Math.round(numU(r[cV]));
       const dd=o.daily[code]||(o.daily[code]={});dd[d.d]=(dd[d.d]||0)+v;
-      const cc=o.cat[code]||(o.cat[code]={});cc[cat]=(cc[cat]||0)+v;if(FRESH_CATS.has(cat)){const fd=o.fday[code]||(o.fday[code]={});const fc=fd[d.d]||(fd[d.d]={});fc[cat]=(fc[cat]||0)+v}
-      if(d.d>o.days)o.days=d.d;o.n++});
+      const cc=o.cat[code]||(o.cat[code]={});cc[cat]=(cc[cat]||0)+v;{const x=o.cdl[d.d]||(o.cdl[d.d]={});const y=x[code]||(x[code]={});y[cat]=(y[cat]||0)+v}if(FRESH_CATS.has(cat)){const fd=o.fday[code]||(o.fday[code]={});const fc=fd[d.d]||(fd[d.d]={});fc[cat]=(fc[cat]||0)+v}
+      if(d.d>o.days)o.days=d.d;if(d.d<o.min)o.min=d.d;o.n++});
     if(!Object.keys(months).length)throw new Error('Không đọc được ngày trong cột "Ngày xuất".');
-    return{kind:'nganh',months,label:'Doanh thu theo ngành hàng',desc:Object.values(months).map(o=>`tháng ${o.m}/${o.y}, đến ngày ${o.days}, ${fmtN.format(o.n)} dòng`).join(' · ')}}
+    Object.values(months).forEach(o=>{o.catLast={day:o.days,s:o.cdl[o.days]||{}};delete o.cdl});
+    return{kind:'nganh',months,label:'Doanh thu theo ngành hàng',desc:Object.values(months).map(o=>`tháng ${o.m}/${o.y}, ${o.min>1?`ngày ${o.min}–${o.days}`:`đến ngày ${o.days}`}, ${fmtN.format(o.n)} dòng`).join(' · ')}}
   if(ix('Tổng số bill')>=0){
     const [cD,cS,cB]=need('Ngày','Mã siêu thị','Tổng số bill');
-    const cOff=ix('Doanh thu offline'),cOn=ix('Doanh thu Online');
+    const cOff=ix('Doanh thu offline'),cOn=ix('Doanh thu Online'),cLK=ix('Loại kho');const sz={};
     const months={};
     rows.forEach(r=>{const d=toYMD(r[cD]);if(!d)return;const k=ymKey(d.y,d.m);
-      const o=months[k]||(months[k]={y:d.y,m:d.m,bills:{},billDays:0,n:0,rev:cOff>=0?{}:null,revd:cOff>=0?{}:null});
-      const code=nz(r[cS]).split(' - ')[0].trim();if(!code)return;
+      const o=months[k]||(months[k]={y:d.y,m:d.m,bills:{},billDays:0,min:99,n:0,rev:cOff>=0?{}:null,revd:cOff>=0?{}:null});
+      const code=nz(r[cS]).split(' - ')[0].trim();if(!code)return;if(cLK>=0&&nz(r[cLK]))sz[code]=nz(r[cLK]);
       const bb=o.bills[code]||(o.bills[code]={});bb[d.d]=(bb[d.d]||0)+Math.round(numU(r[cB]));if(o.rev){const v=Math.round(numU(r[cOff])+(cOn>=0?numU(r[cOn]):0));o.rev[code]=(o.rev[code]||0)+v;const rd=o.revd[code]||(o.revd[code]=[]);rd[d.d-1]=(rd[d.d-1]||0)+v}
-      if(d.d>o.billDays)o.billDays=d.d;o.n++});
+      if(d.d>o.billDays)o.billDays=d.d;if(d.d<o.min)o.min=d.d;o.n++});
     if(!Object.keys(months).length)throw new Error('Không đọc được ngày trong cột "Ngày".');
-    return{kind:'bills',months,label:'Doanh thu / số bill',desc:Object.values(months).map(o=>`tháng ${o.m}/${o.y}, đến ngày ${o.billDays}`).join(' · ')}}
+    Object.values(months).forEach(o=>{if(!o.revd)return;o.rd={};for(const c in o.revd){const x={};o.revd[c].forEach((v,i)=>{if(v!=null)x[i+1]=v});o.rd[c]=x}});
+    return{kind:'bills',months,sz,label:'Doanh thu / số bill',desc:Object.values(months).map(o=>`tháng ${o.m}/${o.y}, ${o.min>1?`ngày ${o.min}–${o.billDays}`:`đến ngày ${o.billDays}`}`).join(' · ')}}
   if(ix('LN lũy kế')>=0){
     const [cS,cC,cDT,cGV,cLN]=need('Mã siêu thị','Ngành hàng','DT FRESH tính giá vốn','Giá vốn cơ bản lũy kế đến ngày hôm qua','LN lũy kế');
     const c3=ix('LN TB 3 tháng trước'),cT=ix('Tháng'),cGT=ix('Giá vốn cơ bản hôm nay');
@@ -1607,23 +1709,74 @@ async function readFile(f){
     const f=p=>H.findIndex(h=>h.startsWith(hk(p)));const cT=f('Base tổng'),cF=f('Base FMCG'),cR=f('Base Fresh');
     if(cT<0||cF<0||cR<0)throw new Error('Thiếu cột Base tổng / Base FMCG / Base Fresh.');
     const cU=ix('User QL'),cQN=ix('Họ và Tên QL'),cTg=ix('Target');
+    // cột QLTP (khu vực): ưu tiên cột mã / user làm khóa, cột tên để hiển thị
+    const qc=H.map((h,i)=>/(^|[^a-z])qltp([^a-z]|$)/.test(h)?i:-1).filter(i=>i>=0);
+    const qCode=qc.find(i=>/user|ma |^ma|id|code/.test(H[i]))??qc.find(i=>!/ten|ho va/.test(H[i]))??qc[0]??-1;
+    const qName=qc.find(i=>i!==qCode&&/ten|ho va/.test(H[i]))??-1;
     const shops={};rows.forEach(r=>{const code=nz(r[cS]);if(!code)return;const full=nz(r[cN]);
       shops[code]={name:full.replace(/^BHX_\w+_\w+ - /,''),full,bT:Math.round(numU(r[cT])),bF:Math.round(numU(r[cF])),bR:Math.round(numU(r[cR]))};
-      if(cTg>=0&&numU(r[cTg])>0)shops[code].tg=Math.round(numU(r[cTg]));if(cU>=0&&nz(r[cU]))shops[code].ql=nz(r[cU]);if(cQN>=0&&nz(r[cQN]))shops[code].qlName=nz(r[cQN])});
-    return{kind:'base',shops,label:'Base',desc:`${Object.keys(shops).length} siêu thị`}}
+      if(cTg>=0&&numU(r[cTg])>0)shops[code].tg=Math.round(numU(r[cTg]));if(cU>=0&&nz(r[cU]))shops[code].ql=nz(r[cU]);if(cQN>=0&&nz(r[cQN]))shops[code].qlName=nz(r[cQN]);
+      if(qCode>=0&&nz(r[qCode])){const v=nz(r[qCode]).trim(),m=qName<0&&v.match(/^(\w+)\s+-\s+(.+)$/);shops[code].qt=m?m[1]:v;shops[code].qtName=qName>=0&&nz(r[qName])?nz(r[qName]):m?m[2].trim():v}});
+    const nq=new Set(Object.values(shops).map(o=>o.qt).filter(Boolean)).size;
+    // trang tính "base qltp": Target năm của từng QLTP
+    let qtTarget=null;try{const a2=await readSheet(fbuf,n=>/qltp/.test(hk(n)));if(a2){const h2=a2.findIndex((r,i)=>i<10&&r&&r.some(c=>hk(c)==='qltp'));
+      if(h2>=0){const H2=a2[h2].map(hk);const cq=H2.indexOf('qltp'),ct=H2.findIndex(h=>/target/.test(h));const yy=(String(a2[h2][ct]||'').match(/20\d\d/)||[])[0];
+        if(ct>=0){const t={};a2.slice(h2+1).forEach(r=>{const v=nz(r&&r[cq]).trim();if(!v)return;const m=v.match(/^(\w+)\s+-\s+(.+)$/);const k=m?m[1]:v;const x=numU(r[ct]);if(x>0)t[k]=(t[k]||0)+Math.round(x)});
+          if(Object.keys(t).length)qtTarget={y:yy?+yy:null,t}}}}}catch(e){console.error(e)}
+    return{kind:'base',shops,qtTarget,label:'Base',desc:`${Object.keys(shops).length} siêu thị${nq?` · ${nq} QLTP`:' · không thấy cột QLTP'}${qtTarget?` · Target năm ${qtTarget.y||''} của ${Object.keys(qtTarget.t).length} QLTP`:''}`}}
   throw new Error('Không nhận ra loại file.');
 }
 function merge(B,list){
   const mon={};
   mon[ymKey(B.cur.y,B.cur.m)]=Object.assign({y:B.cur.y,m:B.cur.m},B.sep);
   mon[ymKey(B.prev.y,B.prev.m)]=Object.assign({y:B.prev.y,m:B.prev.m},B.aug);
-  let shops=B.shops,fresh=B.fresh,freshMonth=B.freshMonth||null,loss=B.loss||null,contests=B.contests||null;
+  let sz=Object.assign({},B.sz||{}),qtTarget=B.qtTarget||null,shops=B.shops,fresh=B.fresh,freshMonth=B.freshMonth||null,loss=B.loss||null,contests=B.contests||null;
   let ytd=B.ytd?JSON.parse(JSON.stringify(B.ytd)):null,ly=B.ly?JSON.parse(JSON.stringify(B.ly)):null;const revs=[];
+  // Tải từng ngày: file không bắt đầu từ ngày 1 thì ghép vào số liệu đã lưu của tháng đó (thay các ngày trùng).
+  const bad=[],info=[];const cl=o=>{const r={};for(const k in o||{})r[k]=Object.assign({},o[k]);return r};
+  // sắp xếp: file từ ngày 1 trước, file từng ngày sau, theo ngày bắt đầu
+  const ord=x=>x.kind==='loss'?(x.loss.min||1):x.kind==='nganh'||x.kind==='bills'?Math.min(...Object.values(x.months).map(o=>o.min||1)):0;
+  list=[...list].sort((a,b)=>ord(a)-ord(b));
   list.forEach(p=>{
-    if(p.kind==='nganh'||p.kind==='bills')for(const k in p.months){const s=p.months[k];const o=mon[k]||(mon[k]={y:s.y,m:s.m});
-      if(p.kind==='nganh'){o.daily=s.daily;o.cat=s.cat;o.days=s.days;o.fday=s.fday}else{o.bills=s.bills;o.billDays=s.billDays;if(s.rev)revs.push(s)}}
-    if(p.kind==='base')shops=p.shops;
-    if(p.kind==='loss')loss=p.loss;
+    if(p.kind==='bills'&&p.sz)Object.assign(sz,p.sz);
+    if(p.kind==='nganh'||p.kind==='bills')for(const k in p.months){const s=p.months[k];const o=mon[k]||(mon[k]={y:s.y,m:s.m});const mm=`tháng ${s.m}/${s.y}`;
+      if(p.kind==='nganh'){
+        if(!(s.min>1)){o.daily=s.daily;o.cat=s.cat;o.days=s.days;o.fday=s.fday;o.catLast=s.catLast;continue}
+        if(!o.daily){bad.push(`Ngành hàng ${mm}: chưa có số liệu đã lưu của tháng này, cần file từ ngày 1 (file đang từ ngày ${s.min}).`);continue}
+        if(s.min>o.days+1){bad.push(`Ngành hàng ${mm}: đã lưu đến ngày ${o.days}, file bắt đầu ngày ${s.min} nên thiếu ngày ${o.days+1}${s.min-1>o.days+1?'–'+(s.min-1):''}.`);continue}
+        const lastOk=o.catLast&&o.catLast.day===o.days;
+        if(s.min<o.days||(s.min===o.days&&!lastOk)){bad.push(`Ngành hàng ${mm}: đã lưu đến ngày ${o.days}, file bắt đầu ngày ${s.min}. Chỉ thay được ngày cuối đã lưu: hãy tải file từ ngày ${lastOk?o.days:o.days+1} (hoặc file từ ngày 1).`);continue}
+        const daily=cl(o.daily),cat=cl(o.cat),fday=cl(o.fday);
+        if(s.min===o.days){for(const sh in o.catLast.s){const c0=cat[sh];if(!c0)continue;for(const c in o.catLast.s[sh])c0[c]=(c0[c]||0)-o.catLast.s[sh][c]}
+          for(const sh in daily)delete daily[sh][o.days];for(const sh in fday)delete fday[sh][o.days]}
+        for(const sh in s.daily)Object.assign(daily[sh]||(daily[sh]={}),s.daily[sh]);
+        for(const sh in s.cat){const c0=cat[sh]||(cat[sh]={});for(const c in s.cat[sh])c0[c]=(c0[c]||0)+s.cat[sh][c]}
+        for(const sh in s.fday)Object.assign(fday[sh]||(fday[sh]={}),s.fday[sh]);
+        Object.assign(o,{daily,cat,fday,days:Math.max(o.days,s.days),catLast:s.catLast});
+        info.push(`Ngành hàng ${mm}: ghép ngày ${s.min}${s.days>s.min?'–'+s.days:''} vào số đã lưu (nay có đến ngày ${o.days}).`)}
+      else{
+        if(!(s.min>1)){o.bills=s.bills;o.billDays=s.billDays;if(s.rd)o.rd=s.rd;else delete o.rd;if(s.rev)revs.push(s);continue}
+        if(!o.bills){bad.push(`Số bill ${mm}: chưa có số liệu đã lưu của tháng này, cần file từ ngày 1 (file đang từ ngày ${s.min}).`);continue}
+        if(s.min>o.billDays+1){bad.push(`Số bill ${mm}: đã lưu đến ngày ${o.billDays}, file bắt đầu ngày ${s.min} nên thiếu ngày ${o.billDays+1}${s.min-1>o.billDays+1?'–'+(s.min-1):''}.`);continue}
+        const bills=cl(o.bills);for(const sh in bills)for(let d=s.min;d<=s.billDays;d++)delete bills[sh][d];
+        for(const sh in s.bills)Object.assign(bills[sh]||(bills[sh]={}),s.bills[sh]);
+        o.bills=bills;o.billDays=Math.max(o.billDays||0,s.billDays);if(s.rev)revs.push({...s,inc:true});
+        if(s.rd&&o.rd){const rd=cl(o.rd);for(const sh in rd)for(let d=s.min;d<=s.billDays;d++)delete rd[sh][d];for(const sh in s.rd)Object.assign(rd[sh]||(rd[sh]={}),s.rd[sh]);o.rd=rd}else if(s.rd)info.push(`Số bill ${mm}: số liệu đã lưu chưa có doanh thu offline + online theo ngày, nên tải lại file từ ngày 1 để doanh thu tính đúng quy ước mới.`);
+        info.push(`Số bill ${mm}: ghép ngày ${s.min}${s.billDays>s.min?'–'+s.billDays:''} vào số đã lưu (nay có đến ngày ${o.billDays}).`)}}
+    if(p.kind==='base'){shops=p.shops;if(p.qtTarget)qtTarget=p.qtTarget}
+    if(p.kind==='loss'){const n=p.loss,mm=`tháng ${n.m}/${n.y}`;
+      if(!(n.min>1))loss=n;
+      else if(!loss||loss.y!==n.y||loss.m!==n.m)bad.push(`Nhập xuất Fresh ${mm}: chưa có số liệu đã lưu của tháng này, cần file từ ngày 1 (file đang từ ngày ${n.min}).`);
+      else if(n.min<=loss.days)bad.push(`Nhập xuất Fresh ${mm}: đã lưu đến ngày ${loss.days}, file bắt đầu ngày ${n.min}. Hãy tải file chỉ gồm các ngày sau ngày ${loss.days} (hoặc file từ ngày 1).`);
+      else if(n.min>loss.days+1)bad.push(`Nhập xuất Fresh ${mm}: đã lưu đến ngày ${loss.days}, file bắt đầu ngày ${n.min} nên thiếu ngày ${loss.days+1}${n.min-1>loss.days+1?'–'+(n.min-1):''}.`);
+      else{const r3=v=>Math.round(v*1000)/1000;const hx=!!(loss.hasX&&n.hasX);
+        const rows=cl(loss.rows);for(const sh in n.rows){const o=rows[sh]||(rows[sh]={});for(const c in n.rows[sh]){const a=n.rows[sh][c],b=o[c];o[c]=b?a.map((v,i)=>r3(v+(b[i]||0))):a.slice()}}
+        const daily=cl(loss.daily);for(const sh in n.daily)Object.assign(daily[sh]||(daily[sh]={}),n.daily[sh]);
+        const nl={...loss,rows,daily,days:n.days};if(hx)nl.hasX=true;else delete nl.hasX;
+        if(loss.pr&&n.pr){const pr={};const sh=new Set([...Object.keys(loss.pr),...Object.keys(n.pr)]);
+          sh.forEach(x=>{const m={};(loss.pr[x]||[]).forEach(([q,a,b])=>m[q]=[a,b]);(n.pr[x]||[]).forEach(([q,a,b])=>{const o=m[q]||(m[q]=[0,0]);o[0]+=a;o[1]+=b});pr[x]=Object.entries(m).map(([q,[a,b]])=>[q,r3(a),r3(b)])});
+          nl.pr=pr;nl.prod=Object.assign({},loss.prod,n.prod);nl.prd=n.prd}
+        loss=nl;info.push(`Nhập xuất Fresh ${mm}: ghép ngày ${n.min}${n.days>n.min?'–'+n.days:''} vào số đã lưu (nay có đến ngày ${n.days}).`)}}
     if(p.kind==='contest')contests=p.list;
     if(p.kind==='fresh'){fresh=p.rows;freshMonth=p.month||freshMonth}
   });
@@ -1631,12 +1784,18 @@ function merge(B,list){
   if(revs.length){const maxY=Math.max(ytd?ytd.y:0,...revs.map(s=>s.y));
     if(ytd&&ytd.y<maxY){if(ytd.y===maxY-1){const same=ly&&ly.y===ytd.y;ly={y:ytd.y,mon:Object.assign({},same?ly.mon:{},ytd.mon),day:same?ly.day||{}:{},n:same?ly.n||{}:{}}}ytd=null}
     if(!ytd)ytd={y:maxY,mon:{}};if(ly&&ly.y!==maxY-1)ly=null;
-    revs.forEach(s=>{if(s.y===maxY)ytd.mon[s.m]=s.rev;
+    revs.forEach(s=>{if(s.y===maxY){ytd.dd=ytd.dd||{};const sumA=a=>(a||[]).reduce((x,v)=>x+(v||0),0);
+        // dữ liệu cũ chưa có doanh thu theo ngày: cộng thêm phần ngày mới
+        if(s.inc&&!ytd.dd[s.m]){const t={...(ytd.mon[s.m]||{})};for(const c in s.revd||{})t[c]=(t[c]||0)+sumA(s.revd[c]);ytd.mon[s.m]=t;return}
+        const dd={};if(s.inc)for(const c in ytd.dd[s.m]){const a=(ytd.dd[s.m][c]||[]).slice();for(let i=s.min-1;i<s.billDays;i++)a[i]=0;dd[c]=a}
+        for(const c in s.revd||{}){const a=dd[c]||[];s.revd[c].forEach((v,i)=>{if(v!=null)a[i]=v});dd[c]=Array.from(a,v=>v||0)}
+        ytd.dd[s.m]=dd;const t={};for(const c in dd)t[c]=sumA(dd[c]);ytd.mon[s.m]=t;return}
       else if(s.y===maxY-1){if(!ly)ly={y:s.y,mon:{},day:{},n:{}};ly.day=ly.day||{};ly.n=ly.n||{};ly.mon[s.m]=s.rev;ly.n[s.m]=s.billDays;
         if(s.revd){const dd={};for(const c in s.revd)dd[c]=Array.from(s.revd[c],v=>v||0);ly.day[s.m]=dd}}})}
-  // doanh thu ngành hàng từng tháng (giữ 14 tháng) để thi đua so với tháng ghi trong file (vd T7)
   const catm=Object.assign({},B.catm||{});for(const k in mon){const o=mon[k];if(o.cat&&o.days)catm[k]={d:o.days,c:o.cat}}
-  Object.keys(catm).sort().reverse().slice(14).forEach(k=>delete catm[k]);
+  Object.keys(catm).sort().reverse().slice(14).forEach(k=>delete catm[k]); // giữ 14 tháng gần nhất
+  if(ytd&&ytd.dd){const ms=Object.keys(ytd.dd).map(Number).sort((a,b)=>b-a);ms.slice(2).forEach(m=>delete ytd.dd[m])} // chỉ giữ số theo ngày của 2 tháng gần nhất
+  if(bad.length)return{bad};
   const keys=Object.keys(mon).filter(k=>mon[k].daily).sort();
   const c=mon[keys[keys.length-1]];
   const pm=c.m===1?{y:c.y-1,m:12}:{y:c.y,m:c.m-1};const p=mon[ymKey(pm.y,pm.m)];
@@ -1645,9 +1804,10 @@ function merge(B,list){
   if(!c.bills)errs.push(`file doanh thu (số bill) tháng ${c.m}/${c.y}`);
   if(!p||!p.bills)errs.push(`file doanh thu (số bill) tháng ${pm.m}/${pm.y}`);
   if(errs.length)return{errs,c};
-  const pack=o=>({daily:o.daily,cat:o.cat,days:o.days,bills:o.bills,billDays:o.billDays,fday:o.fday});
-  const D={shops,freshCats:B.freshCats,cur:{m:c.m,y:c.y,dim:dimOf(c.y,c.m)},prev:{m:pm.m,y:pm.y,dim:dimOf(pm.y,pm.m)},aug:pack(p),sep:pack(c),fresh,freshMonth,loss,ytd,ly,catm,contests,goalPct:(PREVIEW_D||B).goalPct||0};
-  const warn=[];
+  const pack=o=>({daily:o.daily,cat:o.cat,days:o.days,bills:o.bills,billDays:o.billDays,fday:o.fday,catLast:o.catLast,rd:o.rd});
+  const D={shops,freshCats:B.freshCats,cur:{m:c.m,y:c.y,dim:dimOf(c.y,c.m)},prev:{m:pm.m,y:pm.y,dim:dimOf(pm.y,pm.m)},aug:pack(p),sep:pack(c),fresh,freshMonth,loss,ytd,ly,catm,qtTarget,sz,contests,goalPct:(PREVIEW_D||B).goalPct||0};
+  const warn=[...info];
+  if(!c.rd||!p.rd)warn.push(`Chưa có doanh thu offline + online theo ngày của tháng ${!c.rd?c.m:pm.m}: tải lại file doanh thu / số bill tháng đó (có cột Doanh thu offline, Doanh thu Online). Tạm thời doanh thu siêu thị lấy từ file ngành hàng.`);
   if(p.days<dimOf(pm.y,pm.m))warn.push(`Doanh thu tháng ${pm.m} mới có đến ngày ${p.days}. Nên tải thêm file ngành hàng tháng ${pm.m} đủ cả tháng để so sánh chính xác.`);
   if(p.billDays<dimOf(pm.y,pm.m))warn.push(`Số bill tháng ${pm.m} mới có đến ngày ${p.billDays}. Nên tải thêm file doanh thu tháng ${pm.m} đủ cả tháng.`);
   const cm=''+c.y+String(c.m).padStart(2,'0');
@@ -1696,6 +1856,7 @@ async function handleFiles(files){
   }
   merged=parsed.length?merge(BASE_D,parsed):null;
   if(!merged){sum.className='upsum err';sum.textContent='Chưa có file nào dùng được.';return}
+  if(merged.bad){sum.className='upsum err';sum.innerHTML=`<b>Chưa ghép được file theo ngày:</b><br>${merged.bad.map(w=>'• '+escU(w)).join('<br>')}`;return}
   if(merged.errs){sum.className='upsum err';sum.innerHTML=`<b>Còn thiếu để hiển thị tháng ${merged.c.m}/${merged.c.y}:</b> ${merged.errs.map(escU).join('; ')}.`;return}
   const D=merged.D;
   sum.className='upsum';
@@ -1729,7 +1890,9 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function api(path,opt={}){
   const init={method:opt.method||'GET',credentials:'same-origin',headers:{}};
-  if(opt.body!==undefined){init.headers={'Content-Type':'application/json','X-Req':'1'};init.body=JSON.stringify(opt.body)}
+  if(opt.body!==undefined){const txt=JSON.stringify(opt.body);init.headers={'Content-Type':'application/json','X-Req':'1'};init.body=txt;
+    // số liệu cả miền lớn: nén gzip trước khi gửi (Vercel giới hạn 4,5 MB mỗi lần gửi)
+    if(txt.length>256*1024&&typeof CompressionStream!=='undefined'){init.body=await new Response(new Blob([txt]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer();init.headers={'Content-Type':'application/json','X-Req':'1','X-Body-Gz':'1'}}}
   const r=await fetch(path,init);let j=null;try{j=await r.json()}catch(e){}
   return{ok:r.ok,status:r.status,j:j||{}};
 }
@@ -1752,7 +1915,7 @@ function showLogin(){
 function showUbar(me){
   document.body.classList.toggle('is-admin',me.role==='admin');
   $('ubar').hidden=false;$('ubName').textContent=me.name||me.u;$('ubRole').textContent=me.roleName||me.role;
-  $('ubUsers').hidden=me.role!=='admin';$('ubZalo').hidden=!(me.role==='admin'||me.role==='editor');$('ubZalo').onclick=openZalo;$('ubPush').onclick=()=>{openPanel('pushPanel');pushUI()};$('ubStats').hidden=me.role!=='admin';$('ubStats').onclick=()=>{openPanel('statsPanel');loadStats()};$('ubBackup').hidden=me.role!=='admin';$('ubPass').hidden=!!me.envAdmin;
+  $('ubUsers').hidden=me.role!=='admin';$('ubZalo').hidden=!(me.role==='admin'||me.role==='editor');$('ubZalo').onclick=openZalo;$('ubPush').onclick=()=>{openPanel('pushPanel');pushUI()};$('ubBackup').hidden=me.role!=='admin';$('ubPass').hidden=!!me.envAdmin;
   $('ubOut').onclick=async()=>{try{await api('/api/login',{method:'POST',body:{logout:true}})}catch(e){}await cClear();location.reload()};
   $('ubPass').onclick=()=>openPanel('passPanel');
   $('ubRefresh').onclick=manualRefresh;
@@ -1772,9 +1935,7 @@ function openPanel(id){lastFocus=document.activeElement;const p=$(id);p.hidden=f
 function closePanel(p){p.hidden=true;lastFocus&&lastFocus.focus&&lastFocus.focus()}
 // ---- thống kê lượt xem
 const vnToday=()=>new Date(Date.now()+7*3600e3).toISOString().slice(0,10);
-async function recordView(){const me=window.__ME;if(!me)return;const k=`kvv:${me.u}:${vnToday()}`;
-  try{if(localStorage.getItem(k))return}catch(e){}
-  try{const r=await api('/api/stats',{method:'POST',body:{}});if(r.ok){try{localStorage.setItem(k,'1')}catch(e){}}}catch(e){}}
+async function recordView(){} // bản miền không thống kê lượt xem
 window.__recordView=recordView;
 async function loadStats(){const inp=$('stM');if(!inp.value)inp.value=vnToday().slice(0,7);inp.onchange=loadStats;$('stMsg').textContent='';
   const r=await api('/api/stats?m='+encodeURIComponent(inp.value));if(!r.ok){$('stMsg').textContent=r.j.error||'Không tải được thống kê.';return}
@@ -1803,38 +1964,39 @@ function goalSummary(){
   const title=(document.getElementById('goalTitle')||{}).textContent||'';const scope=title.split('·').pop().trim();
   const dLbl=H[iD]?H[iD].replace(/^DT\s*/,''):'';
   const short=`${scope}: DT ${dLbl} ${cell(tot,iD)}, đạt ${cell(tot,iP)} cần/ngày (${cell(tot,iN)}).`;
-  const nm=r=>cell(r,0);
+  const nm=r=>cell(r,0).replace(/\s*\(\d+\)$/,'');
   const top=rows.slice(0,3);
   const pv=parseFloat(cell(tot,iP).replace(/\./g,'').replace(',','.'));const ok=isFinite(pv)&&pv>=100;
-  const lines=[`📊 DT KV QLTP Luân – ${title.replace(' · ',' – ')}`,'',
+  const lines=[`📊 DT Miền Thanh Danh – ${title.replace(' · ',' – ')}`,'',
     `💰 DT ${dLbl}: ${cell(tot,iD)}`,
     `🎯 Cần mỗi ngày: ${cell(tot,iN)} → ${ok?'✅':'⚠️'} đạt ${cell(tot,iP)}`];
-  if(rows.length>1){lines.push('','🏆 Top 3 siêu thị bán tốt:');const md=['🥇','🥈','🥉'];top.forEach((r,i)=>lines.push(`${md[i]} ${nm(r)} – ${cell(r,iD)} (đạt ${cell(r,iP)})`))}
-  lines.push('',`👉 Xem chi tiết: https://luan56605.app/`);
+  if(rows.length>1){lines.push('',window.__HASQT?'🏅 Top 3 QLTP:':'🏆 Top 3 siêu thị bán tốt:');const md=['🥇','🥈','🥉'];top.forEach((r,i)=>lines.push(`${md[i]} ${nm(r)} – ${cell(r,iD)} (đạt ${cell(r,iP)})`))}
+  if(window.__HASQT&&window.__STOP&&window.__STOP.length){lines.push('','🏆 Top 3 siêu thị bán tốt:');const md=['🥇','🥈','🥉'];window.__STOP.forEach((q,i)=>lines.push(`${md[i]} ${q.n} – ${q.d}${q.p?` (đạt ${q.p})`:''}`))}
+  lines.push('',`👉 Xem chi tiết: ${location.origin}/`);
   return{short,text:lines.join('\n')};
 }
 window.__goalSummary=goalSummary;
-// Tóm tắt toàn khu vực (dùng cho thông báo đẩy) dù đang xem 1 siêu thị.
+// Tóm tắt toàn miền (dùng cho thông báo đẩy) dù đang xem 1 siêu thị.
 function withAll(fn){const s=$('shopSel');if(!s||s.value==='all')return fn();
   let ls=null;try{ls=localStorage.getItem('qltp-shop')}catch(e){}const old=s.value;
   s.value='all';s.dispatchEvent(new Event('change'));let r;try{r=fn()}finally{
   s.value=old;s.dispatchEvent(new Event('change'));try{if(ls!=null)localStorage.setItem('qltp-shop',ls)}catch(e){}}return r}
 const areaSummary=()=>withAll(goalSummary);
-// Ảnh mục Doanh thu toàn khu vực (vẽ xong đồng bộ rồi mới trả lại phạm vi đang xem).
+// Ảnh mục Doanh thu toàn miền (vẽ xong đồng bộ rồi mới trả lại phạm vi đang xem).
 async function areaImage(secs){if(document.fonts&&document.fonts.ready)await document.fonts.ready;if(!window.__goalImage)return null;return withAll(()=>window.__goalImage(secs))}
 window.__areaSummary=areaSummary;
 const ZSECS=[{k:'dt',t:'Doanh thu',secs:[['gh1','goalTbl']]},{k:'ths',t:'Hủy thủy hải sản',secs:[['gh3','goalLoss']]},{k:'egg',t:'Tỷ lệ bán trứng',secs:[['gh4','goalEgg']]}];
-let ZIMGS=[];
+let ZIMGS=[];const ZQT={k:'qt',t:'Doanh thu theo QLTP',secs:[['gh1q','goalQtTbl']]};const zSecs=()=>ZSECS;
 const zDate=()=>{const t=($('goalTitle')||{}).textContent||'';const m=t.match(/(\d+)\/(\d+)\/(\d+)/);return m?`${m[1]}-${m[2]}-${m[3]}`:vnToday()};
 async function makeZaloImg(){const box=$('zImgs');ZIMGS.forEach(z=>z.url&&URL.revokeObjectURL(z.url));ZIMGS=[];$('zaloShare').hidden=true;
   const canCopy=!!(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write)&&!/android|iphone|ipad/i.test(navigator.userAgent);
-  box.innerHTML=ZSECS.map(z=>`<div class="zimg" id="zi-${z.k}"><div class="zimg-h"><b>${z.t}</b><span class="row" style="gap:6px;margin-left:auto">${canCopy?`<button class="btn" type="button" data-zc="${z.k}" disabled>Sao chép ảnh</button>`:''}<button class="btn" type="button" data-zd="${z.k}" disabled>Tải ảnh</button></span></div><a target="_blank" rel="noopener"><img alt="Ảnh ${z.t}"></a><p class="muted" style="font-size:12px;margin:4px 0 0">Đang tạo ảnh…</p></div>`).join('');
-  for(const z of ZSECS){const el=$('zi-'+z.k),msg=el.querySelector('p');
+  box.innerHTML=zSecs().map(z=>`<div class="zimg" id="zi-${z.k}"><div class="zimg-h"><b>${z.t}</b><span class="row" style="gap:6px;margin-left:auto">${canCopy?`<button class="btn" type="button" data-zc="${z.k}" disabled>Sao chép ảnh</button>`:''}<button class="btn" type="button" data-zd="${z.k}" disabled>Tải ảnh</button></span></div><a target="_blank" rel="noopener"><img alt="Ảnh ${z.t}"></a><p class="muted" style="font-size:12px;margin:4px 0 0">Đang tạo ảnh…</p></div>`).join('');
+  for(const z of zSecs()){const el=$('zi-'+z.k),msg=el.querySelector('p');
     try{const b=await areaImage(z.secs);if(!b)throw new Error('no image');const file=new File([b],`${z.t.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/gi,'d').replace(/\s+/g,'_')}_${zDate()}.png`,{type:'image/png'});const url=URL.createObjectURL(b);
       ZIMGS.push({...z,file,url});el.querySelector('img').src=url;el.querySelector('a').href=url;msg.textContent='';el.querySelectorAll('button').forEach(x=>x.disabled=false)}
     catch(e){console.error(e);msg.textContent='Không tạo được ảnh. Hãy chụp màn hình thủ công.'}}
   try{const fs=ZIMGS.map(z=>z.file);$('zaloShare').hidden=!(fs.length&&navigator.canShare&&navigator.canShare({files:fs}))}catch(e){}}
-function openZalo(){const s=goalSummary();$('zaloTxt').value=s?s.text:`DT KV QLTP Luân đã cập nhật số liệu.\n\nXem chi tiết: https://luan56605.app/`;$('zaloMsg').textContent='';openPanel('zaloPanel');$('zaloTxt').focus();makeZaloImg()}
+function openZalo(){const s=goalSummary();$('zaloTxt').value=s?s.text:`DT Miền Thanh Danh đã cập nhật số liệu.\n\nXem chi tiết: ${location.origin}/`;$('zaloMsg').textContent='';openPanel('zaloPanel');$('zaloTxt').focus();makeZaloImg()}
 const zMsg=(t,ok)=>{const m=$('zaloMsg');m.className=ok?'msg-ok':'msg-err';m.textContent=t};
 $('zaloShare').onclick=async()=>{if(!ZIMGS.length)return;const text=$('zaloTxt').value;
   try{navigator.clipboard.writeText(text).catch(()=>{})}catch(e){}
@@ -1860,7 +2022,7 @@ async function pushInit(){const b=$('ubPush');
 async function pushUI(){const info=$('pushInfo'),m=$('pushMsg');m.textContent='';m.className='msg-err';['pushOn','pushOff','pushTest'].forEach(i=>$(i).hidden=true);
   if(isIOS&&!isStandalone()){info.innerHTML='Trên iPhone, cần <b>thêm dashboard vào màn hình chính</b> trước: mở bằng Safari → bấm nút <b>Chia sẻ</b> → <b>Thêm vào MH chính</b>. Sau đó mở dashboard từ biểu tượng trên màn hình chính và bấm lại nút này. Cần iOS 16.4 trở lên.';return}
   if(!pushSupported()){info.textContent='Trình duyệt này chưa hỗ trợ thông báo đẩy.';return}
-  if(Notification.permission==='denied'){info.innerHTML='Thông báo đang bị chặn cho trang này. Mở <b>Cài đặt</b> của máy (iPhone: Cài đặt → Thông báo → DT KV Luân) hoặc cài đặt trang trong trình duyệt để cho phép, rồi thử lại.';return}
+  if(Notification.permission==='denied'){info.innerHTML='Thông báo đang bị chặn cho trang này. Mở <b>Cài đặt</b> của máy (iPhone: Cài đặt → Thông báo → DT Miền TD) hoặc cài đặt trang trong trình duyệt để cho phép, rồi thử lại.';return}
   const sub=await currentSub();
   if(sub&&Notification.permission==='granted'){info.textContent='Máy này đang nhận thông báo mỗi khi có số liệu mới được lưu.';$('pushOff').hidden=false;$('pushTest').hidden=false}
   else{info.textContent='Bật để nhận thông báo trên máy này mỗi khi có người lưu số liệu mới, kể cả khi không mở dashboard.';$('pushOn').hidden=false}}
@@ -1894,15 +2056,17 @@ async function loadAuto(){const box=$('apBody'),m=$('apMsg');m.textContent='';m.
   const r=await api('/api/cron?settings=1');if(!r.ok){box.innerHTML='';m.textContent=r.j.error||'Không tải được.';return}const j=r.j;
   const last=l=>!l?'Chưa chạy lần nào.':`Lần chạy gần nhất: ${fmtTime(l.at)} · `+(l.skipped?esc(l.skipped):`đã gửi ${l.ok||0} máy${l.fail?`, lỗi ${l.fail}`:''}${l.skip?`, bỏ qua ${l.skip}`:''}`);
   box.innerHTML=(j.cronSecret?'':`<p class="msg-err" style="margin:0 0 10px">Chưa cài biến <b>CRON_SECRET</b> trên Vercel nên lịch chưa chạy. Vào Vercel → Settings → Environment Variables, thêm CRON_SECRET (chuỗi ngẫu nhiên từ 16 ký tự) rồi Redeploy.</p>`)+
-    `<p class="hint">Gửi lên điện thoại các tài khoản đã bật thông báo. Quản trị và cập nhật dữ liệu nhận số liệu toàn khu vực; tài khoản chỉ xem nhận số liệu siêu thị của mình.</p>`+
+    `<p class="hint">Gửi lên điện thoại các tài khoản đã bật thông báo. Quản trị và cập nhật dữ liệu nhận số liệu toàn miền; tài khoản chỉ xem nhận số liệu siêu thị của mình.</p>`+
     Object.entries(j.jobs).map(([k,t])=>`<div class="ap-job"><div class="ap-row"><label><input type="checkbox" data-ap="${k}"${j.cfg[k]?' checked':''}>${esc(t)}</label><button class="btn" type="button" data-pv="${k}">Xem trước</button><button class="btn" type="button" data-ts="${k}">Gửi thử cho tôi</button></div><div class="ap-last">${last(j.log[k])}</div><div class="ap-pv" id="pv-${k}" hidden></div></div>`).join('');
   box.querySelectorAll('[data-ap]').forEach(c=>c.onchange=async()=>{const r=await api('/api/cron',{method:'POST',body:{cfg:{[c.dataset.ap]:c.checked}}});m.className=r.ok?'msg-ok':'msg-err';m.textContent=r.ok?(c.checked?'Đã bật.':'Đã tắt.'):(r.j.error||'Không lưu được.');if(!r.ok)c.checked=!c.checked});
   box.querySelectorAll('[data-pv]').forEach(b=>b.onclick=async()=>{const k=b.dataset.pv,el=$('pv-'+k);if(!el.hidden){el.hidden=true;return}el.hidden=false;el.textContent='Đang tính…';
     const r=await api('/api/cron?job='+k+'&mode=preview');if(!r.ok){el.textContent=r.j.error||'Lỗi.';return}const p=r.j;
     if(!p.area){el.textContent='Hiện chưa có số liệu phù hợp để gửi tin này (ví dụ: số liệu không phải tháng vừa qua).';return}
     const ks=Object.keys(p.shops).sort((a,b)=>(p.names[a]||'').localeCompare(p.names[b]||'','vi'));
-    el.innerHTML=`<b>Toàn khu vực</b>${esc(p.area.title)}\n${esc(p.area.body)}\n\n<b>Tài khoản chỉ xem</b>${ks.length?`<select aria-label="Chọn siêu thị">${ks.map(s=>`<option value="${esc(s)}">${esc(p.names[s]||s)}</option>`).join('')}</select><span class="ap-shop"></span>`:'(không gửi cho tài khoản chỉ xem)'}`;if(!ks.length)return;
-    const sel=el.querySelector('select'),sp=el.querySelector('.ap-shop');const show=()=>{const x=p.shops[sel.value];sp.textContent=x?x.title+'\n'+x.body:'(không gửi cho tài khoản chỉ xem)'};sel.onchange=show;show()});
+    const qk=Object.keys(p.qt||{}).sort((a,b)=>String((p.qnames||{})[a]||a).localeCompare(String((p.qnames||{})[b]||b),'vi'));
+    el.innerHTML=`<b>Toàn miền</b>${esc(p.area.title)}\n${esc(p.area.body)}\n\n<b>Tài khoản QLTP</b>${qk.length?`<select aria-label="Chọn QLTP" class="ap-qsel">${qk.map(k=>`<option value="${esc(k)}">KV ${esc((p.qnames||{})[k]||k)}</option>`).join('')}</select><span class="ap-q"></span>`:'(chưa có QLTP trong file Base)'}\n\n<b>Tài khoản QL siêu thị</b>${ks.length?`<select aria-label="Chọn siêu thị">${ks.map(s=>`<option value="${esc(s)}">${esc(p.names[s]||s)}</option>`).join('')}</select><span class="ap-shop"></span>`:'(không gửi cho tài khoản chỉ xem)'}`;if(!ks.length)return;
+    {const qs=el.querySelector('.ap-qsel'),qp=el.querySelector('.ap-q');if(qs){const sh=()=>{const x=p.qt[qs.value];qp.textContent=x?x.title+'\n'+x.body:'(không gửi)'};qs.onchange=sh;sh()}}
+    const sel=el.querySelector('select:not(.ap-qsel)'),sp=el.querySelector('.ap-shop');const show=()=>{const x=p.shops[sel.value];sp.textContent=x?x.title+'\n'+x.body:'(không gửi cho tài khoản chỉ xem)'};sel.onchange=show;show()});
   box.querySelectorAll('[data-ts]').forEach(b=>b.onclick=async()=>{b.disabled=true;m.className='msg-err';m.textContent='Đang gửi…';const r=await api('/api/cron?job='+b.dataset.ts+'&mode=test');b.disabled=false;
     if(r.ok&&r.j.ok>0){m.className='msg-ok';m.textContent=`Đã gửi thử tới ${r.j.ok} máy của bạn.`}else m.textContent=r.ok?(r.j.empty?'Chưa có số liệu phù hợp để gửi tin này.':'Máy của bạn chưa bật thông báo (Menu → Bật thông báo).'):(r.j.error||'Lỗi gửi.')});
 }
@@ -1934,39 +2098,70 @@ $('passForm').onsubmit=async e=>{e.preventDefault();const m=$('passMsg');m.class
   else m.textContent=r.j.error||'Không đổi được mật khẩu.'};
 
 // ---- quản lý tài khoản
-const ROLE_OPTS=[['admin','Quản trị'],['editor','Cập nhật dữ liệu'],['viewer','Chỉ xem']];
+const ROLE_OPTS=[['admin','Quản trị'],['editor','Cập nhật dữ liệu'],['qltp','QLTP'],['ql','QL siêu thị'],['viewer','Chỉ xem']];
+const VIEWR=r=>r!=='admin'&&r!=='editor';
 function uMsg(t,ok){const m=$('usersMsg');m.className=ok?'msg-ok':'msg-err';m.textContent=t||''}
-async function loadUsers(){if(!$('nuS').options.length)$('nuS').innerHTML=shopOpts('');$('nuR').onchange=()=>{$('nuSWrap').hidden=$('nuR').value!=='viewer'};$('nuSWrap').hidden=$('nuR').value!=='viewer';const r=await api('/api/users');if(!r.ok){uMsg(r.j.error||'Không tải được danh sách.');return}renderUsers(r.j)}
+async function loadUsers(){const sy=()=>{const r=$('nuR').value;$('nuSWrap').hidden=!VIEWR(r);$('nuS').innerHTML=shopOpts('',r)};$('nuR').onchange=sy;sy();const r=await api('/api/users');if(!r.ok){uMsg(r.j.error||'Không tải được danh sách.');return}renderUsers(r.j)}
 const allShops=()=>{const d=(window.__DOC||{}).data||{};const sh=d.shops||{};return Object.keys(sh).sort((a,b)=>(sh[a].name||'').localeCompare(sh[b].name||'','vi')).map(s=>[s,sh[s].name||s])};
-const shopOpts=v=>`<option value=""${!v?' selected':''}>— Chưa gán —</option><option value="all"${v==='all'?' selected':''}>Toàn khu vực</option>`+allShops().map(([s,n])=>`<option value="${esc(s)}"${v===s?' selected':''}>${esc(n)} (${esc(s)})</option>`).join('');
-const autoShop=u=>{const sh=((window.__DOC||{}).data||{}).shops||{};const k=Object.keys(sh).find(s=>sh[s].ql&&String(sh[s].ql)===u);return k?sh[k].name:''};
+const shopOpts=(v,role)=>role==='qltp'?`<option value=""${!v?' selected':''}>— Tự khớp: mã QLTP = tên đăng nhập —</option>`+allQts().map(q=>`<option value="q:${esc(q.k)}"${v==='q:'+q.k?' selected':''}>QLTP ${esc(q.n)} (${q.c} siêu thị)</option>`).join(''):role==='ql'?`<option value=""${!v?' selected':''}>— Tự khớp: User QL = tên đăng nhập —</option>`+allShops().map(([s,n])=>`<option value="${esc(s)}"${v===s?' selected':''}>${esc(n)} (${esc(s)})</option>`).join(''):`<option value=""${!v?' selected':''}>— Chưa gán —</option><option value="all"${v==='all'?' selected':''}>Toàn miền</option>`+(allQts().length?`<optgroup label="QLTP (xem cả khu vực)">${allQts().map(q=>`<option value="q:${esc(q.k)}"${v==='q:'+q.k?' selected':''}>QLTP ${esc(q.n)} (${q.c} siêu thị)</option>`).join('')}</optgroup><optgroup label="Siêu thị">`:'')+allShops().map(([s,n])=>`<option value="${esc(s)}"${v===s?' selected':''}>${esc(n)} (${esc(s)})</option>`).join('')+(allQts().length?'</optgroup>':'');
+const allQts=()=>{const sh=((window.__DOC||{}).data||{}).shops||{};const m={};for(const s in sh){const o=sh[s];if(o.qt){(m[o.qt]||(m[o.qt]={k:o.qt,n:o.qtName||o.qt,c:0})).c++}}return Object.values(m).sort((a,b)=>a.n.localeCompare(b.n,'vi'))};
+const autoShop=u=>{const sh=((window.__DOC||{}).data||{}).shops||{};const k=Object.keys(sh).find(s=>sh[s].ql&&String(sh[s].ql)===u);if(k)return sh[k].name;const q=allQts().find(x=>String(x.k)===u);return q?'QLTP '+q.n:''};
 function renderUsers(j){
   const me=window.__ME||{};
+  const devCell=u=>{const d=u.dev||{};const one=(k,ic,lb)=>d[k]?`<div class="dvc">${ic} ${esc(d[k].name||lb)} <small class="muted">${fmtTime(d[k].at)}</small> <button class="btn sm" type="button" data-dev="${k}" title="Gỡ ${lb} này để đăng nhập máy khác">Gỡ</button></div>`:'';
+    const h=one('m','📱','điện thoại')+one('d','💻','máy tính');return h||'<span class="muted">Chưa đăng nhập</span>'};
   const rows=(j.envAdmin?[`<tr><td class="l"><b>${esc(j.envAdmin.u)}</b></td><td class="l">${esc(j.envAdmin.name)}</td><td class="l">Quản trị chính</td><td class="l muted">Tất cả</td><td class="l muted note" colspan="2">Cài trong Vercel, không sửa ở đây</td></tr>`]:[])
     .concat((j.users||[]).map(u=>`<tr data-u="${esc(u.u)}"><td class="l"><b>${esc(u.u)}</b>${u.disabled?'<span class="tag-off">đã khóa</span>':''}</td><td class="l">${esc(u.name)}</td>
       <td class="l"><select data-act="role" aria-label="Quyền của ${esc(u.u)}">${ROLE_OPTS.map(([v,t])=>`<option value="${v}"${u.role===v?' selected':''}>${t}</option>`).join('')}</select></td>
-      <td class="l">${u.role==='viewer'?`<select data-act="shop" aria-label="Siêu thị của ${esc(u.u)}">${shopOpts(u.shop)}</select>${!u.shop&&autoShop(u.u)?`<br><small class="muted">Tự khớp: ${esc(autoShop(u.u))}</small>`:''}`:'<span class="muted">Tất cả</span>'}</td>
-      <td class="l muted">${u.created?fmtTime(u.created):''}</td>
+      <td class="l">${VIEWR(u.role)?`<select data-act="shop" aria-label="Phạm vi của ${esc(u.u)}">${shopOpts(u.shop,u.role)}</select>${!u.shop&&autoShop(u.u)?`<br><small class="muted">Tự khớp: ${esc(autoShop(u.u))}</small>`:''}`:'<span class="muted">Tất cả</span>'}</td>
+      <td class="l">${devCell(u)}</td>
       <td><div class="acts"><button class="btn" type="button" data-act="reset">Đặt lại mật khẩu</button><button class="btn" type="button" data-act="toggle">${u.disabled?'Mở khóa':'Khóa'}</button>${u.u===me.u?'':'<button class="btn" type="button" data-act="delete">Xóa</button>'}</div></td></tr>`));
-  $('usersTbl').innerHTML=`<thead><tr><th class="l">Tên đăng nhập</th><th class="l">Tên hiển thị</th><th class="l">Quyền</th><th class="l">Siêu thị được xem</th><th class="l">Ngày tạo</th><th></th></tr></thead><tbody>${rows.join('')||'<tr><td colspan="6" class="l muted">Chưa có tài khoản nào.</td></tr>'}</tbody>`;
+  $('usersTbl').innerHTML=`<thead><tr><th class="l">Tên đăng nhập</th><th class="l">Tên hiển thị</th><th class="l">Quyền</th><th class="l">Siêu thị được xem</th><th class="l" title="Mỗi tài khoản đăng nhập được 1 điện thoại và 1 máy tính">Máy đang đăng nhập</th><th></th></tr></thead><tbody>${rows.join('')||'<tr><td colspan="6" class="l muted">Chưa có tài khoản nào.</td></tr>'}</tbody>`;
   $('usersTbl').querySelectorAll('tr[data-u]').forEach(tr=>{const u=tr.dataset.u;
     tr.querySelector('[data-act="role"]').onchange=e=>act({action:'update',u,role:e.target.value},'Đã đổi quyền.');
     const sh=tr.querySelector('[data-act="shop"]');if(sh)sh.onchange=e=>act({action:'update',u,shop:e.target.value},'Đã gán siêu thị.');
     tr.querySelector('[data-act="reset"]').onclick=()=>{const p=prompt(`Mật khẩu mới cho ${u} (ít nhất 6 ký tự):`);if(p)act({action:'reset',u,password:p},'Đã đặt lại mật khẩu. Gửi mật khẩu mới cho người dùng.')};
     tr.querySelector('[data-act="toggle"]').onclick=e=>act({action:'update',u,disabled:e.target.textContent==='Khóa'},'Đã cập nhật.');
     const d=tr.querySelector('[data-act="delete"]');if(d)d.onclick=()=>{if(confirm(`Xóa tài khoản ${u}?`))act({action:'delete',u},'Đã xóa.')};
+    tr.querySelectorAll('[data-dev]').forEach(b=>b.onclick=()=>{const k=b.dataset.dev;if(confirm(`Gỡ ${k==='m'?'điện thoại':'máy tính'} đang đăng nhập của ${u}? Máy đó sẽ bị đăng xuất, người dùng có thể đăng nhập máy khác.`))act({action:'devices',u,kind:k},'Đã gỡ máy. Người dùng có thể đăng nhập trên máy mới.')});
   });
 }
+// cập nhật tài khoản từ file Excel
+{let rows=null;const RMAP={'quan tri':'admin','admin':'admin','cap nhat du lieu':'editor','cap nhat':'editor','editor':'editor','qltp':'qltp','ql':'ql','ql sieu thi':'ql','quan ly':'ql','chi xem':'viewer','viewer':'viewer'};
+ const hk2=t=>String(t==null?'':t).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[đĐ]/g,'d').toLowerCase().replace(/\s+/g,' ').trim();
+ $('uImp').onchange=async e=>{const f=e.target.files[0];rows=null;$('uImpBtn').disabled=true;const m=$('uImpMsg');if(!f)return;m.textContent='Đang đọc file…';
+  try{if(!window.__readSheet)throw new Error('Trang chưa tải xong, thử lại sau vài giây.');const a=await window.__readSheet(await f.arrayBuffer());const hi=a.findIndex(r=>r&&r.some(c=>/ten dang nhap|username|user/.test(hk2(c))));if(hi<0)throw new Error('Không thấy cột "Tên đăng nhập".');
+   const H=a[hi].map(hk2);const used=new Set();const ix=(...ks)=>{for(const k of ks){const i=H.findIndex((h,j)=>!used.has(j)&&(h===k||h.startsWith(k)));if(i>=0){used.add(i);return i}}return -1};
+   const cU=ix('ten dang nhap','username','user'),cN=ix('ten hien thi','ho va ten','ho ten','ten'),cR=ix('quyen','vai tro'),cS=ix('pham vi','sieu thi','ma st','ma qltp'),cP=ix('mat khau','password');
+   const qts=new Set(allQts().map(q=>String(q.k)));const shs=new Set(allShops().map(x=>String(x[0])));
+   rows=a.slice(hi+1).map((r,i)=>({r,line:hi+i+2})).filter(x=>x.r&&String(x.r[cU]==null?'':x.r[cU]).trim()).map(({r,line})=>{const role=RMAP[hk2(r[cR])]||'';let sc=String(cS>=0&&r[cS]!=null?r[cS]:'').trim();
+     const h=hk2(sc);if(h==='toan mien'||h==='all'||h==='tat ca')sc='all';else if(sc){const code=sc.replace(/^qltp\s*/i,'').split(' - ')[0].trim();
+       if(role==='qltp'||(!shs.has(code)&&qts.has(code)))sc='q:'+code;else sc=code}
+     return{u:String(r[cU]).trim(),name:cN>=0&&r[cN]!=null?String(r[cN]).trim():'',role,shop:VIEWR(role)?sc:'',password:cP>=0&&r[cP]!=null&&String(r[cP]).trim()?String(r[cP]).trim():'',line}});
+   const bad=rows.filter(x=>!x.role).length;m.className='hint';m.textContent=`Đọc được ${rows.length} tài khoản${bad?`, ${bad} dòng chưa ghi quyền hợp lệ (sẽ báo lỗi)`:''}. Bấm "Cập nhật tài khoản" để lưu.`;$('uImpBtn').disabled=!rows.length}
+  catch(err){m.className='msg-err';m.textContent=err.message}};
+ $('uImpBtn').onclick=async()=>{if(!rows||!rows.length)return;const b=$('uImpBtn'),m=$('uImpMsg');b.disabled=true;m.className='hint';m.textContent='Đang cập nhật…';
+  const r=await api('/api/users',{method:'POST',body:{action:'import',rows}});
+  if(r.ok){m.className=r.j.errors.length?'msg-err':'msg-ok';m.textContent=`Đã thêm ${r.j.added}, cập nhật ${r.j.updated} tài khoản.`+(r.j.errors.length?`\n${r.j.errors.length} dòng lỗi:\n`+r.j.errors.slice(0,30).join('\n'):'');renderUsers(r.j.envAdmin!==undefined?r.j:{...r.j,envAdmin:null});loadUsers()}
+  else{m.className='msg-err';m.textContent=r.j.error||'Không cập nhật được.'}b.disabled=false}}
 async function act(body,okMsg){const r=await api('/api/users',{method:'POST',body});if(r.ok){uMsg(okMsg,true);loadUsers()}else{uMsg(r.j.error||'Không thực hiện được.');loadUsers()}}
 $('addUser').onsubmit=async e=>{e.preventDefault();
-  const r=await api('/api/users',{method:'POST',body:{action:'create',u:$('nuU').value,name:$('nuN').value,role:$('nuR').value,password:$('nuP').value,shop:$('nuR').value==='viewer'?$('nuS').value:''}});
+  const r=await api('/api/users',{method:'POST',body:{action:'create',u:$('nuU').value,name:$('nuN').value,role:$('nuR').value,password:$('nuP').value,shop:VIEWR($('nuR').value)?$('nuS').value:''}});
   if(r.ok){uMsg(`Đã thêm ${$('nuU').value.trim().toLowerCase()}. Gửi tên đăng nhập và mật khẩu cho người dùng.`,true);e.target.reset();loadUsers()}else uMsg(r.j.error||'Không thêm được.')};
 
 // ---- chưa có dữ liệu: quản trị nạp file dữ liệu ban đầu
 function showEmpty(me){
   if(me.role!=='admin'){msg('<div class="card">Dashboard chưa có dữ liệu. Vui lòng chờ quản trị cập nhật.</div>');return}
   msg(`<div class="card"><h2 style="margin:0 0 8px;font-size:16px">Chưa có dữ liệu</h2><p class="hint">Chọn file dữ liệu ban đầu (.json) hoặc bản sao lưu để nạp vào dashboard.</p>
-    <input type="file" id="seedFile" accept=".json,application/json"><p class="msg-err" id="seedMsg"></p></div>`);
+    <input type="file" id="seedFile" accept=".json,application/json"><p class="msg-err" id="seedMsg"></p>
+    <p class="hint" style="margin-top:14px">Chưa có file nào: bấm nút dưới để mở dashboard trống, rồi dùng <b>Tải file lên</b> để nạp các file Excel (Base có cột QLTP, doanh thu ngành hàng và doanh thu / số bill của tháng này và tháng trước, hiệu quả Fresh, nhập xuất Fresh).</p>
+    <button class="btn primary" type="button" id="seedEmpty">Bắt đầu với dashboard trống</button></div>`);
+  $('seedEmpty').onclick=async()=>{const m=$('seedMsg');m.className='msg-err';m.textContent='Đang tạo…';
+    const one={daily:{'0000':{1:1}},cat:{'0000':{'Mẫu':1}},days:1,bills:{'0000':{1:1}},billDays:1};
+    const d={shops:{'0000':{name:'Siêu thị mẫu (sẽ thay khi tải file Base)',bT:1,bF:1,bR:1}},freshCats:['Thịt','Cá (Hải sản)','Rau Củ Quả CL','Trái cây','Trứng'],
+      cur:{m:1,y:2000,dim:31},prev:{m:12,y:1999,dim:31},aug:one,sep:one,fresh:[],freshMonth:null,loss:null,ytd:null,contests:null,goalPct:0};
+    const r=await api('/api/data',{method:'POST',body:{data:d,force:true}});if(!r.ok){m.textContent=r.j.error||('Lỗi '+r.status);return}
+    m.className='msg-ok';m.textContent='Đã tạo. Đang mở dashboard, bấm "Tải file lên" để nạp số liệu…';setTimeout(()=>location.reload(),800)};
   $('seedFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;const m=$('seedMsg');m.className='msg-err';m.textContent='Đang nạp…';
     try{const o=JSON.parse(await f.text());const d=o&&o.shops?o:(o&&o.data&&o.data.shops?o.data:null);if(!d)throw new Error('File không phải dữ liệu dashboard.');
       const r=await api('/api/data',{method:'POST',body:{data:d,force:true}});if(!r.ok)throw new Error(r.j.error||('Lỗi '+r.status));
