@@ -1709,7 +1709,13 @@ window.__setGoal=v=>{const nd=JSON.parse(JSON.stringify(PREVIEW_D||BASE_D));nd.g
 $('pvCancel').addEventListener('click',()=>{PREVIEW_D=null;bar.hidden=true;document.body.classList.remove('pv');rerender(BASE_D)});
 saveBtn.addEventListener('click',async()=>{
   if(!PREVIEW_D)return;saveBtn.disabled=true;pvMsg.textContent='Đang lưu…';
-  const post=body=>window.__api('/api/data',{method:'POST',body});
+  // mất kết nối khi đang lưu: kiểm tra máy chủ đã nhận chưa (theo mã lần lưu), chưa thì tự gửi lại, tối đa 3 lần
+  const saveId=Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
+  const savedOnServer=async()=>{try{const v=await window.__api('/api/version?t='+Date.now());return!!(v.ok&&v.j&&v.j.sid===saveId)}catch(e){return false}};
+  const post=async body=>{for(let i=1;;i++){try{return await window.__api('/api/data',{method:'POST',body:{...body,saveId}})}
+      catch(e){if(i>=3)throw e;pvMsg.textContent=`Mạng chập chờn, đang thử lưu lại (lần ${i+1}/3)…`;await wait(1500*i);
+        if(await savedOnServer())return{ok:true,status:200,j:{push:{}}}}}};
   try{const sm=window.__areaSummary?window.__areaSummary():null;const extra={notice:sm?sm.short:'',rank:window.__RANK||null};
     let r=await post({data:PREVIEW_D,baseUpdatedAt:(window.__META||{}).updatedAt||null,...extra});
     if(r.status===409){const m=r.j.meta||{};
@@ -1718,7 +1724,8 @@ saveBtn.addEventListener('click',async()=>{
     if(r.ok){pvMsg.textContent='Đã lưu. Đang tải lại…';try{sessionStorage.setItem('kvSaved',JSON.stringify(r.j.push||{}))}catch(e){}window.__dropDoc&&await window.__dropDoc();setTimeout(()=>location.reload(),400);return}
     if(r.status===401){pvMsg.textContent='Phiên đăng nhập đã hết. Tải lại trang, đăng nhập rồi tải file lên lại.';return}
     pvMsg.textContent=r.j.error||('Lưu chưa thành công ('+r.status+').');saveBtn.disabled=false}
-  catch(e){pvMsg.textContent='Lưu chưa thành công do lỗi kết nối. Bấm lưu lại sau ít giây.';saveBtn.disabled=false}
+  catch(e){if(await savedOnServer()){pvMsg.textContent='Đã lưu. Đang tải lại…';window.__dropDoc&&await window.__dropDoc();setTimeout(()=>location.reload(),400);return}
+    pvMsg.textContent='Lưu chưa thành công do mất kết nối (đã thử 3 lần). Kiểm tra mạng, giữ màn hình mở rồi bấm lưu lại.';saveBtn.disabled=false}
 });
 app(JSON.parse(document.getElementById('data').textContent));
 })();
@@ -1729,7 +1736,9 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function api(path,opt={}){
   const init={method:opt.method||'GET',credentials:'same-origin',headers:{}};
-  if(opt.body!==undefined){init.headers={'Content-Type':'application/json','X-Req':'1'};init.body=JSON.stringify(opt.body)}
+  if(opt.body!==undefined){const txt=JSON.stringify(opt.body);init.headers={'Content-Type':'application/json','X-Req':'1'};init.body=txt;
+    // dữ liệu lớn (lưu số liệu): nén gzip trước khi gửi, khoảng 0,6 MB còn khoảng 0,1 MB
+    if(txt.length>64*1024&&typeof CompressionStream!=='undefined'){init.body=await new Response(new Blob([txt]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer();init.headers['X-Body-Gz']='1'}}
   const r=await fetch(path,init);let j=null;try{j=await r.json()}catch(e){}
   return{ok:r.ok,status:r.status,j:j||{}};
 }
