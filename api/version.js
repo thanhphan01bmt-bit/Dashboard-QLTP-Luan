@@ -9,7 +9,7 @@ export default {
     if (!sessionOk(req)) return fail('Chưa đăng nhập.', 401);
     try {
       const meta = await readJSON('data/meta.json'); // đọc thẳng, không qua bộ đệm CDN (bộ đệm làm trang không thấy số mới vừa lưu)
-      return json(meta ? { updatedAt: meta.updatedAt, by: meta.by, byName: meta.byName } : { updatedAt: null });
+      return json(meta ? { updatedAt: meta.updatedAt, by: meta.by, byName: meta.byName, sid: meta.sid || null } : { updatedAt: null });
     } catch (e) { return fail(e.message, e.status || 500); }
   },
 };

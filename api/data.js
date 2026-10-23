@@ -61,6 +61,8 @@ export default {
         }
         const now = new Date();
         const doc = { meta: { updatedAt: now.toISOString(), by: me.u, byName: me.name }, data };
+        // mã lần lưu: trang dùng để biết đã lưu được chưa khi mất kết nối lúc chờ phản hồi
+        if (body.saveId) doc.meta.sid = String(body.saveId).slice(0, 40);
         await writeJSON(CURRENT, doc);
         try { await writeJSON('data/meta.json', doc.meta); } catch (e) { console.error('meta failed', e); }
         if (body.rank && Array.isArray(body.rank.rk)) {
