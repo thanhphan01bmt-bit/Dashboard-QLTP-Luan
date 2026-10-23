@@ -1,5 +1,6 @@
 // Đăng nhập, phiên (cookie ký HMAC) và danh sách tài khoản.
 import crypto from 'node:crypto';
+import zlib from 'node:zlib';
 import { promisify } from 'node:util';
 import { readJSON, writeJSON } from './store.js';
 
@@ -116,8 +117,14 @@ export function sameOriginWrite(req) {
 
 export async function readBody(req, maxBytes = 8 * 1024 * 1024) {
   const len = +(req.headers.get('content-length') || 0);
-  if (len > maxBytes) throw Object.assign(new Error('Dữ liệu quá lớn.'), { status: 413 });
-  const txt = await req.text();
+  // trang nén gzip số liệu trước khi gửi (gửi nhanh hơn, ít bị đứt khi mạng yếu)
+  const gz = req.headers.get('x-body-gz') === '1';
+  if (!gz && len > maxBytes) throw Object.assign(new Error('Dữ liệu quá lớn.'), { status: 413 });
+  let txt;
+  if (gz) {
+    try { txt = zlib.gunzipSync(Buffer.from(await req.arrayBuffer()), { maxOutputLength: maxBytes + 1 }).toString('utf8'); }
+    catch (e) { throw Object.assign(new Error(/maxOutput|buffer/i.test(String(e && e.message)) ? 'Dữ liệu quá lớn.' : 'Dữ liệu gửi lên không hợp lệ.'), { status: 400 }); }
+  } else txt = await req.text();
   if (txt.length > maxBytes) throw Object.assign(new Error('Dữ liệu quá lớn.'), { status: 413 });
   try { return JSON.parse(txt || '{}'); } catch { throw Object.assign(new Error('Dữ liệu gửi lên không hợp lệ.'), { status: 400 }); }
 }
