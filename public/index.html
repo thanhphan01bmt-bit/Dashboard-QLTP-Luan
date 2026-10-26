@@ -1835,10 +1835,14 @@ window.__areaSummary=areaSummary;
 const ZSECS=[{k:'dt',t:'Doanh thu',secs:[['gh1','goalTbl']]},{k:'ths',t:'Hủy thủy hải sản',secs:[['gh3','goalLoss']]},{k:'egg',t:'Tỷ lệ bán trứng',secs:[['gh4','goalEgg']]}];
 let ZIMGS=[];
 const zDate=()=>{const t=($('goalTitle')||{}).textContent||'';const m=t.match(/(\d+)\/(\d+)\/(\d+)/);return m?`${m[1]}-${m[2]}-${m[3]}`:vnToday()};
+// ảnh hủy thủy hải sản và tỷ lệ bán trứng: chỉ gửi kèm từ 21h00 (giờ Việt Nam), khi đã đủ số liệu trong ngày
+const zAfter21=()=>new Date(Date.now()+7*3600e3).getUTCHours()>=21;
 async function makeZaloImg(){const box=$('zImgs');ZIMGS.forEach(z=>z.url&&URL.revokeObjectURL(z.url));ZIMGS=[];$('zaloShare').hidden=true;
+  const ZS=zAfter21()?ZSECS:ZSECS.filter(z=>z.k==='dt');
   const canCopy=!!(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write)&&!/android|iphone|ipad/i.test(navigator.userAgent);
-  box.innerHTML=ZSECS.map(z=>`<div class="zimg" id="zi-${z.k}"><div class="zimg-h"><b>${z.t}</b><span class="row" style="gap:6px;margin-left:auto">${canCopy?`<button class="btn" type="button" data-zc="${z.k}" disabled>Sao chép ảnh</button>`:''}<button class="btn" type="button" data-zd="${z.k}" disabled>Tải ảnh</button></span></div><a target="_blank" rel="noopener"><img alt="Ảnh ${z.t}"></a><p class="muted" style="font-size:12px;margin:4px 0 0">Đang tạo ảnh…</p></div>`).join('');
-  for(const z of ZSECS){const el=$('zi-'+z.k),msg=el.querySelector('p');
+  box.innerHTML=ZS.map(z=>`<div class="zimg" id="zi-${z.k}"><div class="zimg-h"><b>${z.t}</b><span class="row" style="gap:6px;margin-left:auto">${canCopy?`<button class="btn" type="button" data-zc="${z.k}" disabled>Sao chép ảnh</button>`:''}<button class="btn" type="button" data-zd="${z.k}" disabled>Tải ảnh</button></span></div><a target="_blank" rel="noopener"><img alt="Ảnh ${z.t}"></a><p class="muted" style="font-size:12px;margin:4px 0 0">Đang tạo ảnh…</p></div>`).join('');
+  if(ZS.length<ZSECS.length)box.insertAdjacentHTML('beforeend','<p class="muted" style="font-size:12.5px;margin:10px 0 0">Ảnh hủy thủy hải sản và tỷ lệ bán trứng sẽ có từ 21h00, khi đã đủ số liệu trong ngày.</p>');
+  for(const z of ZS){const el=$('zi-'+z.k),msg=el.querySelector('p');
     try{const b=await areaImage(z.secs);if(!b)throw new Error('no image');const file=new File([b],`${z.t.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/gi,'d').replace(/\s+/g,'_')}_${zDate()}.png`,{type:'image/png'});const url=URL.createObjectURL(b);
       ZIMGS.push({...z,file,url});el.querySelector('img').src=url;el.querySelector('a').href=url;msg.textContent='';el.querySelectorAll('button').forEach(x=>x.disabled=false)}
     catch(e){console.error(e);msg.textContent='Không tạo được ảnh. Hãy chụp màn hình thủ công.'}}
