@@ -1,7 +1,7 @@
 // GET: mọi người đã đăng nhập đọc số liệu. POST: quản trị / cập nhật dữ liệu lưu số liệu mới.
 import { json, fail, currentUser, sameOriginWrite, readBody } from './_lib/auth.js';
 import { useRequest } from './_lib/store.js';
-import { readJSON, writeJSON } from './_lib/store.js';
+import { readJSON, writeJSON, listNames } from './_lib/store.js';
 import { sendEach } from './_lib/webpush.js';
 import { audience } from './_lib/audience.js';
 import { shopNotice } from './_lib/summary.js';
@@ -9,6 +9,27 @@ import { shopOf, filterShop } from './_lib/scope.js';
 
 const CURRENT = 'data/current.json';
 const RANK = 'data/rank.json'; // bảng xếp hạng quản lý tính sẵn (cho tài khoản chỉ xem)
+// Số liệu chốt của từng tháng (lần lưu cuối của tháng đó): months/YYYY-MM.json — để xem lại tháng cũ.
+const MONTH = /^\d{4}-\d{2}$/;
+const monthKey = (d) => d && d.cur ? `${d.cur.y}-${String(d.cur.m).padStart(2, '0')}` : null;
+
+// Tháng chưa có file chốt (trước khi có tính năng này): lấy bản sao lưu cuối cùng có số liệu của tháng đó.
+async function monthDoc(m) {
+  const doc = await readJSON(`months/${m}.json`);
+  if (doc) return doc;
+  const [y, mo] = m.split('-').map(Number);
+  const nx = mo === 12 ? `${y + 1}-01` : `${y}-${String(mo + 1).padStart(2, '0')}`;
+  const names = (await listNames('backup/')).map((b) => b.name).filter((n) => /\/\d{4}-\d{2}-\d{2}\.json$/.test(n))
+    .filter((n) => { const d = n.slice(7, 17); return d.startsWith(m) || (d.startsWith(nx) && +d.slice(8) <= 5); }).sort().reverse();
+  for (const n of names.slice(0, 8)) { const d = await readJSON(n); if (d && monthKey(d.data) === m) return d; }
+  return null;
+}
+async function monthList() {
+  const set = new Set();
+  for (const b of await listNames('months/')) { const k = b.name.slice(7, 14); if (MONTH.test(k)) set.add(k); }
+  for (const b of await listNames('backup/')) { const k = b.name.slice(7, 14); if (MONTH.test(k)) set.add(k); }
+  return [...set].sort().reverse();
+}
 
 function looksValid(d) {
   return d && typeof d === 'object' && d.shops && d.cur && d.prev && d.aug && d.sep
@@ -23,6 +44,24 @@ export default {
       if (!me) return fail('Chưa đăng nhập.', 401);
 
       if (req.method === 'GET') {
+        const q = new URL(req.url).searchParams;
+        if (q.get('months')) return json({ months: await monthList() });
+        const am = q.get('m');
+        if (am) {
+          // xem lại kết quả tháng cũ (chỉ xem, không sửa)
+          if (!MONTH.test(am)) return fail('Tháng không hợp lệ.');
+          const doc = await monthDoc(am);
+          if (!doc || !doc.data) return fail('Chưa có số liệu của tháng này.', 404);
+          if (me.role === 'viewer') {
+            const shop = shopOf(me, doc.data);
+            if (!shop) return fail('Tài khoản của bạn không có số liệu trong tháng này.', 403);
+            if (shop !== 'all') {
+              const rk = doc.rank && Array.isArray(doc.rank.rk) ? { at: doc.meta && doc.meta.updatedAt, rk: doc.rank.rk, ot: doc.rank.ot || [] } : null;
+              return json({ meta: doc.meta, archived: am, data: { ...filterShop(doc.data, shop), rankSnap: rk, viewer: { shop } } });
+            }
+          }
+          return json({ meta: doc.meta, archived: am, data: doc.data });
+        }
         const cur = await readJSON(CURRENT);
         if (!cur) return fail('Chưa có dữ liệu.', 404);
         const rank = await readJSON(RANK, { cache: true });
@@ -71,6 +110,9 @@ export default {
         // Sao lưu mỗi ngày 1 bản (ghi đè trong ngày), giờ Việt Nam.
         const vn = new Date(now.getTime() + 7 * 3600e3).toISOString().slice(0, 10);
         try { await writeJSON(`backup/${vn}.json`, doc); } catch (e) { console.error('backup failed', e); }
+        // chốt số liệu của tháng đang lưu (ghi đè mỗi lần lưu, lần cuối cùng của tháng là kết quả cả tháng)
+        const mk = monthKey(data);
+        if (mk) { try { await writeJSON(`months/${mk}.json`, { ...doc, rank: body.rank && Array.isArray(body.rank.rk) ? { rk: body.rank.rk, ot: Array.isArray(body.rank.ot) ? body.rank.ot : [] } : null }); } catch (e) { console.error('month failed', e); } }
         // Gửi thông báo đẩy cho các máy đã bật (trừ máy của người vừa lưu), tối đa 8 giây.
         const hm = new Date(now.getTime() + 7 * 3600e3).toISOString().slice(11, 16);
         const timeout = (ms) => new Promise((r) => setTimeout(() => r({ timeout: true }), ms));
