@@ -58,6 +58,8 @@ h1{margin:4px 0 6px;font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacin
 .filter{display:flex;flex-direction:column;gap:4px;min-width:0}
 .filter label{font-size:12px;color:var(--accent);font-weight:700;letter-spacing:.02em;display:inline-flex;align-items:center;gap:5px}
 #shopSel{border:2px solid var(--accent);background-color:var(--accent-soft);font-weight:600;padding:9px 36px 9px 12px;box-shadow:0 2px 8px color-mix(in srgb,var(--accent) 22%,transparent);background-image:linear-gradient(45deg,transparent 50%,var(--accent) 50%),linear-gradient(135deg,var(--accent) 50%,transparent 50%)}
+#monSel{min-width:170px;font-weight:600}
+.archbar{display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap;background:var(--warn-bg);border:1.5px solid color-mix(in srgb,var(--warn) 45%,transparent);border-radius:12px;padding:10px 14px;font-size:13px}.archbar .msg{flex:1;min-width:220px}.archbar b{color:var(--warn)}
 #shopSel:hover{box-shadow:0 3px 12px color-mix(in srgb,var(--accent) 35%,transparent)}
 select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--axis);border-radius:8px;padding:8px 34px 8px 12px;max-width:100%;min-width:260px;appearance:none;
   background-image:linear-gradient(45deg,transparent 50%,var(--ink2) 50%),linear-gradient(135deg,var(--ink2) 50%,transparent 50%);background-position:calc(100% - 17px) 55%,calc(100% - 12px) 55%;background-size:5px 5px;background-repeat:no-repeat;cursor:pointer}
@@ -396,7 +398,7 @@ body.pv .wrap{padding-bottom:120px}
  header.top .filter{flex:1 1 100%}
  .filter label{display:none}
  #shopSel{padding:7px 32px 7px 10px;font-size:14px;width:100%}
- body.viewer-shop header.top .filter{display:none}
+ body.viewer-shop header.top .filter:has(#shopSel){display:none}
  #goalTitle{font-size:16px;line-height:1.3}
  #goalSec .sec-title{gap:4px}
  #goalNote .lg{display:none}#goalNote .sm{display:inline}
@@ -556,6 +558,10 @@ body.pv .wrap{padding-bottom:120px}
       <div class="meta" id="meta"></div>
     </div>
     <div class="tools">
+      <div class="filter" id="monWrap" hidden>
+        <label for="monSel"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Xem tháng</label>
+        <select id="monSel" aria-label="Chọn tháng để xem"></select>
+      </div>
       <div class="filter">
         <label for="shopSel"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>Phạm vi xem</label>
         <select id="shopSel"></select>
@@ -805,10 +811,29 @@ function applyView(){const w=document.querySelector('.wrap');if(!w)return;w.clas
   document.querySelectorAll('.tabs .tab').forEach(b=>{const on=b.dataset.view===VIEW;b.setAttribute('aria-selected',on);b.classList.toggle('on',on)})}
 function setView(v){VIEW=v;applyView();window.scrollTo({top:0});if(v==='dash')requestAnimationFrame(()=>drawCurrent&&drawCurrent())} // vẽ lại biểu đồ đúng chiều rộng khi mở tab
 document.addEventListener('click',e=>{const b=e.target.closest('.tabs .tab');if(b)setView(b.dataset.view)});
-function applyEditor(){const b=document.getElementById('uploadBtn');if(b)b.hidden=!CAN_EDIT;document.querySelectorAll('.ed-only').forEach(e=>e.hidden=!IS_ADMIN);document.querySelectorAll('.view-only').forEach(e=>e.hidden=IS_ADMIN)}
+function applyEditor(){const A=!!ARCH;const b=document.getElementById('uploadBtn');if(b)b.hidden=!CAN_EDIT||A;document.querySelectorAll('.ed-only').forEach(e=>e.hidden=!IS_ADMIN||A);document.querySelectorAll('.view-only').forEach(e=>e.hidden=IS_ADMIN&&!A)}
+// ---- xem lại kết quả tháng cũ (chỉ xem): số liệu chốt cuối tháng lưu trên máy chủ
+let ARCH=null;
+const monLabel=k=>{const [y,m]=k.split('-');return `Tháng ${+m}/${y}`};
+function fillMonSel(){const s=document.getElementById('monSel');if(!s)return;const B=JSON.parse(document.getElementById('data').textContent);
+  const curK=B.cur.y+'-'+String(B.cur.m).padStart(2,'0');const L=(window.__MONTHS||[]).filter(k=>k<curK);
+  document.getElementById('monWrap').hidden=!L.length&&!ARCH;
+  s.innerHTML=`<option value="">${monLabel(curK)} (hiện tại)</option>`+L.map(k=>`<option value="${k}">${monLabel(k)}</option>`).join('');s.value=ARCH?ARCH.m:'';s.disabled=false;
+  s.onchange=()=>pickMonth(s.value)}
+window.__fillMonths=fillMonSel;window.__isArch=()=>!!ARCH;
+async function pickMonth(k){const s=document.getElementById('monSel');
+  if(typeof PREVIEW_D!=='undefined'&&PREVIEW_D){alert('Đang xem trước dữ liệu mới: bấm Lưu hoặc Bỏ trước khi xem tháng khác.');fillMonSel();return}
+  if(!k){ARCH=null;rerender(JSON.parse(document.getElementById('data').textContent));return}
+  s.disabled=true;let r;try{r=await window.__api('/api/data?m='+encodeURIComponent(k))}catch(e){r={ok:false,j:{error:'Chưa kết nối mạng, chưa xem được tháng cũ.'}}}
+  if(!r.ok||!r.j.data){alert(r.j.error||'Không tải được số liệu tháng này.');fillMonSel();return}
+  ARCH={m:k,meta:r.j.meta||{}};rerender(r.j.data);window.scrollTo({top:0})}
 
 function app(D){
-fillTokens(D);applyEditor();applyView();
+fillTokens(D);applyEditor();applyView();fillMonSel();
+if(ARCH){const w=document.querySelector('.wrap');const b=document.createElement('div');b.className='archbar';b.setAttribute('role','status');
+  const mt=ARCH.meta.updatedAt?new Date(ARCH.meta.updatedAt).toLocaleString('vi-VN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'}):'';
+  b.innerHTML=`<span class="msg">Đang xem lại <b>kết quả tháng ${D.cur.m}/${D.cur.y}</b> · số liệu đến ngày ${D.sep.days}/${D.cur.m}${mt?`, lưu lúc ${mt}`:''}. Chỉ xem, không sửa được.</span><button class="btn primary" type="button" id="archBack">Về tháng hiện tại</button>`;
+  w.insertBefore(b,w.querySelector('.tabs'));document.getElementById('archBack').onclick=()=>pickMonth('')}
 const M=D.cur.m,P=D.prev.m,MM=String(M).padStart(2,'0'),Y=D.cur.y,PY=D.prev.y,DIM=D.cur.dim,PDIM=D.prev.dim;
 const FM=String(D.freshMonth||(''+Y+MM));
 const shopName=s=>(D.shops[s]&&D.shops[s].name)||s;
@@ -1368,7 +1393,7 @@ function render(){
    box.querySelectorAll('tr[data-s],li[data-ns]').forEach(tr=>{const go=()=>setShop(tr.dataset.s||tr.dataset.ns);tr.onclick=go;tr.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}})}
 
   // Việc cần làm hôm nay (đầu tab Mục tiêu ngày)
-  {const T=window.__TODO,box=document.getElementById('goalTodo');if(!T){box.hidden=true;box.innerHTML=''}else{
+  {const T=window.__TODO,box=document.getElementById('goalTodo');if(!T||ARCH){box.hidden=true;box.innerHTML=''}else{
     (window.__NEAR||[]).sort((a,b)=>a.v-b.v);
     const G=[{k:'A',h:`Doanh thu ngày ${T.fdL}/${M} chưa đạt cần/ngày`,it:T.A,ok:T.fdL>=1?'Đều đạt doanh thu cần/ngày.':'Chưa có ngày đủ số liệu.'},
       {k:'B',h:`Hủy thủy hải sản cao${T.ld?` · ngày ${T.ld}/${M}`:''}`,it:T.B,ok:T.ld?'Không có hủy cao bất thường.':'Chưa có file nhập xuất Fresh.'},
@@ -2020,6 +2045,7 @@ function bootApp(me,doc){
   const s=document.createElement('script');s.type='application/json';s.id='data';s.textContent=JSON.stringify(doc.data);document.body.appendChild(s);
   $('bootMsg').hidden=true;$('appRoot').hidden=false;
   const m=document.createElement('script');m.textContent=$('mainsrc').textContent;document.body.appendChild(m);savedToast();showShellNew();
+  api('/api/data?months=1').then(r=>{if(r.ok){window.__MONTHS=r.j.months||[];window.__fillMonths&&window.__fillMonths()}}).catch(()=>{});
   setTimeout(syncRank,1500);
 }
 // số liệu hiện tại chưa có bảng xếp hạng tính sẵn (vd. vừa khôi phục bản sao lưu) thì gửi lên để tài khoản chỉ xem dùng
@@ -2068,7 +2094,7 @@ try{navigator.serviceWorker&&navigator.serviceWorker.startMessages()}catch(e){}
 start();
 // tự kiểm tra số liệu mới: khi quay lại app / tab và 5 phút một lần khi đang mở
 let lastChk=0,chkBusy=false;
-const busy=()=>!$('pvBar').hidden||!$('upPanel').hidden||['usersPanel','passPanel','statsPanel','pushPanel','zaloPanel','backupPanel','autoPanel'].some(i=>!$(i).hidden);
+const busy=()=>(window.__isArch&&window.__isArch())||!$('pvBar').hidden||!$('upPanel').hidden||['usersPanel','passPanel','statsPanel','pushPanel','zaloPanel','backupPanel','autoPanel'].some(i=>!$(i).hidden);
 async function checkNew(auto){
   if(chkBusy||!window.__META||!window.__ME)return;const now=Date.now();if(now-lastChk<60000)return;lastChk=now;chkBusy=true;
   try{const r=await api('/api/version');if(!r.ok||!r.j.updatedAt)return;
