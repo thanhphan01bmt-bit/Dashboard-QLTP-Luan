@@ -68,7 +68,10 @@ export default {
           const m = ((await imgMeta()) || {})[k];
           if (!m) { await reply(token, ev.replyToken, `Chưa có ảnh ${IMG_KEYS[k]}. Ảnh được tạo mỗi lần lưu số liệu trên dashboard.`); continue; }
           const u = imgUrl(new URL(req.url).origin, k, m.at);
-          await reply(token, ev.replyToken, [`${IMG_KEYS[k]} · toàn khu vực · số liệu lưu lúc ${fmtVN(m.at)}`, { type: 'image', originalContentUrl: u, previewImageUrl: u }]);
+          const img = { type: 'image', originalContentUrl: u, previewImageUrl: u };
+          // mục Doanh thu: ảnh + tóm tắt toàn khu vực (giống tin nhắn nhóm)
+          if (k === 'dt') { const doc = await readJSON('data/current.json'); await reply(token, ev.replyToken, [img, doc && doc.data ? areaReply(doc.data, doc.meta) : 'Dashboard chưa có số liệu.']); continue; }
+          await reply(token, ev.replyToken, [`${IMG_KEYS[k]} · toàn khu vực · số liệu lưu lúc ${fmtVN(m.at)}`, img]);
           continue;
         }
         if (ev.type !== 'message' || !ev.message || ev.message.type !== 'text' || !ev.replyToken) continue;
