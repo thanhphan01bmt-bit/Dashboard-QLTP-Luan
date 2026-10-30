@@ -782,7 +782,7 @@ async function renderGoalPages(opt={}){
   if(opt.image){// ảnh PNG của 1 hoặc vài mục, để gửi kèm tin nhắn nhóm
     const ch=y+MG-20,im=document.createElement('canvas');im.width=PW*2;im.height=ch*2;const g=im.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,im.width,im.height);
     g.drawImage(cv,0,0,PW*2,ch*2,0,0,PW*2,ch*2);g.font=`400 22px ${F}`;g.fillStyle=C.muted;g.textAlign='right';g.textBaseline='middle';g.fillText('Doanh thu khu vực QLTP Luân · luan56605.app',PW*2-MG*2,ch*2-28);
-    return await new Promise(r=>im.toBlob(r,'image/png'))}
+    return await new Promise(r=>im.toBlob(r,opt.jpeg?'image/jpeg':'image/png',.85))}
   table(T('gh2'),document.getElementById('goalFresh'));
   table(T('gh3'),document.getElementById('goalLoss'));
   table(T('gh4'),document.getElementById('goalEgg'));
@@ -795,7 +795,7 @@ async function renderGoalPages(opt={}){
   const b=await new Promise(r=>out.toBlob(r,'image/jpeg',0.9));const out2=[{jpg:new Uint8Array(await b.arrayBuffer()),w:OW,h:OH}];
   return out2;
 }
-window.__goalImage=secs=>renderGoalPages({image:true,secs});
+window.__goalImage=secs=>renderGoalPages({image:true,secs});window.__goalImageJ=secs=>renderGoalPages({image:true,secs,jpeg:true});
 async function exportGoalPdf(btn,filename){
   const old=btn.innerHTML;btn.disabled=true;btn.textContent='Đang tạo PDF…';
   try{
@@ -1799,7 +1799,8 @@ saveBtn.addEventListener('click',async()=>{
     if(r.status===409){const m=r.j.meta||{};
       if(confirm(`Số liệu vừa được ${m.byName||m.by||'người khác'} lưu lúc ${new Date(m.updatedAt).toLocaleString('vi-VN')}.\nBấm OK để vẫn lưu số liệu của bạn (ghi đè), Cancel để hủy rồi tải lại trang xem số mới.`))r=await post({data:PREVIEW_D,force:true,...extra});
       else{pvMsg.textContent='Đã hủy lưu. Tải lại trang để xem số liệu mới nhất.';saveBtn.disabled=false;return}}
-    if(r.ok){pvMsg.textContent='Đã lưu. Đang tải lại…';try{sessionStorage.setItem('kvSaved',JSON.stringify(r.j.push||{}))}catch(e){}window.__dropDoc&&await window.__dropDoc();setTimeout(()=>location.reload(),400);return}
+    if(r.ok){if(r.j&&r.j.meta&&window.__botImages){pvMsg.textContent='Đã lưu. Đang tạo ảnh cho bot LINE…';try{await window.__botImages(r.j.meta.updatedAt)}catch(e){}}
+      pvMsg.textContent='Đã lưu. Đang tải lại…';try{sessionStorage.setItem('kvSaved',JSON.stringify(r.j.push||{}))}catch(e){}window.__dropDoc&&await window.__dropDoc();setTimeout(()=>location.reload(),400);return}
     if(r.status===401){pvMsg.textContent='Phiên đăng nhập đã hết. Tải lại trang, đăng nhập rồi tải file lên lại.';return}
     pvMsg.textContent=r.j.error||('Lưu chưa thành công ('+r.status+').');saveBtn.disabled=false}
   catch(e){if(await savedOnServer()){pvMsg.textContent='Đã lưu. Đang tải lại…';window.__dropDoc&&await window.__dropDoc();setTimeout(()=>location.reload(),400);return}
@@ -1908,6 +1909,12 @@ function withAll(fn){const s=$('shopSel');if(!s||s.value==='all')return fn();
   s.value=old;s.dispatchEvent(new Event('change'));try{if(ls!=null)localStorage.setItem('qltp-shop',ls)}catch(e){}}return r}
 const areaSummary=()=>withAll(goalSummary);
 // Ảnh mục Doanh thu toàn khu vực (vẽ xong đồng bộ rồi mới trả lại phạm vi đang xem).
+// Ảnh 5 mục Mục tiêu ngày (toàn khu vực) gửi lên máy chủ sau mỗi lần lưu, để bot LINE trả ảnh khi có người bấm menu.
+window.__botImages=async at=>{const K=[['dt','gh1','goalTbl'],['fresh','gh2','goalFresh'],['loss','gh3','goalLoss'],['egg','gh4','goalEgg'],['bill','gh5','goalBill']];
+  if(document.fonts&&document.fonts.ready)await document.fonts.ready;if(!window.__goalImageJ)return;
+  for(const [k,g,t] of K){try{const b=await withAll(()=>window.__goalImageJ([[g,t]]));if(!b)continue;
+    const b64=await new Promise((ok,no)=>{const fr=new FileReader();fr.onload=()=>ok(String(fr.result).split(',')[1]);fr.onerror=no;fr.readAsDataURL(b)});
+    await api('/api/img',{method:'POST',body:{k,at,b64}})}catch(e){console.warn('bot image',k,e)}}};
 async function areaImage(secs){if(document.fonts&&document.fonts.ready)await document.fonts.ready;if(!window.__goalImage)return null;return withAll(()=>window.__goalImage(secs))}
 window.__areaSummary=areaSummary;
 const ZSECS=[{k:'dt',t:'Doanh thu',secs:[['gh1','goalTbl']]},{k:'ths',t:'Hủy thủy hải sản',secs:[['gh3','goalLoss']]},{k:'egg',t:'Tỷ lệ bán trứng',secs:[['gh4','goalEgg']]}];
