@@ -13,6 +13,7 @@ const month = (m, s) => {
   if (!m || typeof m !== 'object') return m;
   const out = { ...m };
   for (const k of ['daily', 'cat', 'bills', 'fday']) if (m[k]) out[k] = pick(m[k], s);
+  if (m.catLast) out.catLast = { ...m.catLast, s: pick(m.catLast.s, s) };
   return out;
 };
 
@@ -31,6 +32,8 @@ export function filterShop(d, s) {
     const mon = {};
     for (const m in d.ytd.mon) mon[m] = pick(d.ytd.mon[m], s);
     out.ytd = { ...d.ytd, mon };
+    if (d.ytd.dd) { const dd = {}; for (const m in d.ytd.dd) dd[m] = pick(d.ytd.dd[m], s); out.ytd.dd = dd; }
+    if (d.ytd.pt) { const pt = {}; for (const m in d.ytd.pt) { pt[m] = {}; for (const k in d.ytd.pt[m]) pt[m][k] = pick(d.ytd.pt[m][k], s); } out.ytd.pt = pt; }
   }
   if (d.catm) { const cm = {}; for (const k in d.catm) cm[k] = { ...d.catm[k], c: pick(d.catm[k].c, s) }; out.catm = cm; }
   if (d.ly && d.ly.mon) {
