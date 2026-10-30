@@ -56,6 +56,22 @@ export async function writeJSON(name, obj) {
   }); } catch (e) { throw friendly(e); }
 }
 
+// File nhị phân (ảnh cho bot LINE).
+export async function writeBuf(name, buf, type) {
+  if (LOCAL) { const f = path.join(LOCAL, name); await fs.mkdir(path.dirname(f), { recursive: true }); await fs.writeFile(f, buf); return; }
+  const { put } = await import('@vercel/blob');
+  try { await put(name, buf, { ...auth(), access: 'private', allowOverwrite: true, addRandomSuffix: false, contentType: type, cacheControlMaxAge: 60 }); } catch (e) { throw friendly(e); }
+}
+export async function readBuf(name) {
+  if (LOCAL) { try { return await fs.readFile(path.join(LOCAL, name)); } catch (e) { if (e.code === 'ENOENT') return null; throw e; } }
+  const { get } = await import('@vercel/blob');
+  let r;
+  try { r = await get(name, { access: 'private', useCache: false, ...auth() }); }
+  catch (e) { if (/not.?found/i.test(String(e && (e.name + e.message)))) return null; throw friendly(e); }
+  if (!r || r.statusCode !== 200 || !r.stream) return null;
+  return Buffer.from(await new Response(r.stream).arrayBuffer());
+}
+
 // Liệt kê file theo tiền tố (vd 'backup/'). Trả về [{ name, size, uploadedAt }].
 export async function listNames(prefix) {
   if (LOCAL) {
