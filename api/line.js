@@ -16,7 +16,7 @@ const noAcc = (t) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(
 // Menu Mục tiêu ngày (Flex Message): mỗi dòng gửi postback, bot trả lại ảnh của mục đó.
 function menuMsg() {
   const item = (k, text) => ({ type: 'text', text, wrap: true, size: 'lg', weight: 'bold', color: '#1a3bd6', decoration: 'underline', margin: 'xl',
-    action: { type: 'postback', label: text.slice(0, 40), data: `img=${k}`, displayText: text } });
+    action: { type: 'postback', label: text.slice(0, 40), data: `img=${k}` } }); // không có displayText: bấm vào không hiện câu chat
   return {
     type: 'flex', altText: 'Menu Mục tiêu ngày – Doanh thu khu vực QLTP Luân',
     contents: { type: 'bubble', size: 'mega', body: { type: 'box', layout: 'vertical', paddingAll: 'xl', contents: [
