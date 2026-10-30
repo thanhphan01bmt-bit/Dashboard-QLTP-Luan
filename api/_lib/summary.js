@@ -196,3 +196,24 @@ export function shopNotice(data, meta, s) {
   const need = Math.max(0, (goal(s) - cum(s, d9 - 1)) / (DIM - d9 + 1)), day = dl(s, d9);
   return `${name(s)}: DT ngày ${d9}/${M}${upAt ? ' đến ' + upAt : ''} ${tr(day)} / cần ${tr(need)} → đạt ${need > 0 ? pct(day / need) : '—'}.`;
 }
+
+// Trả lời bot LINE khi có người gõ "dt": tóm tắt doanh thu toàn khu vực (giống tin nhắn nhóm trên dashboard).
+export function areaReply(data, meta) {
+  const B = base(data, meta); const { SH, name, cum, goal, dl, aug, M, Y, DIM, PM, d9, upAt } = B;
+  if (!d9) return 'Dashboard chưa có số liệu tháng này.';
+  const left = Math.max(1, DIM - d9 + 1);
+  const R = SH.map((s) => { const day = dl(s, d9), need = Math.max(0, (goal(s) - cum(s, d9 - 1)) / left); return { s, day, need, p: need > 0 ? day / need : (day > 0 ? 9 : 0) }; })
+    .sort((a, b) => b.p - a.p);
+  const td = sum(R.map((r) => r.day)), tn = sum(R.map((r) => r.need));
+  const lk = sum(SH.map((s) => cum(s, d9))), pj = lk / d9 * DIM, au = sum(SH.map(aug));
+  const ok = tn > 0 && td >= tn, md = ['🥇', '🥈', '🥉'];
+  const L = [
+    `📊 DT khu vực QLTP Luân – ngày ${d9}/${M}/${Y}${upAt ? ` (số liệu đến ${upAt})` : ''}`, '',
+    `💰 DT ngày ${d9}/${M}: ${tr(td)}`,
+    `🎯 Cần mỗi ngày: ${tr(tn)} → ${ok ? '✅' : '⚠️'} đạt ${tn > 0 ? pct(td / tn) : '—'}`,
+    `📈 Lũy kế T${M}: ${tr(lk)} · dự kiến ${tr(pj)}${au > 0 ? ` (${sgn(pj / au - 1)} so T${PM})` : ''}`,
+  ];
+  if (R.length > 1) { L.push('', '🏆 Top 3 siêu thị:'); R.slice(0, 3).forEach((r, i) => L.push(`${md[i]} ${name(r.s)} – ${tr(r.day)} (đạt ${r.need > 0 ? pct(r.p) : '—'})`)); }
+  L.push('', '👉 Xem chi tiết: https://luan56605.app/');
+  return L.join('\n');
+}
