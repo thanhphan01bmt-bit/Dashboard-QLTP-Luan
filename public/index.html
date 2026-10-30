@@ -692,10 +692,11 @@ body.pv .wrap{padding-bottom:120px}
     <div class="sec-title"><h2 id="upTitle">Cập nhật dữ liệu</h2><button class="btn" id="upClose" type="button" aria-label="Đóng">Đóng</button></div>
     <p class="hint">Chọn một hoặc nhiều file Excel. Trang nhận diện file theo tên cột, không cần đổi tên file. File nào không chọn thì giữ số liệu cũ.</p>
     <ul class="kinds">
-      <li><b>Báo cáo doanh thu theo ngành hàng</b> tháng này (gửi hằng ngày)</li>
-      <li><b>Doanh thu / số bill</b> tháng này (gửi hằng ngày)</li>
+      <li><b>Báo cáo doanh thu theo ngành hàng</b>: chỉ cần file của <b>ngày mới</b>, dashboard tự ghép vào số đã lưu của tháng (trong ngày tải lại bao nhiêu lần cũng được)</li>
+      <li><b>Doanh thu / số bill</b>: chỉ cần file của <b>ngày mới</b> (có thể trùng ngày đã lưu, dashboard thay số các ngày đó)</li>
       <li><b>Báo cáo hiệu quả bán Fresh</b> (gửi hằng ngày)</li>
-      <li><b>Báo cáo nhập xuất Fresh</b> có cột SL hủy tồn, SL mất mát kiểm kê (gửi hằng ngày)</li>
+      <li><b>Báo cáo nhập xuất Fresh</b> có cột SL hủy tồn, SL mất mát kiểm kê: chỉ cần file các <b>ngày sau ngày đã lưu</b></li>
+      <li>File bắt đầu từ ngày 1 thì thay cả tháng như trước (ngày đầu tháng mới chỉ cần file ngày 1)</li>
       <li><b>Base</b> và các file <b>tháng trước</b>: chỉ khi thay đổi hoặc sang tháng mới</li>
       <li><b>Thi đua ngành hàng</b> (file có cột "Chương trình Thi đua"): mỗi khi có chương trình mới</li>
       <li class="ed-admin"><b>Bản sao lưu (.json)</b>: chỉ quản trị, dùng khi cần khôi phục số liệu cũ</li>
@@ -1581,9 +1582,9 @@ async function readFile(f){
   if(ix('SL hủy tồn')>=0){
     const [cD,cS,cC,cN,cH,cM]=need('Ngày','Mã siêu thị','Ngành hàng - Phân tích','SL thực nhập','SL hủy tồn','SL mất mát kiểm kê');
     const cP=ix('Mã sản phẩm'),cPN=ix('Tên sản phẩm'),cX=ix('SL thực xuất');
-    let rowsL={},prA={},prod={},dl={},pdA={};let days=0,y=0,m=0,n=0;
+    let rowsL={},prA={},prod={},dl={},pdA={};let days=0,y=0,m=0,n=0,mn=99;
     rows.forEach(r=>{const d=toYMD(r[cD]);if(!d)return;const code=nz(r[cS]).split(' - ')[0].trim();if(!code)return;const cat=nz(r[cC]);
-      const k=d.y*100+d.m;if(k>y*100+m){y=d.y;m=d.m;days=0;rowsL={};prA={};prod={};dl={};pdA={};n=0}if(k<y*100+m)return;if(d.d>days)days=d.d;
+      const k=d.y*100+d.m;if(k>y*100+m){y=d.y;m=d.m;days=0;mn=99;rowsL={};prA={};prod={};dl={};pdA={};n=0}if(k<y*100+m)return;if(d.d>days)days=d.d;if(d.d<mn)mn=d.d;
       const vn=numU(r[cN]),vh=numU(r[cH]),vm=numU(r[cM]),vx=cX>=0?numU(r[cX]):0;
       const o=rowsL[code]||(rowsL[code]={});const a=o[cat]||(o[cat]=cX>=0?[0,0,0,0]:[0,0,0]);a[0]+=vn;a[1]+=vh;a[2]+=vm;if(cX>=0)a[3]+=vx;n++;const ds=dl[code]||(dl[code]={});const dd=ds[d.d]||(ds[d.d]={});const dc=dd[cat]||(dd[cat]=cX>=0?[0,0,0]:[0,0]);dc[0]+=vn;dc[1]+=vh+vm;if(cX>=0)dc[2]+=vx;
       if(cP>=0){const pc=nz(r[cP]);if(pc){if(!prod[pc])prod[pc]=[cPN>=0?nz(r[cPN]):pc,cat];const sp=prA[code]||(prA[code]={});const b=sp[pc]||(sp[pc]=[0,0]);b[0]+=vn;b[1]+=vh+vm;const pd=(pdA[code]||(pdA[code]={}));const pdd=pd[d.d]||(pd[d.d]={});const q=pdd[pc]||(pdd[pc]=[0,0]);q[0]+=vn;q[1]+=vh+vm}}});
@@ -1595,31 +1596,32 @@ async function readFile(f){
     // SP hủy nhiều nhất trong ngày cuối của file (mỗi siêu thị giữ 40 SP)
     const isTHS=pc=>/^th[uủ]y h[aả]i s[aả]n/i.test(String((prod[pc]||[])[1]||'').normalize('NFC'));
     const prd={day:days,s:{}};for(const s in pdA){const o=pdA[s][days];if(!o)continue;const all=Object.entries(o).filter(([p,b])=>b[1]>0).sort((a,b)=>b[1][1]-a[1][1]);const top=all.slice(0,40);all.filter(([p])=>isTHS(p)).slice(0,5).forEach(e=>{if(!top.includes(e))top.push(e)});prd.s[s]=top.map(([p,b])=>[p,r3(b[0]),r3(b[1])])}
-    const LO=cP>=0?{y,m,days,rows:rowsL,prod,pr,prd,daily:dl}:{y,m,days,rows:rowsL,daily:dl};if(cX>=0)LO.hasX=true;
-    return{kind:'loss',loss:LO,label:'Nhập xuất Fresh (hủy)',desc:`tháng ${m}/${y}, đến ngày ${days}, ${fmtN.format(n)} dòng`}}
+    const LO=cP>=0?{y,m,days,rows:rowsL,prod,pr,prd,daily:dl}:{y,m,days,rows:rowsL,daily:dl};if(cX>=0)LO.hasX=true;if(mn>1)LO.min=mn;
+    return{kind:'loss',loss:LO,label:'Nhập xuất Fresh (hủy)',desc:`tháng ${m}/${y}, ${mn>1?`ngày ${mn}–${days}`:`đến ngày ${days}`}, ${fmtN.format(n)} dòng`}}
   const FRESH_CATS=new Set(['Thịt','Cá (Hải sản)','Rau Củ Quả CL','Trái cây','Trứng']);
   if(ix('Ngành hàng BHX')>=0){
     const [cD,cS,cC,cV]=need('Ngày xuất','Mã siêu thị','Ngành hàng BHX','Doanh thu');
     const months={};
     rows.forEach(r=>{const d=toYMD(r[cD]);if(!d)return;const k=ymKey(d.y,d.m);
-      const o=months[k]||(months[k]={y:d.y,m:d.m,daily:{},cat:{},fday:{},days:0,n:0});
+      const o=months[k]||(months[k]={y:d.y,m:d.m,daily:{},cat:{},fday:{},days:0,min:99,n:0,cdl:{}});
       const code=nz(r[cS]).split(' - ')[0].trim();if(!code)return;const cat=nz(r[cC]);const v=Math.round(numU(r[cV]));
       const dd=o.daily[code]||(o.daily[code]={});dd[d.d]=(dd[d.d]||0)+v;
-      const cc=o.cat[code]||(o.cat[code]={});cc[cat]=(cc[cat]||0)+v;if(FRESH_CATS.has(cat)){const fd=o.fday[code]||(o.fday[code]={});const fc=fd[d.d]||(fd[d.d]={});fc[cat]=(fc[cat]||0)+v}
-      if(d.d>o.days)o.days=d.d;o.n++});
+      const cc=o.cat[code]||(o.cat[code]={});cc[cat]=(cc[cat]||0)+v;{const x=o.cdl[d.d]||(o.cdl[d.d]={});const y=x[code]||(x[code]={});y[cat]=(y[cat]||0)+v}if(FRESH_CATS.has(cat)){const fd=o.fday[code]||(o.fday[code]={});const fc=fd[d.d]||(fd[d.d]={});fc[cat]=(fc[cat]||0)+v}
+      if(d.d>o.days)o.days=d.d;if(d.d<o.min)o.min=d.d;o.n++});
     if(!Object.keys(months).length)throw new Error('Không đọc được ngày trong cột "Ngày xuất".');
-    return{kind:'nganh',months,label:'Doanh thu theo ngành hàng',desc:Object.values(months).map(o=>`tháng ${o.m}/${o.y}, đến ngày ${o.days}, ${fmtN.format(o.n)} dòng`).join(' · ')}}
+    Object.values(months).forEach(o=>{o.catLast={day:o.days,s:o.cdl[o.days]||{}};delete o.cdl});
+    return{kind:'nganh',months,label:'Doanh thu theo ngành hàng',desc:Object.values(months).map(o=>`tháng ${o.m}/${o.y}, ${o.min>1?`ngày ${o.min}–${o.days}`:`đến ngày ${o.days}`}, ${fmtN.format(o.n)} dòng`).join(' · ')}}
   if(ix('Tổng số bill')>=0){
     const [cD,cS,cB]=need('Ngày','Mã siêu thị','Tổng số bill');
     const cOff=ix('Doanh thu offline'),cOn=ix('Doanh thu Online');
     const months={};
     rows.forEach(r=>{const d=toYMD(r[cD]);if(!d)return;const k=ymKey(d.y,d.m);
-      const o=months[k]||(months[k]={y:d.y,m:d.m,bills:{},billDays:0,n:0,rev:cOff>=0?{}:null,revd:cOff>=0?{}:null});
+      const o=months[k]||(months[k]={y:d.y,m:d.m,bills:{},billDays:0,min:99,n:0,rev:cOff>=0?{}:null,revd:cOff>=0?{}:null});
       const code=nz(r[cS]).split(' - ')[0].trim();if(!code)return;
       const bb=o.bills[code]||(o.bills[code]={});bb[d.d]=(bb[d.d]||0)+Math.round(numU(r[cB]));if(o.rev){const v=Math.round(numU(r[cOff])+(cOn>=0?numU(r[cOn]):0));o.rev[code]=(o.rev[code]||0)+v;const rd=o.revd[code]||(o.revd[code]=[]);rd[d.d-1]=(rd[d.d-1]||0)+v}
-      if(d.d>o.billDays)o.billDays=d.d;o.n++});
+      if(d.d>o.billDays)o.billDays=d.d;if(d.d<o.min)o.min=d.d;o.n++});
     if(!Object.keys(months).length)throw new Error('Không đọc được ngày trong cột "Ngày".');
-    return{kind:'bills',months,label:'Doanh thu / số bill',desc:Object.values(months).map(o=>`tháng ${o.m}/${o.y}, đến ngày ${o.billDays}`).join(' · ')}}
+    return{kind:'bills',months,label:'Doanh thu / số bill',desc:Object.values(months).map(o=>`tháng ${o.m}/${o.y}, ${o.min>1?`ngày ${o.min}–${o.billDays}`:`đến ngày ${o.billDays}`}`).join(' · ')}}
   if(ix('LN lũy kế')>=0){
     const [cS,cC,cDT,cGV,cLN]=need('Mã siêu thị','Ngành hàng','DT FRESH tính giá vốn','Giá vốn cơ bản lũy kế đến ngày hôm qua','LN lũy kế');
     const c3=ix('LN TB 3 tháng trước'),cT=ix('Tháng'),cGT=ix('Giá vốn cơ bản hôm nay');
@@ -1644,11 +1646,49 @@ function merge(B,list){
   mon[ymKey(B.prev.y,B.prev.m)]=Object.assign({y:B.prev.y,m:B.prev.m},B.aug);
   let shops=B.shops,fresh=B.fresh,freshMonth=B.freshMonth||null,loss=B.loss||null,contests=B.contests||null;
   let ytd=B.ytd?JSON.parse(JSON.stringify(B.ytd)):null,ly=B.ly?JSON.parse(JSON.stringify(B.ly)):null;const revs=[];
+  // Tải từng ngày: file không bắt đầu từ ngày 1 thì ghép vào số liệu đã lưu của tháng đó (thay các ngày trùng).
+  const bad=[],info=[];const cl=o=>{const r={};for(const k in o||{})r[k]=Object.assign({},o[k]);return r};
+  // sắp xếp: file từ ngày 1 trước, file từng ngày sau, theo ngày bắt đầu
+  const ord=x=>x.kind==='loss'?(x.loss.min||1):x.kind==='nganh'||x.kind==='bills'?Math.min(...Object.values(x.months).map(o=>o.min||1)):0;
+  list=[...list].sort((a,b)=>ord(a)-ord(b));
   list.forEach(p=>{
-    if(p.kind==='nganh'||p.kind==='bills')for(const k in p.months){const s=p.months[k];const o=mon[k]||(mon[k]={y:s.y,m:s.m});
-      if(p.kind==='nganh'){o.daily=s.daily;o.cat=s.cat;o.days=s.days;o.fday=s.fday}else{o.bills=s.bills;o.billDays=s.billDays;if(s.rev)revs.push(s)}}
+    if(p.kind==='nganh'||p.kind==='bills')for(const k in p.months){const s=p.months[k];const o=mon[k]||(mon[k]={y:s.y,m:s.m});const mm=`tháng ${s.m}/${s.y}`;
+      if(p.kind==='nganh'){
+        if(!(s.min>1)){o.daily=s.daily;o.cat=s.cat;o.days=s.days;o.fday=s.fday;o.catLast=s.catLast;continue}
+        if(!o.daily){bad.push(`Ngành hàng ${mm}: chưa có số liệu đã lưu của tháng này, cần file từ ngày 1 (file đang từ ngày ${s.min}).`);continue}
+        if(s.min>o.days+1){bad.push(`Ngành hàng ${mm}: đã lưu đến ngày ${o.days}, file bắt đầu ngày ${s.min} nên thiếu ngày ${o.days+1}${s.min-1>o.days+1?'–'+(s.min-1):''}.`);continue}
+        const lastOk=o.catLast&&o.catLast.day===o.days;
+        if(s.min<o.days||(s.min===o.days&&!lastOk)){bad.push(`Ngành hàng ${mm}: đã lưu đến ngày ${o.days}, file bắt đầu ngày ${s.min}. Chỉ thay được ngày cuối đã lưu: hãy tải file từ ngày ${lastOk?o.days:o.days+1} (hoặc file từ ngày 1).`);continue}
+        const daily=cl(o.daily),cat=cl(o.cat),fday=cl(o.fday);
+        if(s.min===o.days){for(const sh in o.catLast.s){const c0=cat[sh];if(!c0)continue;for(const c in o.catLast.s[sh])c0[c]=(c0[c]||0)-o.catLast.s[sh][c]}
+          for(const sh in daily)delete daily[sh][o.days];for(const sh in fday)delete fday[sh][o.days]}
+        for(const sh in s.daily)Object.assign(daily[sh]||(daily[sh]={}),s.daily[sh]);
+        for(const sh in s.cat){const c0=cat[sh]||(cat[sh]={});for(const c in s.cat[sh])c0[c]=(c0[c]||0)+s.cat[sh][c]}
+        for(const sh in s.fday)Object.assign(fday[sh]||(fday[sh]={}),s.fday[sh]);
+        Object.assign(o,{daily,cat,fday,days:Math.max(o.days,s.days),catLast:s.catLast});
+        info.push(`Ngành hàng ${mm}: ghép ngày ${s.min}${s.days>s.min?'–'+s.days:''} vào số đã lưu (nay có đến ngày ${o.days}).`)}
+      else{
+        if(!(s.min>1)){o.bills=s.bills;o.billDays=s.billDays;if(s.rev)revs.push(s);continue}
+        if(!o.bills){bad.push(`Số bill ${mm}: chưa có số liệu đã lưu của tháng này, cần file từ ngày 1 (file đang từ ngày ${s.min}).`);continue}
+        if(s.min>o.billDays+1){bad.push(`Số bill ${mm}: đã lưu đến ngày ${o.billDays}, file bắt đầu ngày ${s.min} nên thiếu ngày ${o.billDays+1}${s.min-1>o.billDays+1?'–'+(s.min-1):''}.`);continue}
+        const bills=cl(o.bills);for(const sh in bills)for(let d=s.min;d<=s.billDays;d++)delete bills[sh][d];
+        for(const sh in s.bills)Object.assign(bills[sh]||(bills[sh]={}),s.bills[sh]);
+        o.bills=bills;o.billDays=Math.max(o.billDays||0,s.billDays);if(s.rev)revs.push({...s,inc:true});
+        info.push(`Số bill ${mm}: ghép ngày ${s.min}${s.billDays>s.min?'–'+s.billDays:''} vào số đã lưu (nay có đến ngày ${o.billDays}).`)}}
     if(p.kind==='base')shops=p.shops;
-    if(p.kind==='loss')loss=p.loss;
+    if(p.kind==='loss'){const n=p.loss,mm=`tháng ${n.m}/${n.y}`;
+      if(!(n.min>1))loss=n;
+      else if(!loss||loss.y!==n.y||loss.m!==n.m)bad.push(`Nhập xuất Fresh ${mm}: chưa có số liệu đã lưu của tháng này, cần file từ ngày 1 (file đang từ ngày ${n.min}).`);
+      else if(n.min<=loss.days)bad.push(`Nhập xuất Fresh ${mm}: đã lưu đến ngày ${loss.days}, file bắt đầu ngày ${n.min}. Hãy tải file chỉ gồm các ngày sau ngày ${loss.days} (hoặc file từ ngày 1).`);
+      else if(n.min>loss.days+1)bad.push(`Nhập xuất Fresh ${mm}: đã lưu đến ngày ${loss.days}, file bắt đầu ngày ${n.min} nên thiếu ngày ${loss.days+1}${n.min-1>loss.days+1?'–'+(n.min-1):''}.`);
+      else{const r3=v=>Math.round(v*1000)/1000;const hx=!!(loss.hasX&&n.hasX);
+        const rows=cl(loss.rows);for(const sh in n.rows){const o=rows[sh]||(rows[sh]={});for(const c in n.rows[sh]){const a=n.rows[sh][c],b=o[c];o[c]=b?a.map((v,i)=>r3(v+(b[i]||0))):a.slice()}}
+        const daily=cl(loss.daily);for(const sh in n.daily)Object.assign(daily[sh]||(daily[sh]={}),n.daily[sh]);
+        const nl={...loss,rows,daily,days:n.days};delete nl.min;if(hx)nl.hasX=true;else delete nl.hasX;
+        if(loss.pr&&n.pr){const pr={};const sh=new Set([...Object.keys(loss.pr),...Object.keys(n.pr)]);
+          sh.forEach(x=>{const m={};(loss.pr[x]||[]).forEach(([q,a,b])=>m[q]=[a,b]);(n.pr[x]||[]).forEach(([q,a,b])=>{const o=m[q]||(m[q]=[0,0]);o[0]+=a;o[1]+=b});pr[x]=Object.entries(m).map(([q,[a,b]])=>[q,r3(a),r3(b)])});
+          nl.pr=pr;nl.prod=Object.assign({},loss.prod,n.prod);nl.prd=n.prd}
+        loss=nl;info.push(`Nhập xuất Fresh ${mm}: ghép ngày ${n.min}${n.days>n.min?'–'+n.days:''} vào số đã lưu (nay có đến ngày ${n.days}).`)}}
     if(p.kind==='contest')contests=p.list;
     if(p.kind==='fresh'){fresh=p.rows;freshMonth=p.month||freshMonth}
   });
@@ -1656,12 +1696,24 @@ function merge(B,list){
   if(revs.length){const maxY=Math.max(ytd?ytd.y:0,...revs.map(s=>s.y));
     if(ytd&&ytd.y<maxY){if(ytd.y===maxY-1){const same=ly&&ly.y===ytd.y;ly={y:ytd.y,mon:Object.assign({},same?ly.mon:{},ytd.mon),day:same?ly.day||{}:{},n:same?ly.n||{}:{}}}ytd=null}
     if(!ytd)ytd={y:maxY,mon:{}};if(ly&&ly.y!==maxY-1)ly=null;
-    revs.forEach(s=>{if(s.y===maxY)ytd.mon[s.m]=s.rev;
+    revs.forEach(s=>{if(s.y===maxY){ytd.dd=ytd.dd||{};const sumA=a=>(a||[]).reduce((x,v)=>x+(v||0),0);
+        // doanh thu năm theo ngày (2 tháng gần nhất) để ghép file từng ngày; dữ liệu cũ chưa có theo ngày thì cộng thêm phần ngày mới
+        // (ghi lại phần đã cộng theo ngày ở ytd.pt để tải lại cùng ngày thì thay, không cộng 2 lần)
+        if(s.inc&&!ytd.dd[s.m]){const t={...(ytd.mon[s.m]||{})};const pt=(ytd.pt=ytd.pt||{})[s.m]||(ytd.pt[s.m]={});
+          for(let d=s.min;d<=s.billDays;d++){const o=pt[d];if(o){for(const c in o)t[c]=(t[c]||0)-o[c];delete pt[d]}}
+          for(const c in s.revd||{})s.revd[c].forEach((v,i)=>{if(v==null)return;const o=pt[i+1]||(pt[i+1]={});o[c]=v;t[c]=(t[c]||0)+v});ytd.mon[s.m]=t;return}
+        if(ytd.pt)delete ytd.pt[s.m];
+        const dd={};if(s.inc)for(const c in ytd.dd[s.m]){const a=(ytd.dd[s.m][c]||[]).slice();for(let i=s.min-1;i<s.billDays;i++)a[i]=0;dd[c]=a}
+        for(const c in s.revd||{}){const a=dd[c]||[];s.revd[c].forEach((v,i)=>{if(v!=null)a[i]=v});dd[c]=Array.from(a,v=>v||0)}
+        ytd.dd[s.m]=dd;const t={};for(const c in dd)t[c]=sumA(dd[c]);ytd.mon[s.m]=t;return}
       else if(s.y===maxY-1){if(!ly)ly={y:s.y,mon:{},day:{},n:{}};ly.day=ly.day||{};ly.n=ly.n||{};ly.mon[s.m]=s.rev;ly.n[s.m]=s.billDays;
         if(s.revd){const dd={};for(const c in s.revd)dd[c]=Array.from(s.revd[c],v=>v||0);ly.day[s.m]=dd}}})}
   // doanh thu ngành hàng từng tháng (giữ 14 tháng) để thi đua so với tháng ghi trong file (vd T7)
   const catm=Object.assign({},B.catm||{});for(const k in mon){const o=mon[k];if(o.cat&&o.days)catm[k]={d:o.days,c:o.cat}}
   Object.keys(catm).sort().reverse().slice(14).forEach(k=>delete catm[k]);
+  if(ytd&&ytd.dd){const ms=Object.keys(ytd.dd).map(Number).sort((a,b)=>b-a);ms.slice(2).forEach(m=>delete ytd.dd[m])}
+  if(ytd&&ytd.pt){const ms=Object.keys(ytd.pt).map(Number).sort((a,b)=>b-a);ms.slice(2).forEach(m=>delete ytd.pt[m])} // chỉ giữ số theo ngày của 2 tháng gần nhất
+  if(bad.length)return{bad};
   const keys=Object.keys(mon).filter(k=>mon[k].daily).sort();
   const c=mon[keys[keys.length-1]];
   const pm=c.m===1?{y:c.y-1,m:12}:{y:c.y,m:c.m-1};const p=mon[ymKey(pm.y,pm.m)];
@@ -1670,9 +1722,9 @@ function merge(B,list){
   if(!c.bills)errs.push(`file doanh thu (số bill) tháng ${c.m}/${c.y}`);
   if(!p||!p.bills)errs.push(`file doanh thu (số bill) tháng ${pm.m}/${pm.y}`);
   if(errs.length)return{errs,c};
-  const pack=o=>({daily:o.daily,cat:o.cat,days:o.days,bills:o.bills,billDays:o.billDays,fday:o.fday});
+  const pack=o=>({daily:o.daily,cat:o.cat,days:o.days,bills:o.bills,billDays:o.billDays,fday:o.fday,catLast:o.catLast});
   const D={shops,freshCats:B.freshCats,cur:{m:c.m,y:c.y,dim:dimOf(c.y,c.m)},prev:{m:pm.m,y:pm.y,dim:dimOf(pm.y,pm.m)},aug:pack(p),sep:pack(c),fresh,freshMonth,loss,ytd,ly,catm,contests,goalPct:(PREVIEW_D||B).goalPct||0};
-  const warn=[];
+  const warn=[...info];
   if(p.days<dimOf(pm.y,pm.m))warn.push(`Doanh thu tháng ${pm.m} mới có đến ngày ${p.days}. Nên tải thêm file ngành hàng tháng ${pm.m} đủ cả tháng để so sánh chính xác.`);
   if(p.billDays<dimOf(pm.y,pm.m))warn.push(`Số bill tháng ${pm.m} mới có đến ngày ${p.billDays}. Nên tải thêm file doanh thu tháng ${pm.m} đủ cả tháng.`);
   const cm=''+c.y+String(c.m).padStart(2,'0');
@@ -1721,6 +1773,7 @@ async function handleFiles(files){
   }
   merged=parsed.length?merge(BASE_D,parsed):null;
   if(!merged){sum.className='upsum err';sum.textContent='Chưa có file nào dùng được.';return}
+  if(merged.bad){sum.className='upsum err';sum.innerHTML=`<b>Chưa ghép được file theo ngày:</b><br>${merged.bad.map(w=>'• '+escU(w)).join('<br>')}`;return}
   if(merged.errs){sum.className='upsum err';sum.innerHTML=`<b>Còn thiếu để hiển thị tháng ${merged.c.m}/${merged.c.y}:</b> ${merged.errs.map(escU).join('; ')}.`;return}
   const D=merged.D;
   sum.className='upsum';
