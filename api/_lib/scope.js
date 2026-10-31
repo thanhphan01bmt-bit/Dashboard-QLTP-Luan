@@ -26,6 +26,7 @@ export function filterShop(d, s) {
     if (L.pr) { nl.pr = pick(L.pr, s); (nl.pr[s] || []).forEach((a) => codes.add(a[0])); }
     if (L.prd) { nl.prd = { ...L.prd, s: pick(L.prd.s, s) }; ((nl.prd.s || {})[s] || []).forEach((a) => codes.add(a[0])); }
     if (L.prod) { nl.prod = {}; for (const c of codes) if (L.prod[c]) nl.prod[c] = L.prod[c]; }
+    if (L.last) nl.last = { ...L.last, rows: pick(L.last.rows, s), pr: L.last.pr ? pick(L.last.pr, s) : null };
     out.loss = nl;
   }
   if (d.ytd && d.ytd.mon) {
