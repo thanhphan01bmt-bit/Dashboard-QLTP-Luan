@@ -1065,17 +1065,22 @@ function render(){
    // 3. loss by category for latest day
    const LG=c=>{const k=c.normalize('NFC').toLowerCase();if(/^th[uủ]y h[aả]i s[aả]n (nh[aậ]p kh[aẩ]u|t[aậ]p trung)$/.test(k))return 'Thủy Hải Sản Các Loại';if(/^th[iị]t (đ[iị]a ph[uư][oơ]ng|nh[aậ]p kh[aẩ]u)$/.test(k))return 'Thịt gia cầm gia súc các loại';return c};
    const L=D.loss&&D.loss.daily&&D.loss.y===D.cur.y&&D.loss.m===D.cur.m?D.loss:null;let ld=0;if(L)for(const s in L.daily)for(const k in L.daily[s])if(+k<=fullCap)ld=Math.max(ld,+k);
+   // tỷ lệ bán trứng: cập nhật ngay theo ngày mới nhất của file nhập xuất (không chờ 21h như mục hủy)
+   let ldE=0;if(L)for(const s in L.daily)for(const k in L.daily[s])ldE=Math.max(ldE,+k);
+   const upE=(()=>{if(!ldE)return null;const iso=(typeof PREVIEW_D!=='undefined'&&PREVIEW_D)?null:(window.__META||{}).updatedAt;const vn=new Date((iso?new Date(iso):new Date()).getTime()+7*3600e3);
+     return vn.getUTCFullYear()===D.cur.y&&vn.getUTCMonth()+1===M&&vn.getUTCDate()===ldE&&vn.getUTCHours()<21?String(vn.getUTCHours()).padStart(2,'0')+':'+String(vn.getUTCMinutes()).padStart(2,'0'):null})();
+   const dayLbE=ldE?`ngày ${ldE}/${M}${upE?` đến ${upE}`:''}`:'hôm nay';
    // 3. Hủy thủy hải sản · 4. Tỷ lệ bán trứng (theo ngày cuối của file nhập xuất)
    const THS=c=>/^th[uủ]y h[aả]i s[aả]n/i.test(String(c).normalize('NFC')),EGG=c=>/^tr[uứ]ng/i.test(String(c).normalize('NFC'));
    const HX=!!(L&&L.hasX);const dayLb=ld?`ngày ${ld}/${M}`:'hôm nay';
    document.getElementById('gh3').innerHTML=`3. Hủy Thủy hải sản <small>${dayLb}</small>`;
-   document.getElementById('gh4').innerHTML=`4. Tỷ lệ bán Trứng <small>${dayLb}</small>`;
+   document.getElementById('gh4').innerHTML=`4. Tỷ lệ bán Trứng <small>${dayLbE}</small>`;
    const le=document.getElementById('goalLoss'),ee=document.getElementById('goalEgg');
    const sumC2=(s,pred,day)=>{const o=L.daily[s]&&L.daily[s][day];let n=0,h=0,x=0;if(o)for(const c in o){if(!pred(c))continue;n+=o[c][0];h+=o[c][1];x+=o[c][2]||0}return{n,h,x}};
    const sumC=(s,pred)=>{const o=L.daily[s]&&L.daily[s][ld];let n=0,h=0,x=0;if(o)for(const c in o){if(!pred(c))continue;n+=o[c][0];h+=o[c][1];x+=o[c][2]||0}return{n,h,x}};
    const q1=v=>nf(1).format(v),q0=v=>nf(0).format(v),rp=(a,b)=>b>0?pct(a/b):'—';
    const noX=HX?'':`<tr><td colspan="6" class="l muted" style="white-space:normal">Chưa có SL bán: tải lại file nhập xuất Fresh để có cột thực xuất.</td></tr>`;
-   if(!ld){const msg=`<tbody><tr><td class="l muted" style="white-space:normal">Chưa có dữ liệu theo ngày. Tải lại file nhập xuất Fresh để cập nhật.</td></tr></tbody>`;le.innerHTML=msg;ee.innerHTML=msg}
+   if(!ld){const msg=`<tbody><tr><td class="l muted" style="white-space:normal">Chưa có dữ liệu theo ngày. Tải lại file nhập xuất Fresh để cập nhật.</td></tr></tbody>`;le.innerHTML=msg}
    else{
     const R3=scope.map(s=>({s,...sumC(s,THS)})).filter(r=>r.n||r.h).sort((a,b)=>(b.n?b.h/b.n:-9)-(a.n?a.h/a.n:-9));
     // trung bình 7 ngày trước; hôm nay cao bất thường (≥ 1,5 lần TB và cao hơn ít nhất 3 điểm %) thì tô đỏ
@@ -1086,11 +1091,14 @@ function render(){
     R3.forEach(r=>{N+=r.n;H+=r.h;X+=r.x;h+=`<tr class="lx" tabindex="0" data-ls="${r.s}"><td class="l"><span class="chev"></span>${esc(shopName(r.s))}</td><td>${q1(r.n)}</td><td><b>${q1(r.h)}</b></td>${(()=>{const a=avg7([r.s]);return nowCell(r.n>0?r.h/r.n:null,a)+`<td class="muted">${a==null?'—':pct(a)}</td>`})()}</tr>`});
     if(!R3.length)h+=`<tr><td colspan="5" class="l muted">Không có nhập / hủy thủy hải sản ${dayLb}.</td></tr>`;
     h+=R3.length>1?`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th>${q1(N)}</th><th>${q1(H)}</th>${(()=>{const a=avg7(R3.map(r=>r.s));return nowCell(N>0?H/N:null,a,'th')+`<th>${a==null?'—':pct(a)}</th>`})()}</tr></tfoot>`:'</tbody>';le.innerHTML=h;
-    const R4=scope.map(s=>({s,...sumC(s,EGG)})).filter(r=>r.n||r.x).sort((a,b)=>(a.n?a.x/a.n:9)-(b.n?b.x/b.n:9));
-    const eggLow=s=>{if(!HX)return null;let n=0;for(let k=ld;k>=1;k--){const v=sumC2(s,EGG,k);if(!(v.n>0))break;if(v.x/v.n<1)n++;else break}return n};
-    let N4=0,X4=0;let e=`<thead><tr><th class="l">Siêu thị</th><th>SL nhập</th><th>SL bán</th><th>Bán / nhập</th><th title="Số ngày liên tiếp (tính đến ${dayLb}) bán dưới 100% lượng nhập">Ngày liền &lt;100%</th></tr></thead><tbody>${HX?'':noX.replace('colspan="6"','colspan="5"')}`;
+}
+   if(!ldE)ee.innerHTML=`<tbody><tr><td class="l muted" style="white-space:normal">Chưa có dữ liệu theo ngày. Tải lại file nhập xuất Fresh để cập nhật.</td></tr></tbody>`;
+   else{
+    const R4=scope.map(s=>({s,...sumC2(s,EGG,ldE)})).filter(r=>r.n||r.x).sort((a,b)=>(a.n?a.x/a.n:9)-(b.n?b.x/b.n:9));
+    const eggLow=s=>{if(!HX)return null;let n=0;for(let k=ldE;k>=1;k--){const v=sumC2(s,EGG,k);if(!(v.n>0))break;if(v.x/v.n<1)n++;else break}return n};
+    let N4=0,X4=0;let e=`<thead><tr><th class="l">Siêu thị</th><th>SL nhập</th><th>SL bán</th><th>Bán / nhập</th><th title="Số ngày liên tiếp (tính đến ${dayLbE}) bán dưới 100% lượng nhập">Ngày liền &lt;100%</th></tr></thead><tbody>${HX?'':noX.replace('colspan="6"','colspan="5"')}`;
     R4.forEach(r=>{N4+=r.n;X4+=r.x;e+=`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(shopName(r.s))}</td><td>${q0(r.n)}</td><td>${HX?q0(r.x):'—'}</td><td class="${HX&&r.n>0&&r.x/r.n<1?'neg':''}"><b>${HX?rp(r.x,r.n):'—'}</b></td>${(()=>{const c=eggLow(r.s);return c==null?'<td class="muted">—</td>':`<td class="${c>=3?'neg':c?'':'muted'}">${c>=3?'<b>⚠️ '+c+' ngày</b>':c+' ngày'}</td>`})()}</tr>`});
-    if(!R4.length)e+=`<tr><td colspan="5" class="l muted">Không có nhập / bán trứng ${dayLb}.</td></tr>`;
+    if(!R4.length)e+=`<tr><td colspan="5" class="l muted">Không có nhập / bán trứng ${dayLbE}.</td></tr>`;
     e+=R4.length>1?`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th>${q0(N4)}</th><th>${HX?q0(X4):'—'}</th><th class="${HX&&N4>0&&X4/N4<1?'neg':''}">${HX?rp(X4,N4):'—'}</th><th></th></tr></tfoot>`:'</tbody>';ee.innerHTML=e}
    // bấm 1 siêu thị ở mục Hủy: hiện / ẩn 3 SP thủy hải sản hủy nhiều nhất
    if(ld){
@@ -1125,11 +1133,11 @@ function render(){
     if(ld){let AN=0,AH=0;scope.forEach(s=>{const v=sumC2(s,THS,ld);AN+=v.n;AH+=v.h});const AR=AN>0?AH/AN:0;
       scope.forEach(s=>{const v=sumC2(s,THS,ld);if(!(v.n>0))return;const r=v.h/v.n;let n0=0,h0=0;for(let k=Math.max(1,ld-7);k<ld;k++){const w=sumC2(s,THS,k);n0+=w.n;h0+=w.h}const a=n0>0?h0/n0:null;
         if(r>=.03&&((a!=null&&r>=a*1.5&&r-a>=.03)||(scope.length>1&&AR>0&&r>=AR*1.5)))tB.push({s,v:r,t:`Hủy / nhập ${pct(r)}${a!=null?` · TB 7 ngày ${pct(a)}`:''}${scope.length>1?` · chung ${pct(AR)}`:''}`})});
-      tB.sort((a,b)=>b.v-a.v);
-      if(HX)scope.forEach(s=>{let n=0,last=null;for(let k=ld;k>=1;k--){const v=sumC2(s,EGG,k);if(!(v.n>0))break;if(k===ld)last=v.x/v.n;if(v.x/v.n<1)n++;else break}
+      tB.sort((a,b)=>b.v-a.v)}
+    if(ldE&&HX){scope.forEach(s=>{let n=0,last=null;for(let k=ldE;k>=1;k--){const v=sumC2(s,EGG,k);if(!(v.n>0))break;if(k===ldE)last=v.x/v.n;if(v.x/v.n<1)n++;else break}
         if(last!=null&&(n>=3||last<.7))tC.push({s,v:last,n,t:`Bán / nhập ${pct(last)}${n>=2?` · ${n} ngày liền dưới 100%`:''}`})});
       tC.sort((a,b)=>b.n-a.n||a.v-b.v)}
-    window.__TODO={nm:scopeName,single:scope.length===1,fdL,ld,HX,A:tA,B:tB,C:tC}}
+    window.__TODO={nm:scopeName,single:scope.length===1,fdL,ld,ldE,dayLbE,HX,A:tA,B:tB,C:tC}}
    document.getElementById('goalFoot').innerHTML=''}
 
   // Year view
@@ -1398,7 +1406,7 @@ function render(){
     (window.__NEAR||[]).sort((a,b)=>a.v-b.v);
     const G=[{k:'A',h:`Doanh thu ngày ${T.fdL}/${M} chưa đạt cần/ngày`,it:T.A,ok:T.fdL>=1?'Đều đạt doanh thu cần/ngày.':'Chưa có ngày đủ số liệu.'},
       {k:'B',h:`Hủy thủy hải sản cao${T.ld?` · ngày ${T.ld}/${M}`:''}`,it:T.B,ok:T.ld?'Không có hủy cao bất thường.':'Chưa có file nhập xuất Fresh.'},
-      {k:'C',h:`Bán trứng thấp${T.ld?` · ngày ${T.ld}/${M}`:''}`,it:T.C,ok:!T.ld?'Chưa có file nhập xuất Fresh.':!T.HX?'File nhập xuất chưa có SL thực xuất.':'Bán trứng ổn.'},
+      {k:'C',h:`Bán trứng thấp${T.ldE?` · ${T.dayLbE}`:''}`,it:T.C,ok:!T.ldE?'Chưa có file nhập xuất Fresh.':!T.HX?'File nhập xuất chưa có SL thực xuất.':'Bán trứng ổn.'},
       {k:'D',h:'Sắp lên mức thi đua',it:window.__NEAR||[],ok:'Chưa có siêu thị sát mức kế.'}];
     const LIM=4,open=JSON.parse(box.dataset.open||"{}");const nT=new Set([...T.A,...T.B,...T.C].map(x=>x.s)).size;
     box.hidden=false;box.innerHTML=`<div class="td-h"><b>Việc cần làm hôm nay</b><small>${esc(T.nm)} · ${nT?(T.single?'cần chú ý':`${nT} siêu thị cần chú ý`):'không có việc gấp'}${T.single?'':' · bấm tên siêu thị để xem riêng'}</small></div><div class="td-g">${G.map(g=>{const sh=open[g.k]?g.it:g.it.slice(0,LIM);
