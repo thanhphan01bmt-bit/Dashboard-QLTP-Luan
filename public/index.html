@@ -1590,11 +1590,11 @@ async function readFile(f){
   if(ix('SL hủy tồn')>=0){
     const [cD,cS,cC,cN,cH,cM]=need('Ngày','Mã siêu thị','Ngành hàng - Phân tích','SL thực nhập','SL hủy tồn','SL mất mát kiểm kê');
     const cP=ix('Mã sản phẩm'),cPN=ix('Tên sản phẩm'),cX=ix('SL thực xuất');
-    let rowsL={},prA={},prod={},dl={},pdA={};let days=0,y=0,m=0,n=0,mn=99;
+    let rowsL={},prA={},prod={},dl={},pdA={},dr={};let days=0,y=0,m=0,n=0,mn=99;
     rows.forEach(r=>{const d=toYMD(r[cD]);if(!d)return;const code=nz(r[cS]).split(' - ')[0].trim();if(!code)return;const cat=nz(r[cC]);
-      const k=d.y*100+d.m;if(k>y*100+m){y=d.y;m=d.m;days=0;mn=99;rowsL={};prA={};prod={};dl={};pdA={};n=0}if(k<y*100+m)return;if(d.d>days)days=d.d;if(d.d<mn)mn=d.d;
+      const k=d.y*100+d.m;if(k>y*100+m){y=d.y;m=d.m;days=0;mn=99;rowsL={};prA={};prod={};dl={};pdA={};dr={};n=0}if(k<y*100+m)return;if(d.d>days)days=d.d;if(d.d<mn)mn=d.d;
       const vn=numU(r[cN]),vh=numU(r[cH]),vm=numU(r[cM]),vx=cX>=0?numU(r[cX]):0;
-      const o=rowsL[code]||(rowsL[code]={});const a=o[cat]||(o[cat]=cX>=0?[0,0,0,0]:[0,0,0]);a[0]+=vn;a[1]+=vh;a[2]+=vm;if(cX>=0)a[3]+=vx;n++;const ds=dl[code]||(dl[code]={});const dd=ds[d.d]||(ds[d.d]={});const dc=dd[cat]||(dd[cat]=cX>=0?[0,0,0]:[0,0]);dc[0]+=vn;dc[1]+=vh+vm;if(cX>=0)dc[2]+=vx;
+      const o=rowsL[code]||(rowsL[code]={});const a=o[cat]||(o[cat]=cX>=0?[0,0,0,0]:[0,0,0]);a[0]+=vn;a[1]+=vh;a[2]+=vm;if(cX>=0)a[3]+=vx;n++;{const r0=(dr[d.d]||(dr[d.d]={}));const ro=r0[code]||(r0[code]={});const ra=ro[cat]||(ro[cat]=cX>=0?[0,0,0,0]:[0,0,0]);ra[0]+=vn;ra[1]+=vh;ra[2]+=vm;if(cX>=0)ra[3]+=vx}const ds=dl[code]||(dl[code]={});const dd=ds[d.d]||(ds[d.d]={});const dc=dd[cat]||(dd[cat]=cX>=0?[0,0,0]:[0,0]);dc[0]+=vn;dc[1]+=vh+vm;if(cX>=0)dc[2]+=vx;
       if(cP>=0){const pc=nz(r[cP]);if(pc){if(!prod[pc])prod[pc]=[cPN>=0?nz(r[cPN]):pc,cat];const sp=prA[code]||(prA[code]={});const b=sp[pc]||(sp[pc]=[0,0]);b[0]+=vn;b[1]+=vh+vm;const pd=(pdA[code]||(pdA[code]={}));const pdd=pd[d.d]||(pd[d.d]={});const q=pdd[pc]||(pdd[pc]=[0,0]);q[0]+=vn;q[1]+=vh+vm}}});
     if(!n)throw new Error('Không đọc được ngày trong cột "Ngày".');
     const r3=v=>Math.round(v*1000)/1000;
@@ -1605,6 +1605,10 @@ async function readFile(f){
     const isTHS=pc=>/^th[uủ]y h[aả]i s[aả]n/i.test(String((prod[pc]||[])[1]||'').normalize('NFC'));
     const prd={day:days,s:{}};for(const s in pdA){const o=pdA[s][days];if(!o)continue;const all=Object.entries(o).filter(([p,b])=>b[1]>0).sort((a,b)=>b[1][1]-a[1][1]);const top=all.slice(0,40);all.filter(([p])=>isTHS(p)).slice(0,5).forEach(e=>{if(!top.includes(e))top.push(e)});prd.s[s]=top.map(([p,b])=>[p,r3(b[0]),r3(b[1])])}
     const LO=cP>=0?{y,m,days,rows:rowsL,prod,pr,prd,daily:dl}:{y,m,days,rows:rowsL,daily:dl};if(cX>=0)LO.hasX=true;if(mn>1)LO.min=mn;
+    // số đầy đủ của ngày cuối trong file: để tải lại cùng ngày (cập nhật liên tục trong ngày) thì thay số ngày đó, không cộng 2 lần
+    {const lr={};for(const s in dr[days]||{}){lr[s]={};for(const c in dr[days][s])lr[s][c]=dr[days][s][c].map(r3)}
+     const lp={};if(cP>=0)for(const s in pdA){const o=pdA[s][days];if(o)lp[s]=Object.entries(o).map(([q,b])=>[q,r3(b[0]),r3(b[1])])}
+     LO.last={day:days,rows:lr,pr:cP>=0?lp:null}}
     return{kind:'loss',loss:LO,label:'Nhập xuất Fresh (hủy)',desc:`tháng ${m}/${y}, ${mn>1?`ngày ${mn}–${days}`:`đến ngày ${days}`}, ${fmtN.format(n)} dòng`}}
   const FRESH_CATS=new Set(['Thịt','Cá (Hải sản)','Rau Củ Quả CL','Trái cây','Trứng']);
   if(ix('Ngành hàng BHX')>=0){
@@ -1687,16 +1691,24 @@ function merge(B,list){
     if(p.kind==='loss'){const n=p.loss,mm=`tháng ${n.m}/${n.y}`;
       if(!(n.min>1))loss=n;
       else if(!loss||loss.y!==n.y||loss.m!==n.m)bad.push(`Nhập xuất Fresh ${mm}: chưa có số liệu đã lưu của tháng này, cần file từ ngày 1 (file đang từ ngày ${n.min}).`);
-      else if(n.min<=loss.days)bad.push(`Nhập xuất Fresh ${mm}: đã lưu đến ngày ${loss.days}, file bắt đầu ngày ${n.min}. Hãy tải file chỉ gồm các ngày sau ngày ${loss.days} (hoặc file từ ngày 1).`);
+      else if(n.min<loss.days)bad.push(`Nhập xuất Fresh ${mm}: đã lưu đến ngày ${loss.days}, file bắt đầu ngày ${n.min}. Chỉ thay được ngày cuối đã lưu: hãy tải file từ ngày ${loss.days} (hoặc file từ ngày 1).`);
       else if(n.min>loss.days+1)bad.push(`Nhập xuất Fresh ${mm}: đã lưu đến ngày ${loss.days}, file bắt đầu ngày ${n.min} nên thiếu ngày ${loss.days+1}${n.min-1>loss.days+1?'–'+(n.min-1):''}.`);
       else{const r3=v=>Math.round(v*1000)/1000;const hx=!!(loss.hasX&&n.hasX);
-        const rows=cl(loss.rows);for(const sh in n.rows){const o=rows[sh]||(rows[sh]={});for(const c in n.rows[sh]){const a=n.rows[sh][c],b=o[c];o[c]=b?a.map((v,i)=>r3(v+(b[i]||0))):a.slice()}}
-        const daily=cl(loss.daily);for(const sh in n.daily)Object.assign(daily[sh]||(daily[sh]={}),n.daily[sh]);
-        const nl={...loss,rows,daily,days:n.days};delete nl.min;if(hx)nl.hasX=true;else delete nl.hasX;
-        if(loss.pr&&n.pr){const pr={};const sh=new Set([...Object.keys(loss.pr),...Object.keys(n.pr)]);
-          sh.forEach(x=>{const m={};(loss.pr[x]||[]).forEach(([q,a,b])=>m[q]=[a,b]);(n.pr[x]||[]).forEach(([q,a,b])=>{const o=m[q]||(m[q]=[0,0]);o[0]+=a;o[1]+=b});pr[x]=Object.entries(m).map(([q,[a,b]])=>[q,r3(a),r3(b)])});
+        // file bắt đầu đúng ngày cuối đã lưu (tải lại trong ngày): bỏ số cũ của ngày đó rồi cộng số mới
+        let base=loss;if(n.min===loss.days){const dd=n.min,LL=loss.last&&loss.last.day===dd?loss.last:null;
+          const rows0=cl(loss.rows),daily0=cl(loss.daily);
+          if(LL){for(const sh in LL.rows){const o=rows0[sh];if(!o)continue;for(const c in LL.rows[sh]){const b=o[c],a=LL.rows[sh][c];if(b)o[c]=b.map((v,i)=>r3(v-(a[i]||0)))}}}
+          else for(const sh in daily0){const x=daily0[sh][dd];const o=rows0[sh];if(!x||!o)continue;for(const c in x){const b=o[c];if(!b)continue;b[0]=r3(b[0]-x[c][0]);b[1]=r3(b[1]-x[c][1]);if(b.length>3&&x[c].length>2)b[3]=r3(b[3]-x[c][2])}}
+          for(const sh in daily0)delete daily0[sh][dd];
+          let pr0=loss.pr;if(pr0&&LL&&LL.pr){pr0={};for(const sh in loss.pr){const sub={};(LL.pr[sh]||[]).forEach(([q,a,b])=>sub[q]=[a,b]);pr0[sh]=loss.pr[sh].map(([q,a,b])=>sub[q]?[q,r3(a-sub[q][0]),r3(b-sub[q][1])]:[q,a,b]).filter(([q,a,b])=>a||b)}}
+          base={...loss,rows:rows0,daily:daily0,pr:pr0,days:dd-1}}
+        const rows=cl(base.rows);for(const sh in n.rows){const o=rows[sh]||(rows[sh]={});for(const c in n.rows[sh]){const a=n.rows[sh][c],b=o[c];o[c]=b?a.map((v,i)=>r3(v+(b[i]||0))):a.slice()}}
+        const daily=cl(base.daily);for(const sh in n.daily)Object.assign(daily[sh]||(daily[sh]={}),n.daily[sh]);
+        const nl={...base,rows,daily,days:n.days,last:n.last};delete nl.min;if(hx)nl.hasX=true;else delete nl.hasX;
+        if(base.pr&&n.pr){const pr={};const sh=new Set([...Object.keys(base.pr),...Object.keys(n.pr)]);
+          sh.forEach(x=>{const m={};(base.pr[x]||[]).forEach(([q,a,b])=>m[q]=[a,b]);(n.pr[x]||[]).forEach(([q,a,b])=>{const o=m[q]||(m[q]=[0,0]);o[0]+=a;o[1]+=b});pr[x]=Object.entries(m).map(([q,[a,b]])=>[q,r3(a),r3(b)])});
           nl.pr=pr;nl.prod=Object.assign({},loss.prod,n.prod);nl.prd=n.prd}
-        loss=nl;info.push(`Nhập xuất Fresh ${mm}: ghép ngày ${n.min}${n.days>n.min?'–'+n.days:''} vào số đã lưu (nay có đến ngày ${n.days}).`)}}
+        const rep=base!==loss;loss=nl;info.push(`Nhập xuất Fresh ${mm}: ${rep?'thay số':'ghép'} ngày ${n.min}${n.days>n.min?'–'+n.days:''} vào số đã lưu (nay có đến ngày ${n.days}).`)}}
     if(p.kind==='contest')contests=p.list;
     if(p.kind==='fresh'){fresh=p.rows;freshMonth=p.month||freshMonth}
   });
