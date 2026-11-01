@@ -988,21 +988,23 @@ function render(){
      if(y!==D.cur.y||m!==M)return(y>D.cur.y||(y===D.cur.y&&m>M))?99:0;return vn.getUTCHours()>=21?d:d-1})();
    document.getElementById('goalTitle').textContent=`Mục tiêu ngày ${d9}/${M}/${D.cur.y} · ${scopeName}`;
    document.getElementById('goalNote').innerHTML=`<span class="lg">Doanh thu ${upAt?`đến ${upAt} ngày ${d9}/${M}`:`đến hết ngày ${d9}/${M}`} · ${left>1?`còn ${left} ngày (tính cả ngày ${d9}/${M})`:'ngày cuối tháng'}</span><span class="sm">${upAt?`Đến ${upAt}`:'Cả ngày'} · ${left>1?`còn ${left} ngày`:'ngày cuối tháng'} · MT ${g>0?'+':''}${nf(0).format(g*100)}% so T${P}</span>`;
-   document.getElementById('goalHint').textContent=`Mục tiêu tháng ${M} = DT tháng ${P} × ${nf(0).format(100+g*100)}%`;
+   document.getElementById('goalHint').textContent=`Mục tiêu tháng ${M} = DT tháng ${P} × ${nf(0).format(100+g*100)}% · shop mới: 30 tr/ngày`;
    // 1. revenue
    document.getElementById('gh1').innerHTML=`1. Doanh thu <small>ngày đổ báo cáo ${d9}/${M}${upAt?`, cập nhật đến ${upAt}`:''}</small>`;
-   const rev=s=>{const st=shopStats(s);const day=(D.sep.daily[s]||{})[d9]||0;const goal=st.aug*(1+g);const avg=st.cum9/d9;const need=Math.max(0,(goal-(st.cum9-day))/left);return{s,day,goal,proj:st.proj,avg,need,cum:st.cum9,aug:st.aug}};
+   // siêu thị mới (chưa có đủ tháng trước: không có số hoặc khai trương sau ngày 1): mục tiêu mặc định 30 tr/ngày
+   const NEWG=30e6;const isNewS=s=>{const o=(D.aug.daily||{})[s]||{};const ks=Object.keys(o).filter(k=>+o[k]>0).map(Number);return !ks.length||Math.min(...ks)>1};
+   const rev=s=>{const st=shopStats(s);const nw=isNewS(s);const day=(D.sep.daily[s]||{})[d9]||0;const goal=nw?NEWG*DIM9:st.aug*(1+g);const avg=st.cum9/d9;const need=nw?NEWG:Math.max(0,(goal-(st.cum9-day))/left);return{s,day,goal,proj:st.proj,avg,need,cum:st.cum9,aug:st.aug,nw}};
    const pctHT=r=>r.need>0?r.day/r.need:(r.day>0?9:0);const RR=scope.map(rev).sort((a,b)=>pctHT(b)-pctHT(a));
    // so cùng thứ tuần trước + chuỗi ngày đạt / hụt (chỉ xét ngày đã đủ: lưu từ 21h00)
    const PDIM0=D.prev.dim||new Date(D.prev.y,D.prev.m,0).getDate();
    const dv=(s,k)=>k>=1?+((D.sep.daily[s]||{})[k]||0):+(((D.aug.daily||{})[s]||{})[PDIM0+k]||0);
    const fullDay=!(upAt&&upAt<'21:00');const lastFull=fullDay?d9:d9-1;
    const wowOf=ss=>{if(!fullDay)return null;const a=ss.reduce((t,s)=>t+dv(s,d9),0),b=ss.reduce((t,s)=>t+dv(s,d9-7),0);return a>0&&b>0?a/b-1:null};
-   const streakOf=s=>{const G=rev(s).goal;if(!(G>0)||lastFull<1)return null;let cum=0;const ok=[];for(let k=1;k<=lastFull;k++){const need=Math.max(0,(G-cum)/(DIM9-k+1));ok[k]=dv(s,k)>=need;cum+=dv(s,k)}
+   const streakOf=s=>{const G=rev(s).goal;if(!(G>0)||lastFull<1)return null;let cum=0;const ok=[];for(let k=1;k<=lastFull;k++){const need=isNewS(s)?NEWG:Math.max(0,(G-cum)/(DIM9-k+1));ok[k]=dv(s,k)>=need;cum+=dv(s,k)}
      let n=0;const st=ok[lastFull];for(let k=lastFull;k>=1&&ok[k]===st;k--)n++;return{st,n}};
    const wowCell=(v,tag='td')=>v==null?`<${tag} class="muted">—</${tag}>`:`<${tag} class="${v>=0?'pos':'neg'}">${sgn(v)}</${tag}>`;
    const stkCell=x=>!x?'<td class="muted">—</td>':x.st?`<td class="pos" title="${x.n} ngày liền đạt cần/ngày">${x.n>=2?'🔥 ':''}${x.n} ngày đạt</td>`:`<td class="${x.n>=3?'neg':'muted'}" title="${x.n} ngày liền hụt cần/ngày">${x.n>=2?'⚠️ ':''}<b>${x.n} ngày hụt</b></td>`;
-   const TT={aug:tot(RR.map(r=>r.aug)),day:tot(RR.map(r=>r.day)),goal:tot(RR.map(r=>r.goal)),proj:tot(RR.map(r=>r.proj)),avg:tot(RR.map(r=>r.avg)),cum:tot(RR.map(r=>r.cum))};TT.need=Math.max(0,(TT.goal-(TT.cum-TT.day))/left);
+   const TT={aug:tot(RR.map(r=>r.aug)),day:tot(RR.map(r=>r.day)),goal:tot(RR.map(r=>r.goal)),proj:tot(RR.map(r=>r.proj)),avg:tot(RR.map(r=>r.avg)),cum:tot(RR.map(r=>r.cum))};{const O=RR.filter(r=>!r.nw);TT.need=Math.max(0,(tot(O.map(r=>r.goal))-(tot(O.map(r=>r.cum))-tot(O.map(r=>r.day))))/left)+NEWG*(RR.length-O.length)}
    // Cảnh báo tự động (tính lại mỗi khi có số liệu mới)
    {const WARN={need:.8,wow:.2,wow2:.3,lossMin:.03,lossX:2};
     const box=document.getElementById('goalWarn');const fd=k=>`${k}/${M}`;const PM=D.prev.dim;
@@ -1010,7 +1012,7 @@ function render(){
     const lastFull=upAt&&upAt<'21:00'?d9-1:d9; // lưu từ 21h00 thì coi ngày đổ báo cáo là đủ ngày; trước 21h xét đến ngày hôm trước
     const Lw=D.loss&&D.loss.daily&&D.loss.y===D.cur.y&&D.loss.m===D.cur.m?D.loss:null;let ldw=0;if(Lw)for(const x in Lw.daily)for(const k in Lw.daily[x])ldw=Math.max(ldw,+k);
     const W=[];
-    scope.forEach(s=>{const st=shopStats(s);const goal=st.aug*(1+g);const it=[];
+    scope.forEach(s=>{const st=shopStats(s);const goal=isNewS(s)?NEWG*DIM9:st.aug*(1+g);const it=[];
      // 1. 3 ngày liền dưới mức cần/ngày
      // (so với mức bình quân cần đạt = mục tiêu tháng ÷ số ngày trong tháng)
      if(goal>0&&lastFull>=3){const base=goal/DIM9;const ks=[lastFull-2,lastFull-1,lastFull],rs=ks.map(k=>dl(s,k)/base);
@@ -1034,7 +1036,7 @@ function render(){
      box.querySelectorAll('[data-ws]').forEach(b=>{const go=()=>setShop(b.dataset.ws);b.onclick=go;b.onkeydown=e=>{if(e.key==='Enter')go()}})}}
    const note=r=>{if(left<=0)return r.proj>=r.goal?`<span class="pill up">Đạt mục tiêu tháng</span>`:`<span class="pill down">Không đạt</span>`;const d=r.day-r.need;return d>=0?`<span class="pill up">Đạt</span> <small class="pos">+${tr1(d)} tr</small>`:`<span class="pill down">Không đạt</span> <small class="neg">−${tr1(-d)} tr</small>`};
    let t=`<thead><tr><th class="l">Siêu thị</th><th class="need">DT ${dayLbl}</th><th>Cần/ngày</th><th>% hoàn thành</th><th>Lũy kế T${M}</th><th>Dự kiến T${M}</th><th>Tăng trưởng so T${P}</th><th title="DT ngày so với cùng thứ tuần trước (chỉ tính khi đủ ngày, từ 21h00)">So cùng thứ tuần trước</th><th title="Số ngày liên tiếp đạt / hụt cần/ngày">Chuỗi ngày</th></tr></thead><tbody>`;
-   RR.forEach(r=>{const o=D.shops[r.s];t+=`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(o.name)}</td><td class="need"><b>${tr(r.day)} tr</b></td><td>${left>0?tr(r.need)+' tr':'—'}</td><td class="${r.need>0?(r.day>=r.need?'pos':'neg'):''}"><b>${r.need>0?nf(1).format(r.day/r.need*100)+'%':'—'}</b></td><td>${tr(r.cum)} tr</td><td class="${r.proj>=r.goal?'pos':'neg'}">${tr(r.proj)} tr</td><td class="${r.aug?(r.proj>=r.aug?'pos':'neg'):''}"><b>${r.aug?sgn(r.proj/r.aug-1):'—'}</b></td>${wowCell(wowOf([r.s]))}${stkCell(streakOf(r.s))}</tr>`});
+   RR.forEach(r=>{const o=D.shops[r.s];t+=`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(o.name)}${r.nw?' <small class="muted">· shop mới, MT 30 tr/ngày</small>':''}</td><td class="need"><b>${tr(r.day)} tr</b></td><td>${left>0?tr(r.need)+' tr':'—'}</td><td class="${r.need>0?(r.day>=r.need?'pos':'neg'):''}"><b>${r.need>0?nf(1).format(r.day/r.need*100)+'%':'—'}</b></td><td>${tr(r.cum)} tr</td><td class="${r.proj>=r.goal?'pos':'neg'}">${tr(r.proj)} tr</td><td class="${r.aug?(r.proj>=r.aug?'pos':'neg'):''}"><b>${r.aug?sgn(r.proj/r.aug-1):'—'}</b></td>${wowCell(wowOf([r.s]))}${stkCell(streakOf(r.s))}</tr>`});
    if(RR.length>1)t+=`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th class="need">${tr(TT.day)} tr</th><th>${left>0?tr(TT.need)+' tr':'—'}</th><th class="${TT.need>0?(TT.day>=TT.need?'pos':'neg'):''}">${TT.need>0?nf(1).format(TT.day/TT.need*100)+'%':'—'}</th><th>${tr(TT.cum)} tr</th><th>${tr(TT.proj)} tr</th><th class="${TT.proj>=TT.aug?'pos':'neg'}">${TT.aug?sgn(TT.proj/TT.aug-1):'—'}</th>${wowCell(wowOf(RR.map(r=>r.s)),'th')}<th></th></tr></tfoot>`;else t+='</tbody>';
    const gt=document.getElementById('goalTbl');gt.innerHTML=t;
    // xem 1 siêu thị: làm nổi bật DT ngày so với cần/ngày
@@ -1127,7 +1129,7 @@ function render(){
    ['goalFresh','goalEgg','goalBill'].forEach(id=>document.getElementById(id).querySelectorAll('tr[data-s]').forEach(tr=>{const go=()=>setShop(tr.dataset.s);tr.onclick=go;tr.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}}));
    // Việc cần làm hôm nay: siêu thị hụt doanh thu cần/ngày, hủy thủy hải sản cao, bán trứng thấp (hiển thị sau khung thi đua)
    {const fdL=fullDay?d9:d9-1;const tA=[],tB=[],tC=[];
-    if(fdL>=1)scope.forEach(s=>{const G=rev(s).goal;if(!(G>0))return;let cm=0;for(let k=1;k<fdL;k++)cm+=dv(s,k);const need=Math.max(0,(G-cm)/(DIM9-fdL+1)),a=dv(s,fdL);
+    if(fdL>=1)scope.forEach(s=>{const G=rev(s).goal;if(!(G>0))return;let cm=0;for(let k=1;k<fdL;k++)cm+=dv(s,k);const need=isNewS(s)?NEWG:Math.max(0,(G-cm)/(DIM9-fdL+1)),a=dv(s,fdL);
       if(need>0&&a<need)tA.push({s,v:a/need,t:`Đạt ${tr(a)} / cần ${tr(need)} tr (${nf(0).format(a/need*100)}%) · thiếu ${tr1(need-a)} tr`})});
     tA.sort((a,b)=>a.v-b.v);
     if(ld){let AN=0,AH=0;scope.forEach(s=>{const v=sumC2(s,THS,ld);AN+=v.n;AH+=v.h});const AR=AN>0?AH/AN:0;
