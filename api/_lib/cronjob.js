@@ -7,12 +7,14 @@ import { useRequest, readJSON, writeJSON } from './store.js';
 import { sendEach } from './webpush.js';
 import { audience } from './audience.js';
 import { morning, evening, weekly, monthly, vnNow } from './summary.js';
+import { linePushDt, lineDtPlan, lineGroups } from './linepush.js';
 
 export const JOBS = {
   morning: 'Mục tiêu hôm nay (7h00)',
   evening: 'Tổng kết ngày (22h00)',
   weekly: 'Tổng kết tuần (thứ Hai 8h00)',
   monthly: 'Chốt tháng (ngày 1, 8h00)',
+  line: 'Bot LINE gửi ảnh Doanh thu vào nhóm (22h00)',
 };
 // phải khớp với "crons" trong vercel.json (giờ UTC)
 const SCHED = { '0 0 * * *': 'morning', '0 15 * * *': 'evening', '0 1 * * 1': 'weekly', '0 1 1 * *': 'monthly' };
@@ -22,6 +24,8 @@ export async function loadCfg() { const c = (await readJSON(CFG)) || {}; const o
 
 async function build(job, cur, rank) {
   const { data, meta } = cur;
+  if (job === 'line') { const p = await lineDtPlan(); const n = lineGroups().length;
+    return { area: { title: '🤖 Bot LINE · 22h00', body: p.skipped ? `Tối nay sẽ không gửi: ${p.skipped}.` : `Gửi vào ${n} nhóm LINE: "${p.text}" kèm ảnh bảng Doanh thu toàn khu vực. Mỗi lần gửi LINE tính bằng số thành viên của nhóm.` }, shops: {} }; }
   if (job === 'morning') return morning(data, meta);
   if (job === 'evening') return evening(data, meta);
   if (job === 'weekly') return weekly(data, meta, rank, await readJSON(WEEK_PREV));
@@ -72,6 +76,7 @@ export default {
         return m ? { title: m.title, body: m.body, url: '/', tag: 'kv-auto-' + job } : null;
       };
       const origin = url.origin;
+      if (mode === 'test' && job === 'line') { const r = await linePushDt(origin, true); return json({ ok: r.ok || 0, test: true, ...r, empty: !!r.skipped }); }
       if (mode === 'test') {
         const r = await sendEach((s) => (s.u === me.u ? payloadFor('all') : null), origin);
         return json({ ok: true, test: true, ...r, empty: !msgs.area });
@@ -80,6 +85,11 @@ export default {
       // chạy theo lịch
       const cfg = await loadCfg();
       let res = { skipped: 'Đang tắt' };
+      // lịch 22h00: chạy cùng Tổng kết ngày; bot LINE gửi ảnh Doanh thu nếu đang bật
+      if (job === 'evening' && cfg.line) {
+        let lr; try { lr = await linePushDt(origin); } catch (e) { lr = { fail: 1, error: String(e.message || e) }; }
+        try { const log = (await readJSON(LOG)) || {}; log.line = { at: new Date().toISOString(), ...lr }; await writeJSON(LOG, log); } catch (e) { console.error(e); }
+      }
       if (cfg[job]) {
         if (!msgs.area) res = { skipped: 'Không có số liệu phù hợp' };
         else { const who = await audience(cur.data); res = await sendEach((s) => payloadFor(who(s.u)), origin); }
