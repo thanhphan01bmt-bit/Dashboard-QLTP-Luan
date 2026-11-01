@@ -26,12 +26,15 @@ function base(data, meta) {
   const dl = (s, k) => (k >= 1 ? +((D.sep.daily[s] || {})[k] || 0) : +(((D.aug.daily || {})[s] || {})[PDIM + k] || 0));
   const cum = (s, upto) => { let t = 0; for (let k = 1; k <= upto; k++) t += dl(s, k); return t; };
   const aug = (s) => sum(Object.values((D.aug.daily || {})[s] || {}));
-  const goal = (s) => aug(s) * (1 + g);
+  // siêu thị mới (chưa có đủ tháng trước: không có số hoặc khai trương sau ngày 1): mục tiêu mặc định 30 tr/ngày
+  const NEWG = 30e6;
+  const newS = (s) => { const o = (D.aug.daily || {})[s] || {}; const ks = Object.keys(o).filter((k) => +o[k] > 0).map(Number); return !ks.length || Math.min(...ks) > 1; };
+  const goal = (s) => (newS(s) ? NEWG * DIM : aug(s) * (1 + g));
   const isNew = (s) => Object.keys((D.aug.daily || {})[s] || {}).length < PDIM;
   // giờ lưu số liệu (VN) nếu lưu đúng ngày đổ báo cáo
   let upAt = null;
   if (meta && meta.updatedAt) { const t = vnNow(new Date(meta.updatedAt).getTime()); if (t.y === Y && t.m === M && t.d === d9) upAt = t.hm; }
-  return { D, M, Y, DIM, PM, PDIM, d9, g, SH, name, dl, cum, aug, goal, isNew, upAt };
+  return { D, M, Y, DIM, PM, PDIM, d9, g, SH, name, dl, cum, aug, goal, isNew, newS, NEWG, upAt };
 }
 
 // Cảnh báo (giống dashboard): 3 ngày liền < 80% bình quân cần đạt; DT giảm ≥ 20% so cùng thứ tuần trước; hủy tăng đột biến.
@@ -65,10 +68,10 @@ export function warnings(B, shops, lastFull) {
 // 7h00: hôm nay cần đạt bao nhiêu + siêu thị hụt tiến độ nhiều nhất
 export function morning(data, meta, at = Date.now()) {
   const B = base(data, meta), T = vnNow(at), out = { area: null, shops: {} };
-  const { SH, name, cum, goal, M, Y, DIM, d9 } = B;
+  const { SH, name, cum, goal, M, Y, DIM, d9, newS, NEWG } = B;
   if (T.y === Y && T.m === M) {
     const upto = Math.min(d9, T.d - 1), left = DIM - T.d + 1;
-    const R = SH.map((s) => { const G = goal(s), c = cum(s, upto); return { s, G, c, need: Math.max(0, (G - c) / left), gap: c - G * upto / DIM }; });
+    const R = SH.map((s) => { const G = goal(s), c = cum(s, upto); return { s, G, c, need: newS(s) ? NEWG : Math.max(0, (G - c) / left), gap: c - G * upto / DIM }; });
     const tot = { need: sum(R.map((r) => r.need)), gap: sum(R.map((r) => r.gap)) };
     const note = upto < T.d - 1 ? ` (số liệu mới đến ${d9}/${M})` : '';
     const behind = R.filter((r) => r.gap < 0).sort((a, b) => a.gap - b.gap);
@@ -97,7 +100,7 @@ export function morning(data, meta, at = Date.now()) {
 // 22h00: tổng kết ngày
 export function evening(data, meta, at = Date.now()) {
   const B = base(data, meta), T = vnNow(at), out = { area: null, shops: {} };
-  const { SH, name, cum, goal, dl, M, Y, DIM, d9, upAt } = B;
+  const { SH, name, cum, goal, dl, M, Y, DIM, d9, upAt, newS, NEWG } = B;
   if (!d9) return out;
   const today = T.y === Y && T.m === M && T.d === d9;
   if (!today) { // chưa ai lưu số liệu hôm nay: chỉ nhắc quản trị / cập nhật dữ liệu, không gửi tổng kết cũ
@@ -105,7 +108,7 @@ export function evening(data, meta, at = Date.now()) {
     return out;
   }
   const dd = d9, left = DIM - dd + 1;
-  const R = SH.map((s) => { const day = dl(s, dd), need = Math.max(0, (goal(s) - cum(s, dd - 1)) / left); return { s, day, need, p: need > 0 ? day / need : (day > 0 ? 9 : 0) }; }).sort((a, b) => b.p - a.p);
+  const R = SH.map((s) => { const day = dl(s, dd), need = newS(s) ? NEWG : Math.max(0, (goal(s) - cum(s, dd - 1)) / left); return { s, day, need, p: need > 0 ? day / need : (day > 0 ? 9 : 0) }; }).sort((a, b) => b.p - a.p);
   const td = sum(R.map((r) => r.day)), tn = sum(R.map((r) => r.need));
   const lbl = `${dd}/${M}${upAt ? ` (số liệu đến ${upAt})` : ''}`;
   const head = `📊 Tổng kết ngày ${lbl}`;
@@ -191,18 +194,18 @@ export function monthly(data, meta, rank, at = Date.now()) {
 
 // Thông báo khi vừa lưu số liệu, cho tài khoản chỉ xem 1 siêu thị (không lộ số liệu cả khu vực)
 export function shopNotice(data, meta, s) {
-  const B = base(data, meta); const { cum, goal, dl, DIM, d9, M, upAt, name } = B;
+  const B = base(data, meta); const { cum, goal, dl, DIM, d9, M, upAt, name, newS, NEWG } = B;
   if (!data.shops[s] || !d9) return null;
-  const need = Math.max(0, (goal(s) - cum(s, d9 - 1)) / (DIM - d9 + 1)), day = dl(s, d9);
+  const need = newS(s) ? NEWG : Math.max(0, (goal(s) - cum(s, d9 - 1)) / (DIM - d9 + 1)), day = dl(s, d9);
   return `${name(s)}: DT ngày ${d9}/${M}${upAt ? ' đến ' + upAt : ''} ${tr(day)} / cần ${tr(need)} → đạt ${need > 0 ? pct(day / need) : '—'}.`;
 }
 
 // Trả lời bot LINE khi có người gõ "dt": tóm tắt doanh thu toàn khu vực (giống tin nhắn nhóm trên dashboard).
 export function areaReply(data, meta) {
-  const B = base(data, meta); const { SH, name, cum, goal, dl, aug, M, Y, DIM, PM, d9, upAt } = B;
+  const B = base(data, meta); const { SH, name, cum, goal, dl, aug, M, Y, DIM, PM, d9, upAt, newS, NEWG } = B;
   if (!d9) return 'Dashboard chưa có số liệu tháng này.';
   const left = Math.max(1, DIM - d9 + 1);
-  const R = SH.map((s) => { const day = dl(s, d9), need = Math.max(0, (goal(s) - cum(s, d9 - 1)) / left); return { s, day, need, p: need > 0 ? day / need : (day > 0 ? 9 : 0) }; })
+  const R = SH.map((s) => { const day = dl(s, d9), need = newS(s) ? NEWG : Math.max(0, (goal(s) - cum(s, d9 - 1)) / left); return { s, day, need, p: need > 0 ? day / need : (day > 0 ? 9 : 0) }; })
     .sort((a, b) => b.p - a.p);
   const td = sum(R.map((r) => r.day)), tn = sum(R.map((r) => r.need));
   const lk = sum(SH.map((s) => cum(s, d9))), pj = lk / d9 * DIM, au = sum(SH.map(aug));
