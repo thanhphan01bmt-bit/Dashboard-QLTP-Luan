@@ -37,6 +37,7 @@ export function filterShop(d, s) {
     if (d.ytd.pt) { const pt = {}; for (const m in d.ytd.pt) { pt[m] = {}; for (const k in d.ytd.pt[m]) pt[m][k] = pick(d.ytd.pt[m][k], s); } out.ytd.pt = pt; }
   }
   if (d.catm) { const cm = {}; for (const k in d.catm) cm[k] = { ...d.catm[k], c: pick(d.catm[k].c, s) }; out.catm = cm; }
+  if (d.lossm) { const lm = {}; for (const k in d.lossm) lm[k] = { ...d.lossm[k], q: pick(d.lossm[k].q, s) }; out.lossm = lm; }
   if (d.ly && d.ly.mon) {
     const mon = {}, day = {};
     for (const m in d.ly.mon) mon[m] = pick(d.ly.mon[m], s);

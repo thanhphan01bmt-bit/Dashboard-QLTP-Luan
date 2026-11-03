@@ -10,7 +10,7 @@ http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
   try {
     if (url.pathname.startsWith('/api/')) {
-      const name = url.pathname.slice(5).replace(/[^a-z0-9_-]/gi, '');
+      const name = url.pathname.slice(5).split('/')[0].replace(/[^a-z0-9_-]/gi, '');
       const mod = await import(path.join(root, 'api', name + '.js'));
       const chunks = []; for await (const c of req) chunks.push(c);
       const body = chunks.length ? Buffer.concat(chunks) : undefined;

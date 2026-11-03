@@ -187,10 +187,10 @@ tr.muted-row td{color:var(--muted)}
 .ct-h h3{margin:0 0 6px;font-size:16px;color:var(--accent)}.ct-meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--ink2)}
 .ct-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.ct-chips span{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:2px 9px;font-size:12px}
 .ct-chips span.lv{border-color:var(--accent);color:var(--accent);font-weight:600}
-.ct-b{padding:12px 16px}.ct-rw{margin:8px 0 0;font-size:12.5px;color:var(--ink2);line-height:1.5}.ct-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.ct-b{padding:12px 16px}.ct-rw{margin:8px 0 0;font-size:12.5px;color:var(--ink2);line-height:1.5}.ct-kpis{display:grid;grid-template-columns:repeat(var(--d,4),minmax(0,1fr));gap:10px;margin-bottom:12px}
 .ct-sm{display:none}
 @media (max-width:760px){.ct-lg{display:none}.ct-sm{display:inline}.ct-chips{flex-wrap:nowrap;gap:4px}.ct-chips span.lv{font-size:10.5px;padding:1px 6px;white-space:nowrap;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
- .ct-kpis{grid-template-columns:repeat(var(--n,3),minmax(0,1fr))!important;gap:6px}.ct-kpis .fk{padding:8px 10px}.ct-kpis .lbl{font-size:11.5px;white-space:nowrap}.ct-kpis .val{font-size:20px}}
+ .ct-kpis{grid-template-columns:repeat(var(--m,3),minmax(0,1fr))!important;gap:6px}.ct-kpis .fk{padding:8px 10px}.ct-kpis .lbl{font-size:11.5px;white-space:nowrap}.ct-kpis .val{font-size:20px}}
 @media (max-width:760px){.ct-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.ct-h,.ct-b{padding:10px 12px}.ct-tbl .cm-h{display:none}}
 .ct-tbl tr[data-s]{cursor:pointer}.lvp{display:inline-block;border-radius:999px;padding:1px 9px;font-size:12px;font-weight:700;white-space:nowrap}
 .lvp.l0{background:var(--bad-bg);color:var(--bad)}.lvp.l1{background:var(--warn-bg);color:#9a6400}.lvp.l2,.lvp.l3,.lvp.l4{background:var(--good-bg);color:var(--good)}
@@ -1320,88 +1320,146 @@ function render(){
    // thi đua Cá - Trứng (bán / nhập): chỉ tài khoản Quản trị xem
    const CT=(D.contests||[]).filter(c=>IS_ADMIN||!/b[aá]n\s*\/\s*nh[aậ]p/i.test(c.cond||''));const NEAR=[];window.__NEAR=NEAR;
    const GRP=false,UH='Siêu thị',ALBL='Toàn khu vực',UNITS=[],xs=u=>u==='all'?SHOPS:[u],isQ=u=>u==='all',unitName=u=>u==='all'?'Toàn khu vực':shopName(u);
-   const nk=t=>String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[đĐ]/g,'d').toLowerCase().replace(/[^a-z0-9]/g,'');
+   const nk=t=>String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[đĐ]/g,'d').toLowerCase().replace(/[^a-z0-9]/g,'');
    const allCats=new Set();[D.sep.cat,D.aug.cat,...Object.values(D.catm||{}).map(x=>x.c)].forEach(o=>{for(const s in o||{})for(const k in o[s])allCats.add(k)});
    const scope=cur==='all'?SHOPS:[cur];const left=Math.max(0,DIM9-d9);
-   // cột QLTP trong file thi đua: mức thưởng theo % DT bán hoặc số tiền / siêu thị (có thể chia theo size)
-   const parseRule=t=>{if(!t)return null;const R={pct:{},fix:{},th:2e9,txt:String(t).trim()};let b='all',any=false;
-     String(t).normalize('NFC').split(/\n|(?=size\s*(?:<|>=|≥|>))|(?=[-+*•]?\s*m[uứ]c\s*\d+\s*:)/i).forEach(l=>{const z=l.match(/size\s*(<|>=|≥|>)\s*([\d.,]+)\s*t[ỷy]/i);if(z){b=z[1]==='<'?'lt':'ge';R.th=parseFloat(z[2].replace(',','.'))*1e9;return}
-       const m=l.match(/m[uứ]c\s*(\d+)\s*:\s*([\d.,]+)\s*(%)?/i);if(!m)return;const n=+m[1];
-       if(m[3]){R.pct[n]=parseFloat(m[2].replace(',','.'))/100;any=true}else{(R.fix[b]||(R.fix[b]={}))[n]=+m[2].replace(/[.,]/g,'');any=true}});return any?R:null};
+   // quyền xem thưởng: Quản trị xem thưởng QLTP + QLST + siêu thị; Cập nhật dữ liệu và Chỉ xem: thưởng QLST + siêu thị (tài khoản xem 1 siêu thị chỉ thấy siêu thị đó)
+   const SEE_QT=IS_ADMIN,SEE_ST=true;
+   const num=s=>parseFloat(String(s).replace(',','.'));
+   // mức thưởng: % DT bán, đ/kg sản lượng bán, hoặc số tiền / siêu thị (vd 10K, có thể chia theo size); "Thưởng QLST = 25%" = phần được nhận
+   const parseRule=t=>{if(!t)return null;const R={pct:{},fix:{},kg:{},th:2e9,share:null,txt:String(t).trim()};let b='all',any=false;
+     String(t).normalize('NFC').split(/\n|(?=size\s*(?:<|>=|≥|>))|(?=[-+*•]?\s*m[uứ]c\s*\d+\s*:)/i).forEach(l=>{
+       const sh=l.match(/th[uư][oở]ng\s*[^=\d\n]{0,14}=\s*([\d.,]+)\s*%/i);if(sh){R.share=num(sh[1])/100;return}
+       const z=l.match(/size\s*(<|>=|≥|>)\s*([\d.,]+)\s*t[ỷy]/i);if(z){b=z[1]==='<'?'lt':'ge';R.th=num(z[2])*1e9;return}
+       const m=l.match(/m[uứ]c\s*(\d+)\s*:\s*([\d.,]+)\s*(%|k(?![a-zà-ỹ])|đ\s*\/\s*kg)?/i);if(!m)return;const n=+m[1],u=(m[3]||'').toLowerCase();
+       if(u==='%')R.pct[n]=num(m[2])/100;else if(/kg/.test(u))R.kg[n]=+m[2].replace(/[.,]/g,'');else (R.fix[b]||(R.fix[b]={}))[n]=+m[2].replace(/[.,]/g,'')*(u==='k'?1000:1);any=true});return any?R:null};
+   // cột "Siêu thị": tách thưởng Quản lý ST (QLST) và Nhân viên / siêu thị (ST)
+   const parseRoles=t=>{if(!t)return{};const S={st:[],ql:[],base:[]},SH={};let cr='base',stN='';
+     String(t).normalize('NFC').split('\n').forEach(l=>{const h=l.trim().replace(/[:：]\s*$/,'').trim();
+       if(/^(nh[aâ]n\s*vi[eê]n(\s*st|\s*si[eê]u\s*th[iị])?|nv|st|si[eê]u\s*th[iị])$/i.test(h)){cr='st';stN=/^n/i.test(h)?'NV':'';return}
+       if(/^(qu[aả]n\s*l[yý](\s*st|\s*si[eê]u\s*th[iị])?|qlst)$/i.test(h)){cr='ql';return}
+       const sh=l.match(/th[uư][oở]ng\s*(qlst|ql|nv|nh[aâ]n\s*vi[eê]n|st|si[eê]u\s*th[iị])\s*=\s*([\d.,]+)\s*%/i);
+       if(sh){const k=/^ql/i.test(sh[1])?'ql':'st';SH[k]=num(sh[2])/100;if(k==='st'&&/^n/i.test(sh[1]))stN='NV';return}
+       S[cr].push(l)});
+     const out={stN};
+     if(S.st.length||S.ql.length){out.st=parseRule([...S.base,...S.st].join('\n'));out.ql=parseRule([...S.base,...S.ql].join('\n'))}
+     else{const B=parseRule(S.base.join('\n'));if(B){if(SH.ql!=null||SH.st!=null){if(SH.ql!=null)out.ql={...B,share:SH.ql};if(SH.st!=null)out.st={...B,share:SH.st}}else out.st=B}}
+     return out};
    // size siêu thị: cột "Loại kho" trong file doanh thu (vd "2 tỷ - < 5 tỷ"); chưa có thì dùng Base tổng
    const szV=s=>{const t=String((D.sz||{})[s]||'');const m=t.match(/([\d]+(?:[.,]\d+)?)\s*t[ỷy]/i);return m?parseFloat(m[1].replace(',','.'))*1e9:((D.shops[s]||{}).bT||0)};
-   const vnd=v=>nf(0).format(Math.round(v))+'đ';
+   const vnd=v=>nf(0).format(Math.round(v))+'đ';const pc=v=>nf(3).format(v*100).replace(/,?0+$/,'');
+   const rTxt=R=>{if(!R)return '';const p=Object.entries(R.pct).map(([n,v])=>`Mức ${n}: ${pc(v)}% DT bán`);const k=Object.entries(R.kg).map(([n,v])=>`Mức ${n}: ${nf(0).format(v)}đ/kg`);
+     const f=Object.entries(R.fix).map(([b,o])=>(b==='all'?'':b==='lt'?`ST < ${nf(0).format(R.th/1e9)} tỷ: `:`ST ≥ ${nf(0).format(R.th/1e9)} tỷ: `)+Object.entries(o).map(([n,v])=>`Mức ${n} ${vnd(v)}`).join(', '));
+     return [...p,...k,...f].join(' · ')+(R.share!=null?` (nhận ${pc(R.share)}% mức thưởng)`:'')};
    const LR=D.loss&&D.loss.rows&&D.loss.y===D.cur.y&&D.loss.m===D.cur.m&&D.loss.hasX?D.loss:null;
-   note.textContent=CT.length?`Tháng ${M}/${D.cur.y}, số liệu ngành hàng đến ngày ${d9}/${M} · dự kiến = lũy kế ÷ ${d9} ngày × ${DIM9} ngày · thưởng QLTP tính trên doanh thu dự kiến`:'';
-   if(!CT.length){box.innerHTML=`<p class="hint">Chưa có chương trình thi đua. ${CAN_EDIT?'Bấm <b>Tải file lên</b> và chọn file thi đua ngành hàng (có cột "Chương trình Thi đua").':'Quản trị sẽ tải file chương trình lên.'}</p>`}
+   note.textContent=CT.length?`Tháng ${M}/${D.cur.y}, số liệu ngành hàng đến ngày ${d9}/${M} · dự kiến = lũy kế ÷ số ngày có số liệu × ${DIM9} ngày · thưởng tính trên số dự kiến`:'';
+   if(!CT.length){box.innerHTML=`<p class="hint">Chưa có chương trình thi đua. ${CAN_EDIT?'Bấm <b>Tải file lên</b> và chọn file thi đua ngành hàng (có cột "Điều kiện nhận thưởng").':'Quản trị sẽ tải file chương trình lên.'}</p>`}
    else box.innerHTML=CT.map((c,ci)=>{
      const AL={thuyhaisancacloai:'cahaisan',thuyhaisan:'cahaisan'};const AC=[...allCats];
      const findCat=n=>{const k=nk(n),k2=AL[k]||k;return AC.find(x=>nk(x)===k)||AC.find(x=>nk(x)===k2)||AC.find(x=>nk(x).length>=4&&k.startsWith(nk(x)))||AC.find(x=>k.length>=6&&nk(x).startsWith(k))};
-     const keys=[],miss=[];c.cats.forEach(n=>{const k=findCat(n);if(k&&!keys.includes(k))keys.push(k);else if(!k)miss.push(n)});
-     const lv=c.levels.length?c.levels:[{n:1,r:1}];const RU=IS_ADMIN?parseRule(c.qtRule):null; // thưởng QLTP: chỉ tài khoản QLTP (và quản trị) xem
-     const sum=(o,s)=>keys.reduce((t,k)=>t+(+(((o||{})[s]||{})[k])||0),0);
-     // loại chương trình: theo tỷ lệ bán / nhập (file nhập xuất) hoặc tăng trưởng doanh thu so với tháng ghi trong file
+     const lossPred=c.cats.map(n=>{const k=nk(n);return /^thuyhaisan/.test(k)?(x=>/^thuyhaisan/.test(nk(x))):/^trung/.test(k)?(x=>/^trung/.test(nk(x))):(x=>nk(x).startsWith(k.slice(0,6)))});
+     // loại chương trình: theo tỷ lệ bán / nhập (file nhập xuất), theo sản lượng bán (kg, file nhập xuất) hoặc tăng trưởng doanh thu so với tháng ghi trong file
      const SELL=/b[aá]n\s*\/\s*nh[aậ]p/i.test(c.cond||'');
+     const QTY=!SELL&&/s[aả]n\s*l[uư][oợ]ng/i.test((c.goal||'')+' '+(c.cond||''));
      // thi đua bán / nhập có thêm điều kiện tăng trưởng doanh thu (vd "Tăng trưởng doanh thu so với T9")
      const GROW=SELL&&/t[aă]ng\s*tr[uư][oở]ng/i.test((c.cond||'')+' '+(c.goal||''));
-     const lossPred=c.cats.map(n=>{const k=nk(n);return /^thuyhaisan/.test(k)?(x=>/^thuyhaisan/.test(nk(x))):/^trung/.test(k)?(x=>/^trung/.test(nk(x))):(x=>nk(x).startsWith(k.slice(0,6)))});
-     const sell=s=>{let n=0,x=0;const o=(LR&&LR.rows[s])||{};for(const cn in o){if(!lossPred.some(f=>f(cn)))continue;n+=o[cn][0];x+=o[cn][3]||0}return{n,x}};
      const bmM=String((c.goal||'')+' '+(c.cond||'')).match(/T\s*0?(\d{1,2})\s*\/\s*(\d{4})/i);const bm=bmM?{m:+bmM[1],y:+bmM[2]}:{m:P,y:PY};
-     const bmK=bm.y+'-'+String(bm.m).padStart(2,'0'),bmH=(D.catm||{})[bmK];
+     const bmK=bm.y+'-'+String(bm.m).padStart(2,'0'),bmH=(D.catm||{})[bmK],BQ=QTY?(D.lossm||{})[bmK]:null;
+     const keys=[],miss=[];
+     if(QTY){const LC=new Set([...Object.values((LR||{}).rows||{}),...Object.values((BQ||{}).q||{})].flatMap(o=>Object.keys(o)));
+       c.cats.forEach((n,i)=>{if(LC.size&&![...LC].some(lossPred[i]))miss.push(n)})}
+     else c.cats.forEach(n=>{const k=findCat(n);if(k&&!keys.includes(k))keys.push(k);else if(!k)miss.push(n)});
+     const lv=c.levels.length?c.levels:[{n:1,r:1}];
+     const RU=SEE_QT?parseRule(c.qtRule):null; // thưởng QLTP: chỉ tài khoản Quản trị xem
+     const RR=SEE_ST?parseRoles(c.stRule):{};
+     const SR=[RR.ql&&{R:RR.ql,h:'Thưởng QLST',n:'QLST'},RR.st&&{R:RR.st,h:RR.stN?'Thưởng NV ST':'Thưởng siêu thị',n:RR.stN?'Nhân viên siêu thị':'Siêu thị'}].filter(Boolean);
+     const sum=(o,s)=>keys.reduce((t,k)=>t+(+(((o||{})[s]||{})[k])||0),0);
+     const inL=cn=>lossPred.some(f=>f(cn));
+     const sell=s=>{let n=0,x=0;const o=(LR&&LR.rows[s])||{};for(const cn in o){if(!inL(cn))continue;n+=o[cn][0];x+=o[cn][3]||0}return{n,x}};
+     const curQ=s=>{let t=0;const o=(LR&&LR.rows[s])||{};for(const cn in o)if(inL(cn))t+=o[cn][3]||0;return t};
+     const baseQ=s=>{let t=0;const o=((BQ||{}).q||{})[s]||{};for(const cn in o)if(inL(cn))t+=+o[cn]||0;return t};
      const baseCat=bm.m===P&&bm.y===PY?D.aug.cat:bm.m===M&&bm.y===D.cur.y?null:bmH?bmH.c:null;const BT='T'+bm.m;
-     const bmNote=SELL&&!LR?`Chưa có tỷ lệ bán / nhập tháng ${M}: tải file nhập xuất Fresh tháng ${M} (có cột SL thực xuất).`:SELL&&!GROW?'':!baseCat?`Chưa có doanh thu ngành hàng tháng ${bm.m}/${bm.y} để so sánh. ${CAN_EDIT?`Bấm <b>Tải file lên</b> và chọn file doanh thu ngành hàng tháng ${bm.m}/${bm.y} (cả tháng).`:'Quản trị sẽ tải file tháng này lên.'}`:bmH&&bmH.d<new Date(bm.y,bm.m,0).getDate()&&!(bm.m===P&&bm.y===PY)?`Doanh thu ngành hàng tháng ${bm.m}/${bm.y} mới có đến ngày ${bmH.d}, cần file đủ cả tháng.`:'';
-     const mk=u=>{const ss=xs(u);const base=ss.reduce((t,s)=>t+sum(baseCat,s),0),cum=ss.reduce((t,s)=>t+sum(D.sep.cat,s),0),proj=d9?cum/d9*DIM9:0;
+     const HASB=QTY?!!BQ:!!baseCat;const dd=QTY?(LR?LR.days:0):d9,lf=Math.max(0,DIM9-dd);
+     const LBL=QTY?'SL bán':'DT',V=v=>QTY?nf(0).format(v)+' kg':tr(v)+' tr',V1=v=>QTY?nf(1).format(v)+' kg':tr1(v)+' tr';
+     const bmNote=QTY?(!LR?`Chưa có sản lượng bán tháng ${M}: tải file nhập xuất Fresh tháng ${M} (có cột SL thực xuất).`:!BQ?`Chưa có sản lượng bán tháng ${bm.m}/${bm.y} để so sánh. ${CAN_EDIT?`Bấm <b>Tải file lên</b> và chọn file nhập xuất Fresh tháng ${bm.m}/${bm.y} (cả tháng, có cột SL thực xuất).`:'Quản trị sẽ tải file tháng này lên.'}`:BQ.d<new Date(bm.y,bm.m,0).getDate()?`Sản lượng bán tháng ${bm.m}/${bm.y} mới có đến ngày ${BQ.d}, cần file nhập xuất đủ cả tháng.`:'')
+       :SELL&&!LR?`Chưa có tỷ lệ bán / nhập tháng ${M}: tải file nhập xuất Fresh tháng ${M} (có cột SL thực xuất).`:SELL&&!GROW?'':!baseCat?`Chưa có doanh thu ngành hàng tháng ${bm.m}/${bm.y} để so sánh. ${CAN_EDIT?`Bấm <b>Tải file lên</b> và chọn file doanh thu ngành hàng tháng ${bm.m}/${bm.y} (cả tháng).`:'Quản trị sẽ tải file tháng này lên.'}`:bmH&&bmH.d<new Date(bm.y,bm.m,0).getDate()&&!(bm.m===P&&bm.y===PY)?`Doanh thu ngành hàng tháng ${bm.m}/${bm.y} mới có đến ngày ${bmH.d}, cần file đủ cả tháng.`:'';
+     const mk=u=>{const ss=xs(u);let base,cum,proj;
+       if(QTY){base=ss.reduce((t,s)=>t+baseQ(s),0);cum=ss.reduce((t,s)=>t+curQ(s),0);proj=dd?cum/dd*DIM9:0}
+       else{base=ss.reduce((t,s)=>t+sum(baseCat,s),0);cum=ss.reduce((t,s)=>t+sum(D.sep.cat,s),0);proj=d9?cum/d9*DIM9:0}
        let sn=0,sx=0;if(SELL)ss.forEach(s=>{const v=sell(s);sn+=v.n;sx+=v.x});
        const r=SELL?(sn>0?sx/sn:null):(base>0?proj/base:null);
        let li=-1;lv.forEach((l,i)=>{if(r!=null&&r>=l.r)li=i});const rawLi=li,gr=base>0?proj/base:null,gfail=GROW&&!(gr!=null&&gr>1);if(gfail)li=-1;
-       const nx=lv[li+1];const need=!SELL&&nx&&left>0&&base>0?Math.max(0,(nx.r*base-cum)/left):null;
+       const nx=lv[li+1];const need=!SELL&&nx&&lf>0&&base>0?Math.max(0,(nx.r*base-cum)/lf):null;
        let tg=0,pt=0;ss.forEach(s=>{const g=(D.shops[s]||{}).tg;if(g){tg+=g;pt+=shopStats(s).proj}});const tgr=tg?pt/tg:null;return{s:u,base,cum,proj,r,li,nx,need,tgr,sn,sx,rawLi,gr,gfail}};
      const ok=x=>x.li>=0&&(!c.needTarget||x.tgr==null||x.tgr>=1);
-     // thưởng QLTP — Cá - Trứng (bán / nhập): xét tổng số liệu cả khu vực QLTP; chương trình khác: cộng thưởng các siêu thị đạt mức
-     // thưởng theo % DT bán: xét tổng doanh thu cả khu vực QLTP; thưởng đ/ST: xét từng siêu thị đạt mức (size theo sheet đính kèm)
-     const AREA=!!RU&&Object.keys(RU.pct).length>0&&!Object.keys(RU.fix).length;
-     const fixOf=(s,n)=>{const b=c.sz&&c.sz[s]?c.sz[s]:(szV(s)>=RU.th?'ge':'lt');const f=RU.fix.all||RU.fix[b]||{};return f[n]||0};
-     const rwS=x=>{if(!RU||!ok(x))return 0;const n=lv[x.li].n;return RU.pct[n]!=null?RU.pct[n]*x.proj:fixOf(x.s,n)};
-     const rwQ=x=>{if(!RU||!x||!isQ(x.s)||!ok(x))return 0;const n=lv[x.li].n;if(RU.pct[n]!=null)return RU.pct[n]*x.proj;return xs(x.s).reduce((t,s)=>t+fixOf(s,n),0)};
-     const Rs=scope.map(mk).filter(x=>x.base>0||x.cum>0||x.sn>0);const RWS={};if(!AREA)Rs.forEach(x=>RWS[x.s]=rwS(x));
+     const fixOf=(R,s,n)=>{const b=c.sz&&c.sz[s]?c.sz[s]:(szV(s)>=R.th?'ge':'lt');const f=R.fix.all||R.fix[b]||{};return f[n]||0};
+     // tiền thưởng ở mức n: % × DT dự kiến, đ/kg × sản lượng dự kiến, hoặc số tiền / siêu thị theo size; nhân phần được nhận (nếu có)
+     const amt=(R,n,x,s)=>{if(!R)return 0;let v;if(R.pct[n]!=null)v=R.pct[n]*x.proj;else if(R.kg[n]!=null)v=QTY?R.kg[n]*x.proj:0;else v=s?fixOf(R,s,n):0;return v*(R.share!=null?R.share:1)};
+     // thưởng QLTP — % DT bán / đ/kg: xét tổng cả khu vực QLTP; thưởng đ/ST: xét từng siêu thị đạt mức (size theo sheet đính kèm)
+     const AREA=!!RU&&(Object.keys(RU.pct).length>0||Object.keys(RU.kg).length>0)&&!Object.keys(RU.fix).length;
+     const rwS=x=>{if(!RU||!ok(x))return 0;return amt(RU,lv[x.li].n,x,x.s)};
+     const rwQ=x=>{if(!RU||!x||!isQ(x.s)||!ok(x))return 0;const n=lv[x.li].n;if(AREA)return amt(RU,n,x);return xs(x.s).reduce((t,s)=>t+amt(RU,n,x,s),0)};
+     const Rs=scope.map(mk).filter(x=>x.base>0||x.cum>0||x.sn>0);const RWS={};
+     const qpass=()=>true;
+     if(RU&&!AREA)Rs.forEach(x=>RWS[x.s]=qpass(x.s)?rwS(x):0);
+     // thưởng QLST / siêu thị: từng siêu thị đạt mức nào nhận đúng mức đó
+     SR.forEach(o=>{o.W={};Rs.forEach(x=>{if(ok(x))o.W[x.s]=amt(o.R,lv[x.li].n,x,x.s)});o.T=Rs.reduce((t,x)=>t+(o.W[x.s]||0),0)});
+     const srV=(o,x)=>isQ(x.s)?xs(x.s).reduce((t,s)=>t+(o.W[s]||0),0):(o.W[x.s]||0);
      const rwU=x=>AREA?rwQ(x):xs(x.s).reduce((t,s)=>t+(RWS[s]||0),0);
      const R=(GRP?UNITS.map(mk).filter(x=>x.base>0||x.cum>0||x.sn>0):Rs.slice()).sort((a,b)=>(b.r??-1)-(a.r??-1));
      const QX=cur==='all'?mk('all'):null; // đang xem toàn khu vực
-     const T={base:R.reduce((t,x)=>t+x.base,0),cum:R.reduce((t,x)=>t+x.cum,0),sn:R.reduce((t,x)=>t+x.sn,0),sx:R.reduce((t,x)=>t+x.sx,0)};T.proj=d9?T.cum/d9*DIM9:0;T.r=SELL?(T.sn?T.sx/T.sn:null):(T.base?T.proj/T.base:null);
+     const T={base:R.reduce((t,x)=>t+x.base,0),cum:R.reduce((t,x)=>t+x.cum,0),sn:R.reduce((t,x)=>t+x.sn,0),sx:R.reduce((t,x)=>t+x.sx,0)};T.proj=dd?T.cum/dd*DIM9:0;T.r=SELL?(T.sn?T.sx/T.sn:null):(T.base?T.proj/T.base:null);
      const TRW=GRP?R.reduce((t,x)=>t+rwU(x),0):AREA?(QX?rwQ(QX):0):Rs.reduce((t,x)=>t+(RWS[x.s]||0),0);const SHOWRW=RU&&(GRP||QX||!AREA);const RWCOL=RU&&(GRP||!AREA);
      const cnt=i=>Rs.filter(x=>x.li>=i).length;
+     const rwL=()=>0;
      const lvName=i=>i<0?'Chưa đạt':`Mức ${lv[i].n}`;
-     const rwH=RWCOL?`<th title="${esc(RU.txt)}">${GRP?'Thưởng QLTP':'Thưởng QLTP (từ siêu thị)'}</th>`:'';
-     const rwC=x=>{if(!RWCOL)return '';const v=isQ(x.s)?rwU(x):RWS[x.s]||0;const why=x.li>=0&&!ok(x)?' <small class="neg">chưa đạt Target</small>':'';return `<td>${v?`<b class="pos">${vnd(v)}</b>`:'<span class="muted">—</span>'}${why}</td>`};
-     let t=`<table class="ct-tbl"><thead><tr><th class="cm-h">#</th><th class="l">${UH}</th>${SELL?`<th>SL nhập</th><th class="cm-h">SL bán</th><th>Bán / nhập</th>${GROW?`<th class="cm-h">DT ${BT}</th><th>Dự kiến T${M}</th><th>% so ${BT}</th>`:''}`:`<th>DT ${BT}</th><th class="cm-h">Lũy kế T${M}</th><th>Dự kiến T${M}</th><th>Dự kiến / ${BT}</th>`}<th class="l">Mức đạt</th>${SELL?(GROW?'':`<th class="cm-h">DT dự kiến T${M}</th>`):`<th class="cm-h">Cần/ngày lên mức kế</th>`}${rwH}</tr></thead><tbody>`;
+     const rwH=(RWCOL?`<th title="${esc(rTxt(RU))}">Thưởng QLTP</th>`:'')+SR.map(o=>`<th title="${esc(rTxt(o.R))}">${o.h}</th>`).join('');
+     const rwC=x=>{let h='';if(RWCOL){const v=isQ(x.s)?rwU(x):RWS[x.s]||0;const kvF=!AREA&&!(isQ(x.s)?x.li>=0:qpass(x.s));const why=kvF&&(isQ(x.s)?Rs.some(y=>xs(x.s).includes(y.s)&&ok(y)):ok(x))?' <small class="neg">KV chưa đạt Mức 1</small>':x.li>=0&&!ok(x)?' <small class="neg">chưa đạt Target</small>':'';h+=`<td>${v?`<b class="pos">${vnd(v)}</b>`:'<span class="muted">—</span>'}${why}</td>`}
+       SR.forEach(o=>{const v=srV(o,x);h+=`<td>${v?`<b class="pos">${vnd(v)}</b>`:'<span class="muted">—</span>'}${!RWCOL&&!isQ(x.s)&&x.li>=0&&!ok(x)?' <small class="neg">chưa đạt Target</small>':''}</td>`});return h};
+     let t=`<table class="ct-tbl"><thead><tr><th class="cm-h">#</th><th class="l">${UH}</th>${SELL?`<th>SL nhập</th><th class="cm-h">SL bán</th><th>Bán / nhập</th>${GROW?`<th class="cm-h">DT ${BT}</th><th>Dự kiến T${M}</th><th>% so ${BT}</th>`:''}`:`<th>${LBL} ${BT}</th><th class="cm-h">Lũy kế T${M}</th><th>Dự kiến T${M}</th><th>Dự kiến / ${BT}</th>`}<th class="l">Mức đạt</th>${SELL?(GROW?'':`<th class="cm-h">DT dự kiến T${M}</th>`):`<th class="cm-h">Cần/ngày lên mức kế</th>`}${rwH}</tr></thead><tbody>`;
      const q0=v=>nf(0).format(v);
      R.forEach((x,i)=>{t+=`<tr${!VIEW_SHOP?` tabindex="0" data-s="${x.s}"`:''} class="${cur===x.s?'sel':''}"><td class="cm-h"><span class="rk">${i+1}</span></td><td class="l">${esc(unitName(x.s))}${isQ(x.s)?` <small class="muted">(${xs(x.s).length})</small>`:''}</td>`+
        (SELL?`<td>${q0(x.sn)}</td><td class="cm-h">${q0(x.sx)}</td><td class="${x.r!=null&&x.r>=lv[0].r?'pos':'neg'}"><b>${x.r==null?'—':pct(x.r)}</b></td>`+(GROW?`<td class="cm-h">${tr(x.base)} tr</td><td>${tr(x.proj)} tr</td><td class="${x.gr!=null&&x.gr>1?'pos':'neg'}"><b>${x.gr==null?'—':sgn(x.gr-1)}</b></td>`:'')
-            :`<td>${tr(x.base)} tr</td><td class="cm-h">${tr(x.cum)} tr</td><td><b>${tr(x.proj)} tr</b></td><td class="${x.r!=null&&x.r>=lv[0].r?'pos':'neg'}"><b>${x.r==null?'—':pct(x.r)}</b></td>`)+
+            :`<td>${V(x.base)}</td><td class="cm-h">${V(x.cum)}</td><td><b>${V(x.proj)}</b></td><td class="${x.r!=null&&x.r>=lv[0].r?'pos':'neg'}"><b>${x.r==null?'—':pct(x.r)}</b></td>`)+
        `<td class="l"><span class="lvp l${x.li+1}">${lvName(x.li)}</span>${x.gfail&&x.rawLi>=0?` <small class="neg" title="Bán / nhập đạt ${lvName(x.rawLi)} nhưng doanh thu chưa tăng trưởng so ${BT}">DT chưa tăng</small>`:''}${isQ(x.s)?(()=>{const m=new Set(xs(x.s));return ` <small class="muted">${Rs.filter(y=>m.has(y.s)&&y.li>=0).length}/${m.size} ST đạt</small>`})():''}</td>`+
-       (SELL?(GROW?'':`<td class="cm-h">${tr(x.proj)} tr</td>`):`<td class="cm-h">${x.nx?(x.need==null?'—':`${tr1(x.need)} tr <small class="muted">→ ${lvName(lv.indexOf(x.nx))}</small>`):'<span class="pos">Mức cao nhất</span>'}</td>`)+rwC(x)+`</tr>`});
-     if(R.length>1)t+=`</tbody><tfoot><tr><th class="cm-h"></th><th class="l">${esc(ALBL)}</th>`+(SELL?`<th>${q0(T.sn)}</th><th class="cm-h">${q0(T.sx)}</th><th>${T.r==null?'—':pct(T.r)}</th>`+(GROW?`<th class="cm-h">${tr(T.base)} tr</th><th>${tr(T.proj)} tr</th><th>${T.base?sgn(T.proj/T.base-1):'—'}</th>`:''):`<th>${tr(T.base)} tr</th><th class="cm-h">${tr(T.cum)} tr</th><th>${tr(T.proj)} tr</th><th>${T.r==null?'—':pct(T.r)}</th>`)+`<th class="l"></th>${SELL&&GROW?'':`<th class="cm-h">${SELL?tr(T.proj)+' tr':''}</th>`}${RWCOL?`<th>${TRW?vnd(TRW):'—'}</th>`:''}</tr></tfoot>`;else t+='</tbody>';
+       (SELL?(GROW?'':`<td class="cm-h">${tr(x.proj)} tr</td>`):`<td class="cm-h">${x.nx?(x.need==null?'—':`${V1(x.need)} <small class="muted">→ ${lvName(lv.indexOf(x.nx))}</small>`):'<span class="pos">Mức cao nhất</span>'}</td>`)+rwC(x)+`</tr>`});
+     if(R.length>1)t+=`</tbody><tfoot><tr><th class="cm-h"></th><th class="l">${esc(ALBL)}</th>`+(SELL?`<th>${q0(T.sn)}</th><th class="cm-h">${q0(T.sx)}</th><th>${T.r==null?'—':pct(T.r)}</th>`+(GROW?`<th class="cm-h">${tr(T.base)} tr</th><th>${tr(T.proj)} tr</th><th>${T.base?sgn(T.proj/T.base-1):'—'}</th>`:''):`<th>${V(T.base)}</th><th class="cm-h">${V(T.cum)}</th><th>${V(T.proj)}</th><th>${T.r==null?'—':pct(T.r)}</th>`)+`<th class="l"></th>${SELL&&GROW?'':`<th class="cm-h">${SELL?tr(T.proj)+' tr':''}</th>`}${RWCOL?`<th>${TRW?vnd(TRW):'—'}</th>`:''}${SR.map(o=>`<th>${o.T?vnd(o.T):'—'}</th>`).join('')}</tr></tfoot>`;else t+='</tbody>';
      t+='</table>';
-     // siêu thị sắp lên mức: chỉ cần tăng ≤ 10% doanh thu/ngày so với nhịp hiện tại là lên mức kế
-     const NEARX=.10;const nr=[];if(!SELL&&baseCat&&d9>0&&left>0)Rs.forEach(x=>{if(!x.nx||x.need==null||!(x.cum>0))return;const avg=x.cum/d9,inc=x.need/avg-1;if(!(inc<=NEARX))return;
-       const gain=RU&&!AREA?fixOf(x.s,x.nx.n)-(ok(x)?fixOf(x.s,lv[x.li].n):0):0;nr.push({s:x.s,inc,need:x.need,n:x.nx.n,gain})});
-     nr.sort((a,b)=>a.inc-b.inc);nr.forEach(y=>NEAR.push({s:y.s,v:y.inc,t:`${c.name}: cần ${tr1(y.need)} tr/ngày (+${nf(0).format(Math.max(0,y.inc)*100)}%) → Mức ${y.n}${y.gain>0?` · thưởng QLTP +${vnd(y.gain)}`:''}`}));
-     const kvL=(()=>{if(!RU||SELL||!QX||!QX.nx||QX.need==null||!(QX.cum>0)||!baseCat||left<=0)return '';const inc=QX.need/(QX.cum/d9)-1;
-       const g=AREA?(RU.pct[QX.nx.n]||0)*QX.nx.r*QX.base-rwQ(QX):0;
-       return `<p class="kv"><b>Khu vực:</b> cần ${tr1(QX.need)} tr/ngày (${inc>=0?'+':''}${nf(0).format(inc*100)}% so nhịp hiện tại) để lên Mức ${QX.nx.n}${AREA&&g>0?` → thưởng QLTP thêm khoảng ${vnd(g)}`:''}.</p>`})();
-     const nearH=nr.length||kvL?`<div class="ct-near">${kvL}${nr.length?`<b>Siêu thị sắp lên mức</b> <span class="muted">· chỉ cần tăng tối đa ${NEARX*100}% doanh thu/ngày so với nhịp hiện tại</span><ul>${nr.slice(0,8).map(y=>`<li data-ns="${y.s}" tabindex="0">${esc(shopName(y.s))} → Mức ${y.n}: <b>${tr1(y.need)} tr/ngày</b> <small class="muted">(+${nf(0).format(Math.max(0,y.inc)*100)}%)</small>${y.gain>0?` <small class="pos">+${vnd(y.gain)}</small>`:''}</li>`).join('')}</ul>${nr.length>8?`<small class="muted">và ${nr.length-8} siêu thị khác</small>`:''}`:''}</div>`:'';
-     const rwTxt=RU?(()=>{const p=Object.entries(RU.pct).map(([n,v])=>`Mức ${n}: ${nf(2).format(v*100).replace(/,?0+$/,'')}% DT bán`);const f=Object.entries(RU.fix).map(([b,o])=>(b==='all'?'':b==='lt'?`ST < ${nf(0).format(RU.th/1e9)} tỷ: `:`ST ≥ ${nf(0).format(RU.th/1e9)} tỷ: `)+Object.entries(o).map(([n,v])=>`Mức ${n} ${vnd(v)}`).join(', '));return [...p,...f].join(' · ')})():'';
+     // siêu thị sắp lên mức: chỉ cần tăng ≤ 10% doanh thu (sản lượng)/ngày so với nhịp hiện tại là lên mức kế
+     const NEARX=.10;const nr=[];if(!SELL&&HASB&&dd>0&&lf>0)Rs.forEach(x=>{if(!x.nx||x.need==null||!(x.cum>0))return;const avg=x.cum/dd,inc=x.need/avg-1;if(!(inc<=NEARX))return;
+       const gain=RU&&!AREA?amt(RU,x.nx.n,x,x.s)-(ok(x)?amt(RU,lv[x.li].n,x,x.s):0):0;
+       const xn={proj:x.nx.r*x.base},gs=SR.map(o=>({n:o.n,v:amt(o.R,x.nx.n,xn,x.s)-(ok(x)?amt(o.R,lv[x.li].n,x,x.s):0)})).filter(g=>g.v>0);
+       nr.push({s:x.s,inc,need:x.need,n:x.nx.n,gain,gs})});
+     nr.sort((a,b)=>a.inc-b.inc);
+     const gsT=y=>y.gs.map(g=>` · ${g.n} +${vnd(g.v)}`).join('');
+     // khu vực QLTP: cần bao nhiêu / ngày để lên mức kế (toàn miền: liệt kê từng QLTP, không liệt kê siêu thị)
+     const RsM={};Rs.forEach(y=>RsM[y.s]=y);
+     const kvInfo=x=>{if(SELL||!x||!x.nx||x.need==null||!(x.cum>0)||!HASB||lf<=0)return null;const inc=x.need/(x.cum/dd)-1;let g=0,unl=0;
+       if(RU){if(AREA)g=amt(RU,x.nx.n,{proj:x.nx.r*x.base})-rwQ(x);else if(x.li<0)unl=xs(x.s).reduce((t,s)=>t+(RsM[s]?rwS(RsM[s]):0),0)}return{inc,g,unl}};
+     const kvTxt=(x,k)=>`cần ${V1(x.need)}/ngày (${k.inc>=0?'+':''}${nf(0).format(k.inc*100)}% so nhịp hiện tại) để lên Mức ${x.nx.n}${k.g>0?` → thưởng QLTP thêm khoảng ${vnd(k.g)}`:''}`;
+     let nearH='';
+     if(GRP){const qr=R.map(x=>({x,k:kvInfo(x)})).filter(o=>o.k).sort((a,b)=>a.k.inc-b.k.inc);
+       qr.filter(o=>o.k.inc<=NEARX).forEach(o=>NEAR.push({s:o.x.s,v:o.k.inc,t:`${c.name}: ${kvTxt(o.x,o.k)}`}));
+       if(qr.length)nearH=`<div class="ct-near">${qr.map(o=>`<p class="kv" data-ns="${o.x.s}" tabindex="0" role="button"><b>${esc(unitName(o.x.s))}:</b> ${kvTxt(o.x,o.k)}.</p>`).join('')}</div>`}
+     else{nr.forEach(y=>NEAR.push({s:y.s,v:y.inc,t:`${c.name}: cần ${V1(y.need)}/ngày (+${nf(0).format(Math.max(0,y.inc)*100)}%) → Mức ${y.n}${y.gain>0?` · thưởng QLTP +${vnd(y.gain)}`:''}${gsT(y)}`}));
+       const kq=kvInfo(QX);const kvL=kq?`<p class="kv"><b>Khu vực:</b> ${kvTxt(QX,kq)}.</p>`:'';
+       nearH=nr.length||kvL?`<div class="ct-near">${kvL}${nr.length?`<b>Siêu thị sắp lên mức</b> <span class="muted">· chỉ cần tăng tối đa ${NEARX*100}% ${QTY?'sản lượng':'doanh thu'}/ngày so với nhịp hiện tại</span><ul>${nr.slice(0,8).map(y=>`<li data-ns="${y.s}" tabindex="0">${esc(shopName(y.s))} → Mức ${y.n}: <b>${V1(y.need)}/ngày</b> <small class="muted">(+${nf(0).format(Math.max(0,y.inc)*100)}%)</small>${y.gain>0?` <small class="pos">QLTP +${vnd(y.gain)}</small>`:''}${y.gs.length?` <small class="pos">${y.gs.map(g=>`${g.n} +${vnd(g.v)}`).join(' · ')}</small>`:''}</li>`).join('')}</ul>${nr.length>8?`<small class="muted">và ${nr.length-8} siêu thị khác</small>`:''}`:''}</div>`:''}
+     const UNIT=QTY?'sản lượng bán':'doanh thu';
+     const rwP=(RU?`<p class="ct-rw"><b>Thưởng QLTP:</b> ${esc(rTxt(RU))}${c.needTarget?' · siêu thị phải đạt Target DT':''}${GROW?` · DT nhóm ngành dự kiến T${M} phải cao hơn ${BT}`:''}. ${AREA?`Thưởng QLTP xét theo tổng ${UNIT} cả khu vực đạt mức.`:`Thưởng QLTP = tổng thưởng của các siêu thị đạt mức${c.sz?' (size siêu thị theo sheet đính kèm)':''}.`}</p>`:'')
+       +SR.map(o=>`<p class="ct-rw"><b>${o.h}:</b> ${esc(rTxt(o.R))}${c.needTarget?' · siêu thị phải đạt Target DT':''}. Xét theo ${UNIT} từng siêu thị, đạt mức nào nhận đúng mức đó.</p>`).join('');
+     const nK=lv.length+(SHOWRW?1:0)+SR.length;
      return `<div class="ct-card"><div class="ct-h"><h3 title="${esc(c.time)} · ${esc(c.scope)} · ${esc(c.goal)} · ${esc(c.cats.join(', '))}">${esc(c.name)}</h3>
-       <div class="ct-chips">${lv.map(l=>`<span class="lv">Mức ${l.n}: ≥ ${nf(0).format(l.r*100)}%<span class="ct-lg"> ${SELL?'bán / nhập':'DT '+BT}</span></span>`).join('')}</div>
-       ${RU?`<p class="ct-rw"><b>Thưởng QLTP:</b> ${esc(rwTxt)}${c.needTarget?' · siêu thị phải đạt Target DT':''}${GROW?` · DT nhóm ngành dự kiến T${M} phải cao hơn ${BT}`:''}. ${AREA?'Thưởng QLTP xét theo tổng doanh thu cả khu vực đạt mức.':`Thưởng QLTP = tổng thưởng của các siêu thị đạt mức${c.sz?' (size siêu thị theo sheet đính kèm)':''}.`}</p>`:''}
+       <div class="ct-chips">${lv.map(l=>`<span class="lv">Mức ${l.n}: ≥ ${nf(0).format(l.r*100)}%<span class="ct-lg"> ${SELL?'bán / nhập':LBL+' '+BT}</span></span>`).join('')}</div>
+       ${rwP}
        ${bmNote?`<p class="msg-err" style="margin:8px 0 0;font-size:12px">${bmNote}</p>`:''}
        ${(()=>{const mm=c.time.match(/\/(\d{1,2})(?:\/\d+)?\s*$/);const cm=mm?+mm[1]:null;return cm&&cm!==M?`<p class="msg-err" style="margin:8px 0 0;font-size:12px">Chương trình áp dụng tháng ${cm}, số liệu đang là tháng ${M}/${D.cur.y}.</p>`:''})()}
        ${miss.length?`<p class="msg-err" style="margin:8px 0 0;font-size:12px">Chưa khớp ngành hàng: ${miss.map(esc).join(', ')}.</p>`:''}</div>
-       <div class="ct-b"><div class="ct-kpis" style="--n:${lv.length+(SHOWRW?1:0)}">
-         ${lv.map((l,i)=>`<div class="fk"><span class="lbl"><span class="ct-lg">Siêu thị đạt </span>Mức ${l.n}${i<lv.length-1?'<span class="ct-lg"> trở lên</span><span class="ct-sm"> trở lên</span>':''}</span><span class="val num">${cnt(i)}/${Rs.length}</span></div>`).join('')}
-         ${SHOWRW?`<div class="fk"><span class="lbl">Thưởng QLTP<span class="ct-lg"> dự kiến</span></span><span class="val num ${TRW?'pos':''}">${TRW?vnd(TRW):'0đ'}</span>${QX&&AREA&&!TRW?`<small class="muted">KV ${QX.li>=0&&!ok(QX)?'chưa đạt Target':QX.gfail?'DT chưa tăng':'chưa đạt mức'}</small>`:''}</div>`:''}</div>
+       <div class="ct-b"><div class="ct-kpis" style="--n:${nK};--d:${Math.min(nK,6)};--m:${nK<=3?nK:nK===4?2:3}">
+         ${lv.map((l,i)=>`<div class="fk"><span class="lbl"><span class="ct-lg">Siêu thị đạt </span>Mức ${l.n}${i<lv.length-1?'<span class="ct-lg"> trở lên</span><span class="ct-sm"> trở lên</span>':''}</span><span class="val num">${cnt(i)}/${Rs.length}</span>${RU&&!AREA&&rwL(i)?`<small class="muted">Thưởng ${vnd(rwL(i))}</small>`:''}</div>`).join('')}
+         ${SHOWRW?`<div class="fk"><span class="lbl">Thưởng QLTP<span class="ct-lg"> dự kiến</span></span><span class="val num ${TRW?'pos':''}">${TRW?vnd(TRW):'0đ'}</span>${QX&&!TRW&&(AREA||QX.li<0)?`<small class="muted">KV ${QX.li>=0&&!ok(QX)?'chưa đạt Target':QX.gfail?'DT chưa tăng':AREA?'chưa đạt mức':'chưa đạt Mức 1'}</small>`:''}</div>`:''}
+         ${SR.map(o=>`<div class="fk"><span class="lbl">${o.h}<span class="ct-lg"> dự kiến</span></span><span class="val num ${o.T?'pos':''}">${o.T?vnd(o.T):'0đ'}</span>${Rs.length>1?`<small class="muted">${Rs.filter(x=>o.W[x.s]).length} siêu thị có thưởng</small>`:''}</div>`).join('')}</div>
        ${nearH}<div class="tbl-wrap">${t}</div></div></div>`}).join('');
-   box.querySelectorAll('tr[data-s],li[data-ns]').forEach(tr=>{const go=()=>setShop(tr.dataset.s||tr.dataset.ns);tr.onclick=go;tr.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}})}
+   box.querySelectorAll('tr[data-s],[data-ns]').forEach(tr=>{const go=()=>setShop(tr.dataset.s||tr.dataset.ns);tr.onclick=go;tr.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}}})}
 
   // Việc cần làm hôm nay (đầu tab Mục tiêu ngày)
   {const T=window.__TODO,box=document.getElementById('goalTodo');if(!T||ARCH){box.hidden=true;box.innerHTML=''}else{
@@ -1567,18 +1625,21 @@ async function readSheet(buf,pick){
 }
 async function readFile(f){
   const fbuf=await f.arrayBuffer();const aoa=await readSheet(fbuf);
-  const KEYS=['nganh hang bhx','tong so bill','ln luy ke','ma st','sl huy ton','chuong trinh thi dua'];
+  const KEYS=['nganh hang bhx','tong so bill','ln luy ke','ma st','sl huy ton','chuong trinh thi dua','dieu kien nhan thuong'];
   const hi=aoa.findIndex((r,i)=>i<15&&r&&r.some(c=>KEYS.includes(hk(c))));
   if(hi<0)throw new Error('Không nhận ra loại file: không thấy cột "Ngành hàng BHX", "Tổng số bill", "LN lũy kế" hoặc "Mã ST".');
   const H=aoa[hi].map(hk);const ix=n=>H.indexOf(hk(n));
   const rows=aoa.slice(hi+1).filter(r=>r&&r.some(c=>c!=null&&c!==''));
   const need=(...ns)=>{const miss=ns.filter(n=>ix(n)<0);if(miss.length)throw new Error('Thiếu cột: '+miss.join(', '));return ns.map(ix)};
-  if(ix('Chương trình Thi đua')>=0){
-    // file chương trình thi đua ngành hàng: mỗi dòng 1 chương trình
-    const [cN,cT,cP,cG,cM,cK]=need('Chương trình Thi đua','Thời gian','Phạm vi','Sản phẩm/Nhóm hàng Thi đua','Mục tiêu','Điều kiện nhận thưởng');const cQ=H.findIndex(h=>/qltp/.test(h));
+  if(ix('Chương trình Thi đua')>=0||ix('Điều kiện nhận thưởng')>=0){
+    // file chương trình thi đua ngành hàng: mỗi dòng 1 chương trình (cột tên: "Chương trình Thi đua" hoặc "Ngành hàng")
+    const nmC=ix('Chương trình Thi đua')>=0?'Chương trình Thi đua':'Ngành hàng';
+    const [cN,cT,cP,cG,cM,cK]=need(nmC,'Thời gian','Phạm vi','Sản phẩm/Nhóm hàng Thi đua','Mục tiêu','Điều kiện nhận thưởng');const cQ=H.findIndex(h=>/qltp/.test(h)),cST=H.findIndex(h=>h==='sieu thi'||h==='thuong sieu thi');
+    // nhóm hàng: bỏ dòng "Toàn bộ NH" (tiêu đề), giữ phần tên nếu chỉ có 1 dòng
+    const catsOf=t=>{const a=nz(t).split(/\n|;/).map(x=>x.trim()).filter(Boolean);const re=/^to[aà]n\s*b[oộ]\s*(nh|ng[aà]nh\s*h[aà]ng)\b\s*/i;const b=a.filter(x=>!re.test(x));return (b.length?b:a.map(x=>x.replace(re,'').trim())).filter(Boolean)};
     const list=rows.filter(r=>nz(r[cN])).map(r=>{const cond=nz(r[cK]);const lv=[];let m;const re=/m[uứ]c\s*(\d+)\s*:\s*~?\s*(\d+(?:[.,]\d+)?)\s*%/gi;
       while((m=re.exec(cond.normalize('NFC'))))lv.push({n:+m[1],r:parseFloat(m[2].replace(',','.'))/100});lv.sort((a,b)=>a.r-b.r);
-      return{name:nz(r[cN]).trim(),time:nz(r[cT]).trim(),scope:nz(r[cP]).trim(),cats:nz(r[cG]).split(/\n|;/).map(x=>x.trim()).filter(Boolean),goal:nz(r[cM]).trim(),cond,levels:lv,needTarget:/target/i.test(cond),qtRule:cQ>=0?nz(r[cQ]):''}});
+      return{name:nz(r[cN]).trim(),time:nz(r[cT]).trim(),scope:nz(r[cP]).trim(),cats:catsOf(r[cG]),goal:nz(r[cM]).trim(),cond,levels:lv,needTarget:/target/i.test(cond),qtRule:cQ>=0?nz(r[cQ]):'',stRule:cST>=0?nz(r[cST]):''}});
     if(!list.length)throw new Error('Không thấy chương trình thi đua nào trong file.');
     // các sheet phụ có cột MST + Size (vd sheet "bia nước"): size siêu thị dùng tính thưởng QLTP theo đ/ST
     const nk2=t=>String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[đĐ]/g,'d').toLowerCase().replace(/[^a-z0-9]/g,'');let szInfo=[];
@@ -1654,6 +1715,9 @@ async function readFile(f){
     return{kind:'base',shops,label:'Base',desc:`${Object.keys(shops).length} siêu thị`}}
   throw new Error('Không nhận ra loại file.');
 }
+// sản lượng bán (SL thực xuất) theo siêu thị × ngành hàng nhập xuất — lưu theo tháng để so sánh thi đua theo sản lượng (vd Thịt heo nóng)
+const lossQ=L=>{const q={};for(const s in (L&&L.rows)||{}){const o={};for(const c in L.rows[s]){const v=L.rows[s][c][3];if(v)o[c]=Math.round(v*1000)/1000}if(Object.keys(o).length)q[s]=o}return q};
+let EXTRA_LQ={};
 function merge(B,list){
   const mon={};
   mon[ymKey(B.cur.y,B.cur.m)]=Object.assign({y:B.cur.y,m:B.cur.m},B.sep);
@@ -1661,7 +1725,7 @@ function merge(B,list){
   let shops=B.shops,fresh=B.fresh,freshMonth=B.freshMonth||null,loss=B.loss||null,contests=B.contests||null;
   let ytd=B.ytd?JSON.parse(JSON.stringify(B.ytd)):null,ly=B.ly?JSON.parse(JSON.stringify(B.ly)):null;const revs=[];
   // Tải từng ngày: file không bắt đầu từ ngày 1 thì ghép vào số liệu đã lưu của tháng đó (thay các ngày trùng).
-  const bad=[],info=[];const cl=o=>{const r={};for(const k in o||{})r[k]=Object.assign({},o[k]);return r};
+  const bad=[],info=[],oldL=[];const cl=o=>{const r={};for(const k in o||{})r[k]=Object.assign({},o[k]);return r};
   // sắp xếp: file từ ngày 1 trước, file từng ngày sau, theo ngày bắt đầu
   const ord=x=>x.kind==='loss'?(x.loss.min||1):x.kind==='nganh'||x.kind==='bills'?Math.min(...Object.values(x.months).map(o=>o.min||1)):0;
   list=[...list].sort((a,b)=>ord(a)-ord(b));
@@ -1691,7 +1755,9 @@ function merge(B,list){
         info.push(`Số bill ${mm}: ghép ngày ${s.min}${s.billDays>s.min?'–'+s.billDays:''} vào số đã lưu (nay có đến ngày ${o.billDays}).`)}}
     if(p.kind==='base')shops=p.shops;
     if(p.kind==='loss'){const n=p.loss,mm=`tháng ${n.m}/${n.y}`;
-      if(!(n.min>1))loss=n;
+      // file nhập xuất của tháng cũ hơn tháng đang lưu: chỉ lưu sản lượng bán để so sánh thi đua, không thay số tháng hiện tại
+      if(loss&&n.y*100+n.m<loss.y*100+loss.m){if(n.hasX&&!(n.min>1)){oldL.push(n);info.push(`Nhập xuất Fresh ${mm}: lưu sản lượng bán đến ngày ${n.days} để so sánh thi đua (không thay số liệu tháng ${loss.m}/${loss.y}).`)}else bad.push(`Nhập xuất Fresh ${mm}: tháng cũ hơn số đã lưu (tháng ${loss.m}/${loss.y}). Muốn lưu sản lượng bán để so sánh thi đua thì cần file từ ngày 1, có cột SL thực xuất.`)}
+      else if(!(n.min>1))loss=n;
       else if(!loss||loss.y!==n.y||loss.m!==n.m)bad.push(`Nhập xuất Fresh ${mm}: chưa có số liệu đã lưu của tháng này, cần file từ ngày 1 (file đang từ ngày ${n.min}).`);
       else if(n.min<loss.days)bad.push(`Nhập xuất Fresh ${mm}: đã lưu đến ngày ${loss.days}, file bắt đầu ngày ${n.min}. Chỉ thay được ngày cuối đã lưu: hãy tải file từ ngày ${loss.days} (hoặc file từ ngày 1).`);
       else if(n.min>loss.days+1)bad.push(`Nhập xuất Fresh ${mm}: đã lưu đến ngày ${loss.days}, file bắt đầu ngày ${n.min} nên thiếu ngày ${loss.days+1}${n.min-1>loss.days+1?'–'+(n.min-1):''}.`);
@@ -1733,6 +1799,10 @@ function merge(B,list){
   // doanh thu ngành hàng từng tháng (giữ 14 tháng) để thi đua so với tháng ghi trong file (vd T7)
   const catm=Object.assign({},B.catm||{});for(const k in mon){const o=mon[k];if(o.cat&&o.days)catm[k]={d:o.days,c:o.cat}}
   Object.keys(catm).sort().reverse().slice(14).forEach(k=>delete catm[k]);
+  const lossm=Object.assign({},B.lossm||{});const putQ=(k,v)=>{if(v&&(!lossm[k]||lossm[k].d<=v.d))lossm[k]=v};
+  for(const k in EXTRA_LQ)putQ(k,EXTRA_LQ[k]);oldL.forEach(n=>putQ(ymKey(n.y,n.m),{d:n.days,q:lossQ(n)}));
+  if(loss&&loss.hasX)lossm[ymKey(loss.y,loss.m)]={d:loss.days,q:lossQ(loss)};
+  Object.keys(lossm).sort().reverse().slice(6).forEach(k=>delete lossm[k]); // giữ 6 tháng gần nhất
   if(ytd&&ytd.dd){const ms=Object.keys(ytd.dd).map(Number).sort((a,b)=>b-a);ms.slice(2).forEach(m=>delete ytd.dd[m])}
   if(ytd&&ytd.pt){const ms=Object.keys(ytd.pt).map(Number).sort((a,b)=>b-a);ms.slice(2).forEach(m=>delete ytd.pt[m])} // chỉ giữ số theo ngày của 2 tháng gần nhất
   if(bad.length)return{bad};
@@ -1745,7 +1815,7 @@ function merge(B,list){
   if(!p||!p.bills)errs.push(`file doanh thu (số bill) tháng ${pm.m}/${pm.y}`);
   if(errs.length)return{errs,c};
   const pack=o=>({daily:o.daily,cat:o.cat,days:o.days,bills:o.bills,billDays:o.billDays,fday:o.fday,catLast:o.catLast});
-  const D={shops,freshCats:B.freshCats,cur:{m:c.m,y:c.y,dim:dimOf(c.y,c.m)},prev:{m:pm.m,y:pm.y,dim:dimOf(pm.y,pm.m)},aug:pack(p),sep:pack(c),fresh,freshMonth,loss,ytd,ly,catm,contests,goalPct:(PREVIEW_D||B).goalPct||0};
+  const D={shops,freshCats:B.freshCats,cur:{m:c.m,y:c.y,dim:dimOf(c.y,c.m)},prev:{m:pm.m,y:pm.y,dim:dimOf(pm.y,pm.m)},aug:pack(p),sep:pack(c),fresh,freshMonth,loss,ytd,ly,catm,lossm,contests,goalPct:(PREVIEW_D||B).goalPct||0};
   const warn=[...info];
   if(p.days<dimOf(pm.y,pm.m))warn.push(`Doanh thu tháng ${pm.m} mới có đến ngày ${p.days}. Nên tải thêm file ngành hàng tháng ${pm.m} đủ cả tháng để so sánh chính xác.`);
   if(p.billDays<dimOf(pm.y,pm.m))warn.push(`Số bill tháng ${pm.m} mới có đến ngày ${p.billDays}. Nên tải thêm file doanh thu tháng ${pm.m} đủ cả tháng.`);
@@ -1793,6 +1863,13 @@ async function handleFiles(files){
       row.children[1].className='pill up';row.children[1].textContent=p.label;row.children[2].textContent=p.desc}
     catch(err){row.children[1].className='pill down';row.children[1].textContent='Không dùng được';row.children[2].textContent=err.message}
   }
+  // thi đua theo sản lượng bán: tháng so sánh chưa có sản lượng thì lấy từ số liệu đã chốt của tháng đó (nếu có)
+  EXTRA_LQ={};try{const ctl=(parsed.find(q=>q.kind==='contest')||{}).list||BASE_D.contests||[];const have=BASE_D.lossm||{};
+    const ks=[...new Set(ctl.filter(c=>/s[aả]n\s*l[uư][oợ]ng/i.test((c.goal||'')+' '+(c.cond||''))&&!/b[aá]n\s*\/\s*nh[aậ]p/i.test(c.cond||'')).map(c=>{const m=String((c.goal||'')+' '+(c.cond||'')).match(/T\s*0?(\d{1,2})\s*\/\s*(\d{4})/i);return m?ymKey(+m[2],+m[1]):null}).filter(Boolean))];
+    for(const k of ks){if(have[k]&&have[k].d>=dimOf(+k.slice(0,4),+k.slice(5)))continue;if(parsed.some(q=>q.kind==='loss'&&ymKey(q.loss.y,q.loss.m)===k))continue;if(!(window.__MONTHS||[]).includes(k))continue;
+      sum.textContent=`Đang lấy sản lượng bán tháng ${+k.slice(5)}/${k.slice(0,4)} đã lưu…`;
+      const r=await window.__api('/api/data?m='+encodeURIComponent(k));const L=r.ok&&r.j.data&&r.j.data.loss;
+      if(L&&L.hasX&&ymKey(L.y,L.m)===k)EXTRA_LQ[k]={d:L.days,q:lossQ(L)}}}catch(e){}
   merged=parsed.length?merge(BASE_D,parsed):null;
   if(!merged){sum.className='upsum err';sum.textContent='Chưa có file nào dùng được.';return}
   if(merged.bad){sum.className='upsum err';sum.innerHTML=`<b>Chưa ghép được file theo ngày:</b><br>${merged.bad.map(w=>'• '+escU(w)).join('<br>')}`;return}
