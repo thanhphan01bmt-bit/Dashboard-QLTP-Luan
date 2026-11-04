@@ -1372,12 +1372,20 @@ function render(){
      // loại chương trình: theo tỷ lệ bán / nhập (file nhập xuất), theo sản lượng bán (kg, file nhập xuất) hoặc tăng trưởng doanh thu so với tháng ghi trong file
      const SELL=/b[aá]n\s*\/\s*nh[aậ]p/i.test(c.cond||'');
      const QTY=!SELL&&/s[aả]n\s*l[uư][oợ]ng/i.test((c.goal||'')+' '+(c.cond||''));
+     // thi đua theo sản phẩm (cột Sản phẩm có "Toàn bộ sản phẩm …", vd heo C.P): tính sản lượng bán của đúng các SP đó
+     const PRD=QTY&&c.cats.some(x=>/s[aả]n\s*ph[aẩ]m/i.test(x));
+     const pw=t=>String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[đĐ]/g,'d').toLowerCase().replace(/[^a-z0-9\s]/g,'').split(/\s+/).filter(Boolean);
+     const PP=PRD?c.cats.map(x=>{const mm=x.match(/^to[aà]n\s*b[oộ]\s*(?:c[aá]c\s*)?s[aả]n\s*ph[aẩ]m\s*(.*)$/i);if(mm){const w=pw(mm[1]);return n=>{if(!w.length)return false;const W=pw(n);return w.every(t=>W.includes(t))}}const k=nk(x);return n=>k.length>=4&&nk(n).includes(k)}):[];
+     const PM={};const inP=n=>n in PM?PM[n]:(PM[n]=PP.some(f=>f(n)));
+     const cpCur=s=>{let t=0;const o=((LR&&LR.cpd)||{})[s]||{},N=(LR&&LR.cpn)||{};for(const q in o)for(const pc in o[q])if(inP(N[pc]||pc))t+=o[q][pc];return t};
+     const cpBase=s=>{let t=0;const o=((BQ||{}).p||{})[s]||{},N=(BQ||{}).pn||{};for(const pc in o)if(inP(N[pc]||pc))t+=+o[pc]||0;return t};
      // thi đua bán / nhập có thêm điều kiện tăng trưởng doanh thu (vd "Tăng trưởng doanh thu so với T9")
      const GROW=SELL&&/t[aă]ng\s*tr[uư][oở]ng/i.test((c.cond||'')+' '+(c.goal||''));
      const bmM=String((c.goal||'')+' '+(c.cond||'')).match(/T\s*0?(\d{1,2})\s*\/\s*(\d{4})/i);const bm=bmM?{m:+bmM[1],y:+bmM[2]}:{m:P,y:PY};
      const bmK=bm.y+'-'+String(bm.m).padStart(2,'0'),bmH=(D.catm||{})[bmK],BQ=QTY?(D.lossm||{})[bmK]:null;
      const keys=[],miss=[];
-     if(QTY){const LC=new Set([...Object.values((LR||{}).rows||{}),...Object.values((BQ||{}).q||{})].flatMap(o=>Object.keys(o)));
+     if(PRD){const N={...((LR||{}).cpn||{}),...((BQ||{}).pn||{})};if(Object.keys(N).length&&!Object.values(N).some(inP))miss.push(c.cats[0])}
+     else if(QTY){const LC=new Set([...Object.values((LR||{}).rows||{}),...Object.values((BQ||{}).q||{})].flatMap(o=>Object.keys(o)));
        c.cats.forEach((n,i)=>{if(LC.size&&![...LC].some(lossPred[i]))miss.push(n)})}
      else c.cats.forEach(n=>{const k=findCat(n);if(k&&!keys.includes(k))keys.push(k);else if(!k)miss.push(n)});
      const lv=c.levels.length?c.levels:[{n:1,r:1}];
@@ -1387,12 +1395,12 @@ function render(){
      const sum=(o,s)=>keys.reduce((t,k)=>t+(+(((o||{})[s]||{})[k])||0),0);
      const inL=cn=>lossPred.some(f=>f(cn));
      const sell=s=>{let n=0,x=0;const o=(LR&&LR.rows[s])||{};for(const cn in o){if(!inL(cn))continue;n+=o[cn][0];x+=o[cn][3]||0}return{n,x}};
-     const curQ=s=>{let t=0;const o=(LR&&LR.rows[s])||{};for(const cn in o)if(inL(cn))t+=o[cn][3]||0;return t};
-     const baseQ=s=>{let t=0;const o=((BQ||{}).q||{})[s]||{};for(const cn in o)if(inL(cn))t+=+o[cn]||0;return t};
+     const curQ=s=>{if(PRD)return cpCur(s);let t=0;const o=(LR&&LR.rows[s])||{};for(const cn in o)if(inL(cn))t+=o[cn][3]||0;return t};
+     const baseQ=s=>{if(PRD)return cpBase(s);let t=0;const o=((BQ||{}).q||{})[s]||{};for(const cn in o)if(inL(cn))t+=+o[cn]||0;return t};
      const baseCat=bm.m===P&&bm.y===PY?D.aug.cat:bm.m===M&&bm.y===D.cur.y?null:bmH?bmH.c:null;const BT='T'+bm.m;
      const HASB=QTY?!!BQ:!!baseCat;const dd=QTY?(LR?LR.days:0):d9,lf=Math.max(0,DIM9-dd);
      const LBL=QTY?'SL bán':'DT',V=v=>QTY?nf(0).format(v)+' kg':tr(v)+' tr',V1=v=>QTY?nf(1).format(v)+' kg':tr1(v)+' tr';
-     const bmNote=QTY?(!LR?`Chưa có sản lượng bán tháng ${M}: tải file nhập xuất Fresh tháng ${M} (có cột SL thực xuất).`:!BQ?`Chưa có sản lượng bán tháng ${bm.m}/${bm.y} để so sánh. ${CAN_EDIT?`Bấm <b>Tải file lên</b> và chọn file nhập xuất Fresh tháng ${bm.m}/${bm.y} (cả tháng, có cột SL thực xuất).`:'Quản trị sẽ tải file tháng này lên.'}`:BQ.d<new Date(bm.y,bm.m,0).getDate()?`Sản lượng bán tháng ${bm.m}/${bm.y} mới có đến ngày ${BQ.d}, cần file nhập xuất đủ cả tháng.`:'')
+     const bmNote=QTY?(!LR?`Chưa có sản lượng bán tháng ${M}: tải file nhập xuất Fresh tháng ${M} (có cột SL thực xuất).`:PRD&&!LR.cpd?`Chưa có sản lượng bán theo sản phẩm tháng ${M}: tải lại file nhập xuất Fresh tháng ${M} từ ngày 1 (có cột Mã sản phẩm, Tên sản phẩm, SL thực xuất).`:!BQ||(PRD&&!BQ.p)?`Chưa có sản lượng bán ${PRD?'theo sản phẩm ':''}tháng ${bm.m}/${bm.y} để so sánh. ${CAN_EDIT?`Bấm <b>Tải file lên</b> và chọn file nhập xuất Fresh tháng ${bm.m}/${bm.y} (cả tháng, có cột SL thực xuất).`:'Quản trị sẽ tải file tháng này lên.'}`:BQ.d<new Date(bm.y,bm.m,0).getDate()?`Sản lượng bán tháng ${bm.m}/${bm.y} mới có đến ngày ${BQ.d}, cần file nhập xuất đủ cả tháng.`:'')
        :SELL&&!LR?`Chưa có tỷ lệ bán / nhập tháng ${M}: tải file nhập xuất Fresh tháng ${M} (có cột SL thực xuất).`:SELL&&!GROW?'':!baseCat?`Chưa có doanh thu ngành hàng tháng ${bm.m}/${bm.y} để so sánh. ${CAN_EDIT?`Bấm <b>Tải file lên</b> và chọn file doanh thu ngành hàng tháng ${bm.m}/${bm.y} (cả tháng).`:'Quản trị sẽ tải file tháng này lên.'}`:bmH&&bmH.d<new Date(bm.y,bm.m,0).getDate()&&!(bm.m===P&&bm.y===PY)?`Doanh thu ngành hàng tháng ${bm.m}/${bm.y} mới có đến ngày ${bmH.d}, cần file đủ cả tháng.`:'';
      const mk=u=>{const ss=xs(u);let base,cum,proj;
        if(QTY){base=ss.reduce((t,s)=>t+baseQ(s),0);cum=ss.reduce((t,s)=>t+curQ(s),0);proj=dd?cum/dd*DIM9:0}
@@ -1679,6 +1687,11 @@ async function readFile(f){
     const isTHS=pc=>/^th[uủ]y h[aả]i s[aả]n/i.test(String((prod[pc]||[])[1]||'').normalize('NFC'));
     const prd={day:days,s:{}};for(const s in pdA){const o=pdA[s][days];if(!o)continue;const all=Object.entries(o).filter(([p,b])=>b[1]>0).sort((a,b)=>b[1][1]-a[1][1]);const top=all.slice(0,40);all.filter(([p])=>isTHS(p)).slice(0,5).forEach(e=>{if(!top.includes(e))top.push(e)});prd.s[s]=top.map(([p,b])=>[p,r3(b[0]),r3(b[1])])}
     const LO=cP>=0?{y,m,days,rows:rowsL,prod,pr,prd,daily:dl}:{y,m,days,rows:rowsL,daily:dl};if(cX>=0)LO.hasX=true;if(mn>1)LO.min=mn;
+    // sản lượng bán (SL thực xuất) theo sản phẩm, theo ngày: chỉ giữ SP có "C.P" / "heo" trong tên (thi đua theo sản phẩm, vd Thịt heo nóng: SP heo C.P)
+    if(cP>=0&&cX>=0){const cpd={},cpn={};const CPN=t=>/(^|[^a-z0-9])c\s*\.?\s*p([^a-z0-9]|$)|heo/i.test(String(t).normalize('NFC'));
+      rows.forEach(r=>{const d=toYMD(r[cD]);if(!d||d.y!==y||d.m!==m)return;const code=nz(r[cS]).split(' - ')[0].trim(),pc=nz(r[cP]);if(!code||!pc)return;const nm=cPN>=0?nz(r[cPN]):pc;if(!CPN(nm))return;const vx=numU(r[cX]);if(!vx)return;
+        cpn[pc]=nm;const a=cpd[code]||(cpd[code]={}),b=a[d.d]||(a[d.d]={});b[pc]=(b[pc]||0)+vx});
+      for(const s in cpd)for(const k in cpd[s])for(const q in cpd[s][k])cpd[s][k][q]=r3(cpd[s][k][q]);if(Object.keys(cpn).length){LO.cpd=cpd;LO.cpn=cpn}}
     // số đầy đủ của ngày cuối trong file: để tải lại cùng ngày (cập nhật liên tục trong ngày) thì thay số ngày đó, không cộng 2 lần
     {const lr={};for(const s in dr[days]||{}){lr[s]={};for(const c in dr[days][s])lr[s][c]=dr[days][s][c].map(r3)}
      const lp={};if(cP>=0)for(const s in pdA){const o=pdA[s][days];if(o)lp[s]=Object.entries(o).map(([q,b])=>[q,r3(b[0]),r3(b[1])])}
@@ -1727,6 +1740,8 @@ async function readFile(f){
   throw new Error('Không nhận ra loại file.');
 }
 // sản lượng bán (SL thực xuất) theo siêu thị × ngành hàng nhập xuất — lưu theo tháng để so sánh thi đua theo sản lượng (vd Thịt heo nóng)
+// sản lượng bán theo sản phẩm (cộng các ngày) để so sánh thi đua theo sản phẩm
+const lossP=L=>{if(!L||!L.cpd)return{};const p={};for(const s in L.cpd){const o={};for(const d in L.cpd[s])for(const c in L.cpd[s][d])o[c]=(o[c]||0)+L.cpd[s][d][c];for(const c in o)o[c]=Math.round(o[c]*1000)/1000;p[s]=o}return{p,pn:L.cpn||{}}};
 const lossQ=L=>{const q={};for(const s in (L&&L.rows)||{}){const o={};for(const c in L.rows[s]){const v=L.rows[s][c][3];if(v)o[c]=Math.round(v*1000)/1000}if(Object.keys(o).length)q[s]=o}return q};
 let EXTRA_LQ={};
 function merge(B,list){
@@ -1784,6 +1799,8 @@ function merge(B,list){
         const rows=cl(base.rows);for(const sh in n.rows){const o=rows[sh]||(rows[sh]={});for(const c in n.rows[sh]){const a=n.rows[sh][c],b=o[c];o[c]=b?a.map((v,i)=>r3(v+(b[i]||0))):a.slice()}}
         const daily=cl(base.daily);for(const sh in n.daily)Object.assign(daily[sh]||(daily[sh]={}),n.daily[sh]);
         const nl={...base,rows,daily,days:n.days,last:n.last};delete nl.min;if(hx)nl.hasX=true;else delete nl.hasX;
+        if(base.cpd&&n.cpd){const cp=cl(base.cpd);for(const sh in cp)for(let q=n.min;q<=n.days;q++)delete cp[sh][q];for(const sh in n.cpd)Object.assign(cp[sh]||(cp[sh]={}),n.cpd[sh]);nl.cpd=cp;nl.cpn=Object.assign({},base.cpn,n.cpn)}
+        else{delete nl.cpd;delete nl.cpn;if(n.cpd)info.push(`Nhập xuất Fresh ${mm}: số đã lưu chưa có sản lượng bán theo sản phẩm (thi đua SP heo C.P). Tải lại file nhập xuất từ ngày 1 để tính.`)}
         if(base.pr&&n.pr){const pr={};const sh=new Set([...Object.keys(base.pr),...Object.keys(n.pr)]);
           sh.forEach(x=>{const m={};(base.pr[x]||[]).forEach(([q,a,b])=>m[q]=[a,b]);(n.pr[x]||[]).forEach(([q,a,b])=>{const o=m[q]||(m[q]=[0,0]);o[0]+=a;o[1]+=b});pr[x]=Object.entries(m).map(([q,[a,b]])=>[q,r3(a),r3(b)])});
           nl.pr=pr;nl.prod=Object.assign({},loss.prod,n.prod);nl.prd=n.prd}
@@ -1811,8 +1828,8 @@ function merge(B,list){
   const catm=Object.assign({},B.catm||{});for(const k in mon){const o=mon[k];if(o.cat&&o.days)catm[k]={d:o.days,c:o.cat}}
   Object.keys(catm).sort().reverse().slice(14).forEach(k=>delete catm[k]);
   const lossm=Object.assign({},B.lossm||{});const putQ=(k,v)=>{if(v&&(!lossm[k]||lossm[k].d<=v.d))lossm[k]=v};
-  for(const k in EXTRA_LQ)putQ(k,EXTRA_LQ[k]);oldL.forEach(n=>putQ(ymKey(n.y,n.m),{d:n.days,q:lossQ(n)}));
-  if(loss&&loss.hasX)lossm[ymKey(loss.y,loss.m)]={d:loss.days,q:lossQ(loss)};
+  for(const k in EXTRA_LQ)putQ(k,EXTRA_LQ[k]);oldL.forEach(n=>putQ(ymKey(n.y,n.m),{d:n.days,q:lossQ(n),...lossP(n)}));
+  if(loss&&loss.hasX)lossm[ymKey(loss.y,loss.m)]={d:loss.days,q:lossQ(loss),...lossP(loss)};
   Object.keys(lossm).sort().reverse().slice(6).forEach(k=>delete lossm[k]); // giữ 6 tháng gần nhất
   if(ytd&&ytd.dd){const ms=Object.keys(ytd.dd).map(Number).sort((a,b)=>b-a);ms.slice(2).forEach(m=>delete ytd.dd[m])}
   if(ytd&&ytd.pt){const ms=Object.keys(ytd.pt).map(Number).sort((a,b)=>b-a);ms.slice(2).forEach(m=>delete ytd.pt[m])} // chỉ giữ số theo ngày của 2 tháng gần nhất
@@ -1880,7 +1897,7 @@ async function handleFiles(files){
     for(const k of ks){if(have[k]&&have[k].d>=dimOf(+k.slice(0,4),+k.slice(5)))continue;if(parsed.some(q=>q.kind==='loss'&&ymKey(q.loss.y,q.loss.m)===k))continue;if(!(window.__MONTHS||[]).includes(k))continue;
       sum.textContent=`Đang lấy sản lượng bán tháng ${+k.slice(5)}/${k.slice(0,4)} đã lưu…`;
       const r=await window.__api('/api/data?m='+encodeURIComponent(k));const L=r.ok&&r.j.data&&r.j.data.loss;
-      if(L&&L.hasX&&ymKey(L.y,L.m)===k)EXTRA_LQ[k]={d:L.days,q:lossQ(L)}}}catch(e){}
+      if(L&&L.hasX&&ymKey(L.y,L.m)===k)EXTRA_LQ[k]={d:L.days,q:lossQ(L),...lossP(L)}}}catch(e){}
   merged=parsed.length?merge(BASE_D,parsed):null;
   if(!merged){sum.className='upsum err';sum.textContent='Chưa có file nào dùng được.';return}
   if(merged.bad){sum.className='upsum err';sum.innerHTML=`<b>Chưa ghép được file theo ngày:</b><br>${merged.bad.map(w=>'• '+escU(w)).join('<br>')}`;return}
