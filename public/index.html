@@ -635,9 +635,9 @@ body.pv .wrap{padding-bottom:120px}
   </section>
 
   <section class="card" id="compSec">
-    <div class="sec-title"><h2>Bảng thi đua Quản lý</h2><span class="note">Thang 100 điểm · Doanh thu so T<span data-t="P"></span> 40 · Hủy thủy hải sản 30 · Bán / nhập trứng 30 · chấm theo ngưỡng</span></div>
+    <div class="sec-title"><h2>Bảng thi đua Quản lý</h2><span class="note">Thang 100 điểm · Doanh thu so T<span data-t="P"></span> 50 · Hủy thủy hải sản 25 · Bán / nhập trứng 25 · chấm theo ngưỡng</span></div>
     <p class="lhint" id="compPrize"></p>
-    <p class="lhint">Bấm vào một quản lý để xem dashboard của siêu thị đó. Mỗi tiêu chí chấm theo ngưỡng: đạt mức đủ điểm thì được trọn điểm, chạm mức 0 điểm thì 0, ở giữa tính theo tỷ lệ. <b>Doanh thu</b> so tháng trước: từ +5% = 40 điểm, từ −10% trở xuống = 0 (tăng từ +5% là điều kiện nhận thưởng). <b>% hủy thủy hải sản</b> (SL hủy ÷ SL nhập): từ 3% trở xuống = 30 điểm, từ 15% trở lên = 0. <b>Bán / nhập trứng</b>: từ 100% = 30 điểm, từ 85% trở xuống = 0. Hủy và trứng tính lũy kế tháng từ file nhập xuất Fresh. Bằng điểm thì xếp theo doanh thu tăng trưởng cao hơn.</p>
+    <p class="lhint">Bấm vào một quản lý để xem dashboard của siêu thị đó. Mỗi tiêu chí chấm theo ngưỡng: đạt mức đủ điểm thì được trọn điểm, chạm mức 0 điểm thì 0, ở giữa tính theo tỷ lệ. <b>Doanh thu</b> so tháng trước: từ +5% = 50 điểm, từ −10% trở xuống = 0 (tăng từ +5% là điều kiện nhận thưởng). <b>% hủy thủy hải sản</b> (SL hủy ÷ SL nhập): từ 3% trở xuống = 25 điểm, từ 12% trở lên = 0. <b>Bán / nhập trứng</b>: từ 100% = 25 điểm, từ 80% trở xuống = 0. Hủy và trứng tính lũy kế tháng từ file nhập xuất Fresh. Bằng điểm thì xếp theo doanh thu tăng trưởng cao hơn.</p>
     <div class="tbl-wrap"><table id="compTbl"></table></div>
   </section>
 
@@ -1305,7 +1305,7 @@ function render(){
   rt+='</tbody>';const rT=document.getElementById('rankTbl');rT.innerHTML=rt;
 
   // competition: 3 tiêu chí · Doanh thu so tháng trước (MT +5%) · Hủy thủy hải sản · Bán / nhập trứng
-  {const W1=40,W2=30,W3=30,GOALG=.05;
+  {const W1=50,W2=25,W3=25,GOALG=.05;
     const L=D.loss&&D.loss.rows&&D.loss.y===D.cur.y&&D.loss.m===D.cur.m?D.loss:null,HX=!!(L&&L.hasX);
     const THS=c=>/^th[uủ]y h[aả]i s[aả]n/i.test(String(c).normalize('NFC')),EGG=c=>/^tr[uứ]ng/i.test(String(c).normalize('NFC'));
     const PRZ=[1500000,1000000,500000],przTxt=v=>nf(0).format(v)+'đ',gLbl='+'+nf(0).format(GOALG*100)+'%';
@@ -1318,7 +1318,7 @@ function render(){
       return {s,ch:a.ch,thr,thi,eg,isNew:pd<DIM8}});
     const rk=cs.filter(c=>!c.isNew&&c.ch!=null&&isFinite(c.ch));
     // chấm theo ngưỡng: đạt mức "đủ điểm" được trọn điểm, chạm mức "0 điểm" thì 0, ở giữa tính theo tỷ lệ (không so với siêu thị khác)
-    const TH={dt:{z:-.10,f:.05},ths:{z:.15,f:.03},egg:{z:.85,f:1}};
+    const TH={dt:{z:-.10,f:.05},ths:{z:.12,f:.03},egg:{z:.80,f:1}};
     const lin=(v,t)=>v==null||!isFinite(v)?0:Math.max(0,Math.min(1,(v-t.z)/(t.f-t.z)));
     rk.forEach(c=>{c.p1=W1*lin(c.ch,TH.dt);c.p2=W2*lin(c.thr,TH.ths);c.p3=W3*lin(c.eg,TH.egg);c.tot=c.p1+c.p2+c.p3;c.ok=c.ch>=GOALG-1e-9});
     // bằng điểm: xếp theo doanh thu tăng trưởng cao hơn
