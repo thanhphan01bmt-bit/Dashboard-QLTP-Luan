@@ -33,14 +33,26 @@ function menuMsg() {
 }
 const fmtVN = (iso) => { try { return new Date(iso).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' }); } catch { return ''; } };
 
-async function reply(token, replyToken, msg) {
+// tag: gắn @All (tag cả nhóm) vào đầu tin trả lời — chỉ dùng trong nhóm / phòng chat, tắt bằng LINE_TAG_ALL=0
+async function reply(token, replyToken, msg, tag = false) {
   const one = (x) => (typeof x === 'string' ? { type: 'text', text: x.slice(0, 4900) } : x);
-  const m = Array.isArray(msg) ? msg.map(one) : one(msg);
-  const r = await fetch('https://api.line.me/v2/bot/message/reply', {
+  const plain = (Array.isArray(msg) ? msg : [msg]).map(one);
+  let tagged = null;
+  if (tag && process.env.LINE_TAG_ALL !== '0') {
+    const all = (t) => ({ type: 'textV2', text: `{all} ${t.replace(/[{}]/g, (c) => c + c)}`.slice(0, 4900), substitution: { all: { type: 'mention', mentionee: { type: 'all' } } } });
+    const i = plain.findIndex((x) => x.type === 'text');
+    tagged = plain.slice();
+    if (i >= 0) tagged[i] = all(plain[i].text);
+    else if (tagged.length < 5) tagged.unshift(all('Mục tiêu ngày · bấm 1 mục bên dưới để xem ảnh'));
+  }
+  const send = (messages) => fetch('https://api.line.me/v2/bot/message/reply', {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ replyToken, messages: Array.isArray(m) ? m : [m] }),
+    body: JSON.stringify({ replyToken, messages }),
   });
+  let r = await send(tagged || plain);
+  // LINE từ chối tin có tag (400) thì gửi lại tin thường
+  if (!r.ok && tagged && r.status === 400) { console.error('LINE reply @All', await r.text().catch(() => '')); r = await send(plain); }
   if (!r.ok) console.error('LINE reply', r.status, await r.text().catch(() => ''));
 }
 
@@ -61,7 +73,7 @@ export default {
       try {
         // bấm 1 mục trong menu Mục tiêu ngày → gửi ảnh mục đó
         if (ev.type === 'postback' && ev.replyToken) {
-          const src = ev.source || {}, id = src.groupId || src.roomId || src.userId || '';
+          const src = ev.source || {}, id = src.groupId || src.roomId || src.userId || '', grp = !!(src.groupId || src.roomId);
           const k = new URLSearchParams(String((ev.postback || {}).data || '')).get('img');
           if (!IMG_KEYS[k]) continue;
           if (!allow.includes(id)) { await reply(token, ev.replyToken, 'Nhóm này chưa được cấp quyền xem doanh thu.'); continue; }
@@ -69,19 +81,19 @@ export default {
           if (!m) { await reply(token, ev.replyToken, `Chưa có ảnh ${IMG_KEYS[k]}. Ảnh được tạo mỗi lần lưu số liệu trên dashboard.`); continue; }
           const u = imgUrl(new URL(req.url).origin, k, m.at);
           const img = { type: 'image', originalContentUrl: u, previewImageUrl: u };
-          await reply(token, ev.replyToken, [`${IMG_KEYS[k]} · toàn khu vực · số liệu lưu lúc ${fmtVN(m.at)}`, img]);
+          await reply(token, ev.replyToken, [`${IMG_KEYS[k]} · toàn khu vực · số liệu lưu lúc ${fmtVN(m.at)}`, img], grp);
           continue;
         }
         if (ev.type !== 'message' || !ev.message || ev.message.type !== 'text' || !ev.replyToken) continue;
         const t = String(ev.message.text || '').trim().toLowerCase().replace(/\s+/g, ' ');
-        const src = ev.source || {}, id = src.groupId || src.roomId || src.userId || '';
+        const src = ev.source || {}, id = src.groupId || src.roomId || src.userId || '', grp = !!(src.groupId || src.roomId);
         if (t === 'dt id') { await reply(token, ev.replyToken, `Mã của nhóm / cuộc trò chuyện này:\n${id}\n\nGửi mã này cho quản trị dashboard để thêm vào LINE_GROUPS.`); continue; }
         const isMenu = MENU.test(noAcc(t));
         if (!ASK.test(t) && !isMenu) continue;
         if (!allow.includes(id)) { await reply(token, ev.replyToken, 'Nhóm này chưa được cấp quyền xem doanh thu. Gõ "dt id" để lấy mã nhóm rồi gửi quản trị dashboard.'); continue; }
-        if (isMenu) { await reply(token, ev.replyToken, menuMsg()); continue; }
+        if (isMenu) { await reply(token, ev.replyToken, menuMsg(), grp); continue; }
         const doc = await readJSON('data/current.json');
-        await reply(token, ev.replyToken, doc && doc.data ? areaReply(doc.data, doc.meta) : 'Dashboard chưa có số liệu.');
+        await reply(token, ev.replyToken, doc && doc.data ? areaReply(doc.data, doc.meta) : 'Dashboard chưa có số liệu.', grp && !!(doc && doc.data));
       } catch (e) { console.error('line event', e); }
     }
     return json({ ok: true });
