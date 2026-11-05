@@ -165,6 +165,29 @@ th:first-child,td:first-child,th.l,td.l{text-align:left}
 tbody tr[tabindex]{cursor:pointer}
 tbody tr:hover{background:var(--surface2)}
 tr.sel td{background:var(--hl)}
+/* điện thoại: bảng rộng không co nhỏ quá 85%, vuốt ngang để xem thêm cột, cột tên siêu thị đứng yên */
+.tbl-wrap>table[data-stk] tr>:first-child,.tbl-wrap>table[data-stk="2"] tr>:nth-child(2){position:sticky;left:0;z-index:2;background:var(--surface);box-shadow:inset -1px 0 0 var(--grid)}
+.tbl-wrap>table[data-stk="2"] tr>:nth-child(2){left:var(--stk2,0)}
+.tbl-wrap>table[data-stk="2"] tr>td:first-child{min-width:0;width:1%;white-space:nowrap}
+@media (max-width:760px){.tbl-wrap>table{min-width:0}}
+.tbl-wrap>table[data-stk] thead th:first-child,.tbl-wrap>table[data-stk="2"] thead th:nth-child(2){z-index:3;background:var(--surface2)}
+.tbl-wrap>table[data-stk] tfoot>tr>:first-child,.tbl-wrap>table[data-stk="2"] tfoot>tr>:nth-child(2){background:var(--surface2)}
+.tbl-wrap>table[data-stk] tr.sel>td:first-child,.tbl-wrap>table[data-stk="2"] tr.sel>td:nth-child(2){background:var(--hl)}
+.tbl-wrap>table[data-stk] tr.ldet>td:first-child{background:var(--accent-soft);box-shadow:none}
+.tbl-wrap>table[data-stk] td.l,.tbl-wrap>table[data-stk="2"] tr>td:nth-child(2){white-space:normal;min-width:96px;max-width:150px}
+/* cơ cấu ngành hàng: danh sách có thanh tỷ trọng thay cho biểu đồ tròn */
+#mix.pie{display:block;margin-top:12px}
+#mix .pl{gap:9px}
+#mix .pl .r{row-gap:4px}
+#mix .pl .r .bar{grid-column:2/4;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+#mix .pl .r .bar b{display:block;height:100%;border-radius:3px}
+/* thi đua ngành hàng: cách tính thưởng thu gọn */
+.ct-how{margin:8px 0 0}
+.ct-how>summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--accent);list-style:none;display:inline-flex;align-items:center;gap:5px;padding:3px 0}
+.ct-how>summary::-webkit-details-marker{display:none}
+.ct-how>summary::after{content:"▾";font-size:11px;transition:transform .15s}
+.ct-how[open]>summary::after{transform:rotate(180deg)}
+.ct-how>.ct-rw:first-of-type{margin-top:4px}
 .rk{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;font-size:11px;font-weight:600;background:var(--surface2);color:var(--ink2)}
 .rk.hot{background:var(--bad-bg);color:var(--bad)}
 .rk.top{color:#fff}.rk.top1{background:#c9971c}.rk.top2{background:#8d99a3}.rk.top3{background:#b0703f}
@@ -1257,9 +1280,7 @@ function render(){
     return `M${P(R,a)}A${R} ${R} 0 ${L} 1 ${P(R,b)}L${P(r0,b)}A${r0} ${r0} 0 ${L} 0 ${P(r0,a)}Z`};
   const ttl=c=>`${c.n}: ${moneyS(c.p)} (${pct(c.p/pt)})${c.sub?` · gồm ${c.sub} ngành`:''}`;
   const paths=sl.map((c,i)=>{const a=a0,b=a0+c.p/pt*2*Math.PI;a0=b;return `<path d="${arc(a,b)}" fill="${c.col}" data-i="${i}"><title>${esc(ttl(c))}</title></path>`}).join('');
-  mixEl.innerHTML=`<svg viewBox="0 0 200 200" role="img" aria-label="Cơ cấu doanh thu dự kiến: 10 ngành lớn nhất và ngành hàng khác">${paths}<text x="100" y="95" text-anchor="middle" font-size="11" fill="var(--muted)">Tổng dự kiến</text><text x="100" y="114" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ink)" class="num">${esc(moneyS(pt))}</text></svg>
-    <div class="pl">${sl.map((c,i)=>`<div class="r" data-i="${i}" title="${esc(ttl(c))}"><i style="background:${c.col}"></i><span class="nm">${esc(c.n)}${c.tg?tagf(c):''}</span><span class="v num"><b>${pct(c.p/pt)}</b> · ${moneyS(c.p)}</span></div>`).join('')}</div>`;
-  mixEl.querySelectorAll('.pl .r').forEach(r=>{r.onmouseenter=()=>{mixEl.classList.add('hl');mixEl.querySelector(`path[data-i="${r.dataset.i}"]`).classList.add('on')};r.onmouseleave=()=>{mixEl.classList.remove('hl');mixEl.querySelectorAll('path.on').forEach(p=>p.classList.remove('on'))}});
+  const mxP=Math.max(...sl.map(c=>c.p));mixEl.innerHTML=`<div class="pl">${sl.map((c,i)=>`<div class="r" data-i="${i}" title="${esc(ttl(c))}"><i style="background:${c.col}"></i><span class="nm">${esc(c.n)}${c.tg?tagf(c):''}</span><span class="v num"><b>${pct(c.p/pt)}</b> · ${moneyS(c.p)}</span><span class="bar"><b style="width:${(c.p/mxP*100).toFixed(1)}%;background:${c.col}"></b></span></div>`).join('')}</div>`;
 
   // category compare
   const cc=cats.filter(c=>c.a>0&&Math.max(c.p/pt,c.a/aug)>=0.002).map(c=>({...c,ch:c.p/c.a-1,d:c.p-c.a}));
@@ -1469,7 +1490,7 @@ function render(){
      const nK=lv.length+(SHOWRW?1:0)+SR.length;
      return `<div class="ct-card"><div class="ct-h"><h3 title="${esc(c.time)} · ${esc(c.scope)} · ${esc(c.goal)} · ${esc(c.cats.join(', '))}">${esc(c.name)}</h3>
        <div class="ct-chips">${lv.map(l=>`<span class="lv">Mức ${l.n}: ≥ ${nf(0).format(l.r*100)}%<span class="ct-lg"> ${SELL?'bán / nhập':LBL+' '+BT}</span></span>`).join('')}</div>
-       ${rwP}
+       ${rwP?`<details class="ct-how"><summary>ⓘ Cách tính thưởng</summary>${rwP}</details>`:''}
        ${bmNote?`<p class="msg-err" style="margin:8px 0 0;font-size:12px">${bmNote}</p>`:''}
        ${(()=>{const mm=c.time.match(/\/(\d{1,2})(?:\/\d+)?\s*$/);const cm=mm?+mm[1]:null;return cm&&cm!==M?`<p class="msg-err" style="margin:8px 0 0;font-size:12px">Chương trình áp dụng tháng ${cm}, số liệu đang là tháng ${M}/${D.cur.y}.</p>`:''})()}
        ${miss.length?`<p class="msg-err" style="margin:8px 0 0;font-size:12px">Chưa khớp ngành hàng: ${miss.map(esc).join(', ')}.</p>`:''}</div>
@@ -2297,8 +2318,12 @@ addEventListener('focus',()=>checkNew(true));
 setInterval(()=>{if(document.visibilityState==='visible')checkNew(false)},5*60000);
 // tự co bảng cho vừa bề ngang màn hình điện thoại (vẫn có thể chụm 2 ngón để phóng to)
 let fitQ=0;function fitTables(){fitQ=0;const small=innerWidth<=760;
-  document.querySelectorAll('.tbl-wrap>table').forEach(t=>{t.style.zoom='';if(!small)return;const w=t.parentElement.clientWidth,sw=Math.max(t.scrollWidth,t.parentElement.scrollWidth,t.getBoundingClientRect().width);
-    if(w>0&&sw>w+1)t.style.zoom=Math.max(.5,Math.floor(w/sw*1000)/1000)})}
+  document.querySelectorAll('.tbl-wrap>table').forEach(t=>{t.style.zoom='';delete t.dataset.stk;if(!small)return;const w=t.parentElement.clientWidth,sw=Math.max(t.scrollWidth,t.parentElement.scrollWidth,t.getBoundingClientRect().width);
+    if(w>0&&sw>w+1){const z=Math.max(.85,Math.floor(w/sw*1000)/1000);
+      // còn rộng hơn màn hình: ghim cột tên (bảng có cột "#" thì ghim cả cột tên ngay sau)
+      if(sw*z>w+1){const h=t.querySelector('thead tr')||t.querySelector('tr'),f=h&&h.cells[0];t.dataset.stk='1';
+        if(f&&/^#?$/.test(f.textContent.trim())&&h.cells[1]){t.dataset.stk='2';t.style.zoom='';t.style.setProperty('--stk2',f.offsetWidth+'px')}}
+      t.style.zoom=z}})}
 const qFit=()=>{if(!fitQ)fitQ=requestAnimationFrame(fitTables)};
 new MutationObserver(qFit).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','hidden']});addEventListener('resize',qFit);addEventListener('orientationchange',qFit);
 })();
