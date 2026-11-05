@@ -1105,9 +1105,11 @@ function render(){
    const sumC=(s,pred)=>{const o=L.daily[s]&&L.daily[s][ld];let n=0,h=0,x=0;if(o)for(const c in o){if(!pred(c))continue;n+=o[c][0];h+=o[c][1];x+=o[c][2]||0}return{n,h,x}};
    const q1=v=>nf(1).format(v),q0=v=>nf(0).format(v),rp=(a,b)=>b>0?pct(a/b):'—';
    const noX=HX?'':`<tr><td colspan="6" class="l muted" style="white-space:normal">Chưa có SL bán: tải lại file nhập xuất Fresh để có cột thực xuất.</td></tr>`;
-   if(!ld){const msg=`<tbody><tr><td class="l muted" style="white-space:normal">Chưa có dữ liệu theo ngày. Tải lại file nhập xuất Fresh để cập nhật.</td></tr></tbody>`;le.innerHTML=msg}
+   if(!ld){if(cur==='all')(window.__botTags||(window.__botTags={})).loss=null;const msg=`<tbody><tr><td class="l muted" style="white-space:normal">Chưa có dữ liệu theo ngày. Tải lại file nhập xuất Fresh để cập nhật.</td></tr></tbody>`;le.innerHTML=msg}
    else{
     const R3=scope.map(s=>({s,...sumC(s,THS)})).filter(r=>r.n||r.h).sort((a,b)=>(b.n?b.h/b.n:-9)-(a.n?a.h/a.n:-9));
+    // bot LINE: siêu thị hủy thủy hải sản trên 10% (ngày của ảnh) → tag quản lý
+    if(cur==='all')(window.__botTags||(window.__botTags={})).loss=R3.filter(r=>r.n>0&&r.h/r.n>.1).map(r=>r.s);
     // trung bình 7 ngày trước; hôm nay cao bất thường (≥ 1,5 lần TB và cao hơn ít nhất 3 điểm %) thì tô đỏ
     const avg7=ss=>{let n=0,h=0;for(let k=Math.max(1,ld-7);k<ld;k++)ss.forEach(s=>{const v=sumC2(s,THS,k);n+=v.n;h+=v.h});return n>0?h/n:null};
     const odd=(r,a)=>r!=null&&a!=null&&r>=a*1.5&&r-a>=.03;
@@ -1117,12 +1119,14 @@ function render(){
     if(!R3.length)h+=`<tr><td colspan="5" class="l muted">Không có nhập / hủy thủy hải sản ${dayLb}.</td></tr>`;
     h+=R3.length>1?`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th>${q1(N)}</th><th>${q1(H)}</th>${(()=>{const a=avg7(R3.map(r=>r.s));return nowCell(N>0?H/N:null,a,'th')+`<th>${a==null?'—':pct(a)}</th>`})()}</tr></tfoot>`:'</tbody>';le.innerHTML=h;
 }
-   if(!ldE)ee.innerHTML=`<tbody><tr><td class="l muted" style="white-space:normal">Chưa có dữ liệu theo ngày. Tải lại file nhập xuất Fresh để cập nhật.</td></tr></tbody>`;
+   if(!ldE&&cur==='all')(window.__botTags||(window.__botTags={})).egg=null;if(!ldE)ee.innerHTML=`<tbody><tr><td class="l muted" style="white-space:normal">Chưa có dữ liệu theo ngày. Tải lại file nhập xuất Fresh để cập nhật.</td></tr></tbody>`;
    else{
     const R4=scope.map(s=>({s,...sumC2(s,EGG,ldE)})).filter(r=>r.n||r.x).sort((a,b)=>(a.n?a.x/a.n:9)-(b.n?b.x/b.n:9));
     const eggLow=s=>{if(!HX)return null;let n=0;for(let k=ldE;k>=1;k--){const v=sumC2(s,EGG,k);if(!(v.n>0))break;if(v.x/v.n<1)n++;else break}return n};
     let N4=0,X4=0;let e=`<thead><tr><th class="l">Siêu thị</th><th>SL nhập</th><th>SL bán</th><th>Bán / nhập</th><th title="Số ngày liên tiếp (tính đến ${dayLbE}) bán dưới 100% lượng nhập">Ngày liền &lt;100%</th></tr></thead><tbody>${HX?'':noX.replace('colspan="6"','colspan="5"')}`;
     R4.forEach(r=>{N4+=r.n;X4+=r.x;e+=`<tr tabindex="0" data-s="${r.s}"><td class="l">${esc(shopName(r.s))}</td><td>${q0(r.n)}</td><td>${HX?q0(r.x):'—'}</td><td class="${HX&&r.n>0&&r.x/r.n<1?'neg':''}"><b>${HX?rp(r.x,r.n):'—'}</b></td>${(()=>{const c=eggLow(r.s);return c==null?'<td class="muted">—</td>':`<td class="${c>=3?'neg':c?'':'muted'}">${c>=3?'<b>⚠️ '+c+' ngày</b>':c+' ngày'}</td>`})()}</tr>`});
+    // bot LINE: siêu thị bán trứng 3 ngày liền dưới 100% → tag quản lý
+    if(cur==='all')(window.__botTags||(window.__botTags={})).egg=HX?R4.filter(r=>(eggLow(r.s)||0)>=3).map(r=>r.s):null;
     if(!R4.length)e+=`<tr><td colspan="5" class="l muted">Không có nhập / bán trứng ${dayLbE}.</td></tr>`;
     e+=R4.length>1?`</tbody><tfoot><tr><th class="l">Toàn khu vực</th><th>${q0(N4)}</th><th>${HX?q0(X4):'—'}</th><th class="${HX&&N4>0&&X4/N4<1?'neg':''}">${HX?rp(X4,N4):'—'}</th><th></th></tr></tfoot>`:'</tbody>';ee.innerHTML=e}
    // bấm 1 siêu thị ở mục Hủy: hiện / ẩn 3 SP thủy hải sản hủy nhiều nhất
@@ -1754,11 +1758,12 @@ async function readFile(f){
     const [cS,cN]=need('Mã ST','Tên siêu thị');
     const f=p=>H.findIndex(h=>h.startsWith(hk(p)));const cT=f('Base tổng'),cF=f('Base FMCG'),cR=f('Base Fresh');
     if(cT<0||cF<0||cR<0)throw new Error('Thiếu cột Base tổng / Base FMCG / Base Fresh.');
-    const cU=ix('User QL'),cQN=ix('Họ và Tên QL'),cTg=ix('Target');
+    const cU=ix('User QL'),cQN=ix('Họ và Tên QL'),cTg=ix('Target'),cL=H.findIndex(h=>/(^|[^a-z])line([^a-z]|$)/.test(h));let nL=0,badL=0;
     const shops={};rows.forEach(r=>{const code=nz(r[cS]);if(!code)return;const full=nz(r[cN]);
       shops[code]={name:full.replace(/^BHX_\w+_\w+ - /,''),full,bT:Math.round(numU(r[cT])),bF:Math.round(numU(r[cF])),bR:Math.round(numU(r[cR]))};
-      if(cTg>=0&&numU(r[cTg])>0)shops[code].tg=Math.round(numU(r[cTg]));if(cU>=0&&nz(r[cU]))shops[code].ql=nz(r[cU]);if(cQN>=0&&nz(r[cQN]))shops[code].qlName=nz(r[cQN])});
-    return{kind:'base',shops,label:'Base',desc:`${Object.keys(shops).length} siêu thị`}}
+      if(cTg>=0&&numU(r[cTg])>0)shops[code].tg=Math.round(numU(r[cTg]));if(cU>=0&&nz(r[cU]))shops[code].ql=nz(r[cU]);if(cQN>=0&&nz(r[cQN]))shops[code].qlName=nz(r[cQN]);
+      if(cL>=0&&nz(r[cL])){const v=nz(r[cL]).trim();if(/^U[0-9a-f]{32}$/.test(v)){shops[code].line=v;nL++}else badL++}});
+    return{kind:'base',shops,label:'Base',desc:`${Object.keys(shops).length} siêu thị`+(cL>=0?` · ${nL} QL có tài khoản LINE`+(badL?` · ${badL} ô LINE không đúng mã (mã đúng bắt đầu bằng U, 33 ký tự: QL nhắn "dt id" cho bot để lấy)`:''):'')}}
   throw new Error('Không nhận ra loại file.');
 }
 // sản lượng bán (SL thực xuất) theo siêu thị × ngành hàng nhập xuất — lưu theo tháng để so sánh thi đua theo sản lượng (vd Thịt heo nóng)
@@ -2063,7 +2068,8 @@ window.__botImages=async at=>{const K=[['dt','gh1','goalTbl'],['fresh','gh2','go
   if(document.fonts&&document.fonts.ready)await document.fonts.ready;if(!window.__goalImageJ)return;
   for(const [k,g,t] of K){try{const b=await withAll(()=>window.__goalImageJ([[g,t]]));if(!b)continue;
     const b64=await new Promise((ok,no)=>{const fr=new FileReader();fr.onload=()=>ok(String(fr.result).split(',')[1]);fr.onerror=no;fr.readAsDataURL(b)});
-    await api('/api/img',{method:'POST',body:{k,at,b64}})}catch(e){console.warn('bot image',k,e)}}};
+    const tg=(k==='loss'||k==='egg')&&window.__botTags?window.__botTags[k]:undefined;
+    await api('/api/img',{method:'POST',body:Array.isArray(tg)?{k,at,b64,tag:tg}:{k,at,b64}})}catch(e){console.warn('bot image',k,e)}}};
 async function areaImage(secs){if(document.fonts&&document.fonts.ready)await document.fonts.ready;if(!window.__goalImage)return null;return withAll(()=>window.__goalImage(secs))}
 window.__areaSummary=areaSummary;
 const ZSECS=[{k:'dt',t:'Doanh thu',secs:[['gh1','goalTbl']]},{k:'ths',t:'Hủy thủy hải sản',secs:[['gh3','goalLoss']]},{k:'egg',t:'Tỷ lệ bán trứng',secs:[['gh4','goalEgg']]}];

@@ -2,10 +2,12 @@
 // Cần biến môi trường trên Vercel: LINE_CHANNEL_SECRET, LINE_CHANNEL_TOKEN, LINE_GROUPS (mã các nhóm được phép, cách nhau dấu phẩy).
 // Gõ "dt id" trong nhóm để bot trả lời mã nhóm (dùng khi cài đặt).
 // Gõ "menu" (hoặc "bc", "báo cáo") để hiện menu Mục tiêu ngày: bấm 1 mục thì bot gửi ảnh mục đó (ảnh tạo mỗi lần lưu số liệu).
+// Quản lý tự đăng ký 1 lần trong nhóm: "dt dk <mã siêu thị hoặc user QL>" → bot tag tên khi siêu thị cần nhắc (Hủy thủy hải sản / Bán trứng, từ 21h).
+// "dt huy dk": bỏ đăng ký của mình · "dt ds": xem siêu thị nào đã / chưa có quản lý đăng ký.
 import crypto from 'node:crypto';
 import { json } from './_lib/auth.js';
-import { readJSON, useRequest } from './_lib/store.js';
-import { areaReply } from './_lib/summary.js';
+import { readJSON, writeJSON, useRequest } from './_lib/store.js';
+import { areaReply, vnNow } from './_lib/summary.js';
 import { IMG_KEYS, imgMeta, imgUrl } from './img.js';
 
 const ASK = /^(dt|doanh thu|\/dt)$/i;
@@ -56,6 +58,48 @@ async function reply(token, replyToken, msg, tag = false) {
   if (!r.ok) console.error('LINE reply', r.status, await r.text().catch(() => ''));
 }
 
+const REG = 'line/reg.json'; // { mã siêu thị: { u: userId LINE, n: tên LINE, at } }
+const NAG_HOUR = 21; // chỉ tag quản lý ở ảnh Hủy thủy hải sản / Bán trứng từ 21h00 (giờ VN)
+const isUid = (u) => /^U[0-9a-f]{32}$/.test(u || '');
+async function lineName(token, src) {
+  try {
+    const path = src.groupId ? `group/${src.groupId}/member/${src.userId}` : src.roomId ? `room/${src.roomId}/member/${src.userId}` : `profile/${src.userId}`;
+    const r = await fetch(`https://api.line.me/v2/bot/${path}`, { headers: { Authorization: `Bearer ${token}` } });
+    return r.ok ? ((await r.json()).displayName || '') : '';
+  } catch { return ''; }
+}
+// tìm siêu thị theo mã siêu thị hoặc user QL (không phân biệt hoa thường)
+const findShops = (shops, q) => { const k = String(q || '').trim().toLowerCase(); if (!k) return []; if (shops[k] || shops[q]) return [shops[q] ? q : k]; return Object.keys(shops).filter((s) => String(shops[s].ql || '').trim().toLowerCase() === k); };
+
+// Ảnh Hủy thủy hải sản / Bán trứng: chỉ tag quản lý các siêu thị cần nhắc (danh sách lưu kèm ảnh khi lưu số liệu).
+// Tài khoản LINE của quản lý: quản lý tự đăng ký trong nhóm (dt dk), chưa có thì lấy cột LINE trong file Base (nếu có).
+const NEED = { loss: ['⚠️ Hủy thủy hải sản trên 10%:', '✅ Không có siêu thị hủy thủy hải sản trên 10%.'], egg: ['⚠️ Bán trứng 3 ngày liền dưới 100%:', '✅ Không có siêu thị bán trứng 3 ngày liền dưới 100%.'] };
+async function nagMsgs(k, m, head) {
+  const tags = Array.isArray(m.tag) ? m.tag : null;
+  if (!tags) return null; // ảnh lưu trước khi có tính năng: trả lời như cũ
+  if (!tags.length) return { tagged: [{ type: 'text', text: `${head}\n${NEED[k][1]}` }], plain: null };
+  const doc = await readJSON('data/current.json');
+  const shops = (doc && doc.data && doc.data.shops) || {}, reg = (await readJSON(REG)) || {};
+  const esc = (t) => String(t).replace(/[{}]/g, (c) => c + c);
+  const rows = tags.map((s) => { const i = shops[s] || {}; return { s, shop: i.name || s, ql: i.qlName || '', line: isUid((reg[s] || {}).u) ? reg[s].u : isUid(i.line) ? i.line : null }; });
+  const plainLines = rows.map((r) => `• ${r.ql ? r.ql + ' – ' : ''}${r.shop}`);
+  // tối đa 20 người được tag trong 1 tin: chia nhiều tin nếu cần
+  const tagged = [], plain = [{ type: 'text', text: [head, NEED[k][0], ...plainLines].join('\n').slice(0, 4900) }];
+  for (let i = 0; i < rows.length; i += 20) {
+    const part = rows.slice(i, i + 20), sub = {};
+    const lines = part.map((r, j) => { if (!r.line) return `• ${esc(r.ql ? r.ql + ' – ' : '')}${esc(r.shop)}`; const key = 'q' + j; sub[key] = { type: 'mention', mentionee: { type: 'user', userId: r.line } }; return `• {${key}} – ${esc(r.shop)}`; });
+    const text = (i === 0 ? [esc(head), NEED[k][0]] : []).concat(lines).join('\n').slice(0, 4900);
+    tagged.push(Object.keys(sub).length ? { type: 'textV2', text, substitution: sub } : { type: 'text', text: text.replace(/\{\{/g, '{').replace(/\}\}/g, '}') });
+  }
+  return { tagged: tagged.slice(0, 4), plain };
+}
+async function replyRaw(token, replyToken, messages, fallback) {
+  const send = (ms) => fetch('https://api.line.me/v2/bot/message/reply', { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ replyToken, messages: ms }) });
+  let r = await send(messages);
+  if (!r.ok && fallback && r.status === 400) { console.error('LINE reply tag', await r.text().catch(() => '')); r = await send(fallback); }
+  if (!r.ok) console.error('LINE reply', r.status, await r.text().catch(() => ''));
+}
+
 export default {
   async fetch(req) {
     useRequest(req);
@@ -81,13 +125,43 @@ export default {
           if (!m) { await reply(token, ev.replyToken, `Chưa có ảnh ${IMG_KEYS[k]}. Ảnh được tạo mỗi lần lưu số liệu trên dashboard.`); continue; }
           const u = imgUrl(new URL(req.url).origin, k, m.at);
           const img = { type: 'image', originalContentUrl: u, previewImageUrl: u };
-          await reply(token, ev.replyToken, [`${IMG_KEYS[k]} · toàn khu vực · số liệu lưu lúc ${fmtVN(m.at)}`, img], grp);
+          const head = `${IMG_KEYS[k]} · toàn khu vực · số liệu lưu lúc ${fmtVN(m.at)}`;
+          // Hủy thủy hải sản / Bán trứng trong nhóm: từ 21h tag quản lý cần nhắc; trước 21h trả ảnh, không tag ai
+          const nag = grp && NEED[k] && process.env.LINE_TAG_ALL !== '0' && vnNow().date.getUTCHours() >= NAG_HOUR ? await nagMsgs(k, m, head) : null;
+          if (nag) { await replyRaw(token, ev.replyToken, [...nag.tagged, img], nag.plain && [...nag.plain, img]); continue; }
+          await reply(token, ev.replyToken, [head, img], grp && !NEED[k]);
           continue;
         }
         if (ev.type !== 'message' || !ev.message || ev.message.type !== 'text' || !ev.replyToken) continue;
         const t = String(ev.message.text || '').trim().toLowerCase().replace(/\s+/g, ' ');
         const src = ev.source || {}, id = src.groupId || src.roomId || src.userId || '', grp = !!(src.groupId || src.roomId);
-        if (t === 'dt id') { await reply(token, ev.replyToken, `Mã của nhóm / cuộc trò chuyện này:\n${id}\n\nGửi mã này cho quản trị dashboard để thêm vào LINE_GROUPS.`); continue; }
+        if (t === 'dt id') { await reply(token, ev.replyToken, `Mã của nhóm / cuộc trò chuyện này:\n${id}\n\nGửi mã này cho quản trị dashboard để thêm vào LINE_GROUPS.${src.userId ? `\n\nMã LINE của bạn (điền vào cột LINE trong file Base để bot tag tên bạn):\n${src.userId}` : ''}`); continue; }
+        // đăng ký / bỏ đăng ký / danh sách đăng ký quản lý (chỉ trong nhóm được cấp quyền)
+        const tn = noAcc(t), dk = tn.match(/^dt (dk|dang ky)\s+(.+)$/), huy = /^dt huy( dk| dang ky)?$/.test(tn), ds = /^dt (ds|danh sach)$/.test(tn);
+        if (dk || huy || ds) {
+          if (!allow.includes(id)) { await reply(token, ev.replyToken, 'Nhóm này chưa được cấp quyền. Gõ "dt id" để lấy mã nhóm rồi gửi quản trị dashboard.'); continue; }
+          const doc = await readJSON('data/current.json'), shops = (doc && doc.data && doc.data.shops) || {}, reg = (await readJSON(REG)) || {};
+          const lbl = (s) => `${shops[s].qlName ? shops[s].qlName + ' – ' : ''}${shops[s].name || s} (${s})`;
+          if (ds) {
+            const all = Object.keys(shops), ok = all.filter((s) => isUid((reg[s] || {}).u) || isUid(shops[s].line)), no = all.filter((s) => !ok.includes(s));
+            await reply(token, ev.replyToken, `Quản lý đã đăng ký: ${ok.length}/${all.length} siêu thị.${no.length ? `\n\nChưa đăng ký:\n${no.map((s) => '• ' + lbl(s)).join('\n')}\n\nQuản lý gõ: dt dk <mã siêu thị hoặc user QL>` : ''}`);
+            continue;
+          }
+          if (!src.userId) { await reply(token, ev.replyToken, 'Không đọc được tài khoản LINE của bạn. Hãy cập nhật LINE bản mới rồi thử lại.'); continue; }
+          if (huy) {
+            const mine = Object.keys(reg).filter((s) => reg[s].u === src.userId);
+            mine.forEach((s) => delete reg[s]); if (mine.length) await writeJSON(REG, reg);
+            await reply(token, ev.replyToken, mine.length ? `Đã bỏ đăng ký: ${mine.map((s) => shops[s] ? lbl(s) : s).join(', ')}.` : 'Bạn chưa đăng ký siêu thị nào.');
+            continue;
+          }
+          const hit = findShops(shops, dk[2]);
+          if (!hit.length) { await reply(token, ev.replyToken, 'Không tìm thấy siêu thị. Gõ: dt dk <mã siêu thị> (ví dụ dt dk 6235) hoặc dt dk <user QL>.'); continue; }
+          const nm = await lineName(token, src), at = new Date().toISOString();
+          hit.forEach((s) => { reg[s] = { u: src.userId, n: nm, at }; });
+          await writeJSON(REG, reg);
+          await reply(token, ev.replyToken, `✅ Đã ghi nhận ${nm || 'bạn'} quản lý: ${hit.map(lbl).join(', ')}.\nTừ 21h, khi siêu thị hủy thủy hải sản trên 10% hoặc bán trứng 3 ngày liền dưới 100%, bot sẽ tag tên bạn.`);
+          continue;
+        }
         const isMenu = MENU.test(noAcc(t));
         if (!ASK.test(t) && !isMenu) continue;
         if (!allow.includes(id)) { await reply(token, ev.replyToken, 'Nhóm này chưa được cấp quyền xem doanh thu. Gõ "dt id" để lấy mã nhóm rồi gửi quản trị dashboard.'); continue; }

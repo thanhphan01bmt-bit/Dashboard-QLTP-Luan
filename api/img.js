@@ -34,6 +34,8 @@ export default {
         await writeBuf(`img/${b.k}.jpg`, buf, 'image/jpeg');
         const m = (await readJSON(META)) || {};
         m[b.k] = { at: String(b.at), size: buf.length };
+        // mục Hủy thủy hải sản / Bán trứng: danh sách siêu thị cần nhắc (bot LINE tag quản lý)
+        if (Array.isArray(b.tag)) m[b.k].tag = b.tag.map(String).filter((x) => /^[\w.-]{1,20}$/.test(x)).slice(0, 300);
         await writeJSON(META, m);
         return json({ ok: true });
       }
