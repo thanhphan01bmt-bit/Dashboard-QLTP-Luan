@@ -4,6 +4,7 @@
 // Gõ "menu" (hoặc "bc", "báo cáo") để hiện menu Mục tiêu ngày: bấm 1 mục thì bot gửi ảnh mục đó (ảnh tạo mỗi lần lưu số liệu).
 // Quản lý tự đăng ký 1 lần trong nhóm: "dt dk <mã siêu thị hoặc user QL>" → bot tag tên khi siêu thị cần nhắc (Hủy thủy hải sản / Bán trứng, từ 21h).
 // "dt huy dk": bỏ đăng ký của mình · "dt ds": xem siêu thị nào đã / chưa có quản lý đăng ký.
+// "dt tk": thống kê từ đầu tháng số ngày mỗi siêu thị rơi vào diện bị nhắc tên (hủy thủy hải sản > 10%, bán trứng 3 ngày liền < 100%).
 import crypto from 'node:crypto';
 import { json } from './_lib/auth.js';
 import { readJSON, writeJSON, useRequest } from './_lib/store.js';
@@ -71,6 +72,26 @@ async function lineName(token, src) {
 // tìm siêu thị theo mã siêu thị hoặc user QL (không phân biệt hoa thường)
 const findShops = (shops, q) => { const k = String(q || '').trim().toLowerCase(); if (!k) return []; if (shops[k] || shops[q]) return [shops[q] ? q : k]; return Object.keys(shops).filter((s) => String(shops[s].ql || '').trim().toLowerCase() === k); };
 
+// Thống kê nhắc tên từ đầu tháng, tính lại từ số liệu nhập xuất Fresh theo ngày (không phụ thuộc có ai bấm xem ảnh hay không).
+// Ngày hôm nay chỉ tính từ 21h (cùng giờ bot bắt đầu tag).
+function nagStats(data) {
+  const L = data && data.loss, cur = data && data.cur;
+  if (!L || !L.daily || !cur || L.y !== cur.y || L.m !== cur.m) return null;
+  const t = vnNow(), today = t.y === L.y && t.m === L.m ? t.d : 99;
+  const last = Math.min(L.days || 0, t.date.getUTCHours() >= NAG_HOUR ? today : today - 1);
+  const THS = (c) => /^th[uủ]y h[aả]i s[aả]n/i.test(String(c).normalize('NFC')), EGG = (c) => /^tr[uứ]ng/i.test(String(c).normalize('NFC'));
+  const sum = (o, f) => { let n = 0, h = 0, x = 0; for (const c in o || {}) if (f(c)) { n += o[c][0] || 0; h += o[c][1] || 0; x += o[c][2] || 0; } return { n, h, x }; };
+  const loss = {}, egg = {};
+  for (const s in L.daily) {
+    const D = L.daily[s]; let streak = 0;
+    for (let d = 1; d <= last; d++) {
+      const a = sum(D[d], THS); if (a.n > 0 && a.h / a.n > 0.10) loss[s] = (loss[s] || 0) + 1;
+      if (L.hasX) { const e = sum(D[d], EGG); if (e.n > 0 && e.x / e.n < 1) { streak++; if (streak >= 3) egg[s] = (egg[s] || 0) + 1; } else streak = 0; }
+    }
+  }
+  return { last, m: L.m, loss, egg, hasX: !!L.hasX };
+}
+
 // Ảnh Hủy thủy hải sản / Bán trứng: chỉ tag quản lý các siêu thị cần nhắc (danh sách lưu kèm ảnh khi lưu số liệu).
 // Tài khoản LINE của quản lý: quản lý tự đăng ký trong nhóm (dt dk), chưa có thì lấy cột LINE trong file Base (nếu có).
 const NEED = { loss: ['⚠️ Hủy thủy hải sản trên 10%:', '✅ Không có siêu thị hủy thủy hải sản trên 10%.'], egg: ['⚠️ Bán trứng 3 ngày liền dưới 100%:', '✅ Không có siêu thị bán trứng 3 ngày liền dưới 100%.'] };
@@ -137,11 +158,22 @@ export default {
         const src = ev.source || {}, id = src.groupId || src.roomId || src.userId || '', grp = !!(src.groupId || src.roomId);
         if (t === 'dt id') { await reply(token, ev.replyToken, `Mã của nhóm / cuộc trò chuyện này:\n${id}\n\nGửi mã này cho quản trị dashboard để thêm vào LINE_GROUPS.${src.userId ? `\n\nMã LINE của bạn (điền vào cột LINE trong file Base để bot tag tên bạn):\n${src.userId}` : ''}`); continue; }
         // đăng ký / bỏ đăng ký / danh sách đăng ký quản lý (chỉ trong nhóm được cấp quyền)
-        const tn = noAcc(t), dk = tn.match(/^dt (dk|dang ky)\s+(.+)$/), huy = /^dt huy( dk| dang ky)?$/.test(tn), ds = /^dt (ds|danh sach)$/.test(tn);
-        if (dk || huy || ds) {
+        const tn = noAcc(t), dk = tn.match(/^dt (dk|dang ky)\s+(.+)$/), huy = /^dt huy( dk| dang ky)?$/.test(tn), ds = /^dt (ds|danh sach)$/.test(tn), tk = /^dt (tk|thong ke)$/.test(tn);
+        if (dk || huy || ds || tk) {
           if (!allow.includes(id)) { await reply(token, ev.replyToken, 'Nhóm này chưa được cấp quyền. Gõ "dt id" để lấy mã nhóm rồi gửi quản trị dashboard.'); continue; }
           const doc = await readJSON('data/current.json'), shops = (doc && doc.data && doc.data.shops) || {}, reg = (await readJSON(REG)) || {};
           const lbl = (s) => `${shops[s].qlName ? shops[s].qlName + ' – ' : ''}${shops[s].name || s} (${s})`;
+          if (tk) {
+            const st = nagStats(doc && doc.data);
+            if (!st || !st.last) { await reply(token, ev.replyToken, 'Chưa có số liệu nhập xuất Fresh tháng này để thống kê.'); continue; }
+            const who = (s) => { const i = shops[s] || {}, q = i.qlName || (reg[s] || {}).n || ''; return `${q ? q + ' – ' : ''}${i.name || s}`; };
+            const top = (o) => Object.entries(o).sort((a, b) => b[1] - a[1] || who(a[0]).localeCompare(who(b[0]))).map(([s, n], i) => `${i + 1}. ${who(s)}: ${n} ngày`);
+            const A = top(st.loss), B = top(st.egg);
+            const out = [`📋 Thống kê nhắc tên tháng ${st.m} (đến ngày ${st.last}/${st.m})`, '', '🐟 Hủy thủy hải sản trên 10%:', ...(A.length ? A : ['✅ Không có siêu thị nào']), '', '🥚 Bán trứng 3 ngày liền dưới 100%:',
+              ...(!st.hasX ? ['(File nhập xuất chưa có cột SL thực xuất)'] : B.length ? B : ['✅ Không có siêu thị nào'])];
+            await reply(token, ev.replyToken, out.join('\n'));
+            continue;
+          }
           if (ds) {
             const all = Object.keys(shops), ok = all.filter((s) => isUid((reg[s] || {}).u) || isUid(shops[s].line)), no = all.filter((s) => !ok.includes(s));
             await reply(token, ev.replyToken, `Quản lý đã đăng ký: ${ok.length}/${all.length} siêu thị.${no.length ? `\n\nChưa đăng ký:\n${no.map((s) => '• ' + lbl(s)).join('\n')}\n\nQuản lý gõ: dt dk <mã siêu thị hoặc user QL>` : ''}`);
