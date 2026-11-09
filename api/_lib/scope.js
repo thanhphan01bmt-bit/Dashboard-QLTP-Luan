@@ -25,9 +25,10 @@ export function filterShop(d, s) {
     const codes = new Set();
     if (L.pr) { nl.pr = pick(L.pr, s); (nl.pr[s] || []).forEach((a) => codes.add(a[0])); }
     if (L.prd) { nl.prd = { ...L.prd, s: pick(L.prd.s, s) }; ((nl.prd.s || {})[s] || []).forEach((a) => codes.add(a[0])); }
+    if (L.px) { nl.px = pick(L.px, s); Object.keys(nl.px[s] || {}).forEach((c) => codes.add(c)); }
     if (L.prod) { nl.prod = {}; for (const c of codes) if (L.prod[c]) nl.prod[c] = L.prod[c]; }
     if (L.cpd) nl.cpd = pick(L.cpd, s);
-    if (L.last) nl.last = { ...L.last, rows: pick(L.last.rows, s), pr: L.last.pr ? pick(L.last.pr, s) : null };
+    if (L.last) nl.last = { ...L.last, rows: pick(L.last.rows, s), pr: L.last.pr ? pick(L.last.pr, s) : null, ...(L.last.px ? { px: pick(L.last.px, s) } : {}) };
     out.loss = nl;
   }
   if (d.ytd && d.ytd.mon) {

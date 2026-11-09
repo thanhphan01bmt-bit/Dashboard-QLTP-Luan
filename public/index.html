@@ -204,6 +204,14 @@ tr.muted-row td{color:var(--muted)}
 @media (max-width:520px){.tab{flex:0 0 auto;padding:9px 12px;font-size:13px}}
 .wrap:not(.v-comp) #compSec{display:none}
 .wrap:not(.v-cat) #catSec{display:none}
+.wrap:not(.v-prod) #prodSec{display:none}
+.wrap.v-prod>section:not(#prodSec),.wrap.v-prod>.two,.wrap.v-prod .alertbar{display:none!important}
+.pd-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 12px}
+.pd-bar select{font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
+.pd-card{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:12px;background:var(--surface)}
+.pd-card h3{margin:0;font-size:15px}.pd-card .pd-sub{font-size:12px;color:var(--muted);margin:2px 0 8px}
+.pd-card h4{margin:10px 0 4px;font-size:13px}.pd-card h4.good{color:var(--good)}.pd-card h4.bad{color:var(--bad)}
+.pd-card td.l{white-space:normal;max-width:220px}
 .wrap.v-cat>section:not(#catSec),.wrap.v-cat>.two,.wrap.v-cat .alertbar{display:none!important}
 .ct-card{border:1.5px solid var(--accent);border-radius:14px;margin:0 0 18px;overflow:hidden;box-shadow:0 2px 10px color-mix(in srgb,var(--accent) 14%,transparent)}
 .ct-h{background:var(--accent-soft);padding:12px 16px;border-bottom:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
@@ -598,6 +606,7 @@ body.pv .wrap{padding-bottom:120px}
     <button class="tab" role="tab" type="button" data-view="dash" id="tabDash"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12l4-4 4 4 6-6 4 4M3 20h18"/></svg><span class="tl">Dashboard doanh thu</span><span class="ts">Dashboard</span></button>
     <button class="tab" role="tab" type="button" data-view="comp" id="tabComp"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg><span class="tl">Bảng thi đua Quản lý</span><span class="ts">Thi đua QL</span></button>
     <button class="tab" role="tab" type="button" data-view="cat" id="tabCat"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4z"/><path d="M14 17.5l2 2 4-4"/></svg><span class="tl">Thi đua ngành hàng</span><span class="ts">Ngành hàng</span></button>
+    <button class="tab" role="tab" type="button" data-view="prod" id="tabProd"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7l-8-4-8 4 8 4 8-4zM4 7v10l8 4 8-4V7M12 11v10"/></svg><span class="tl">Sản phẩm</span><span class="ts">Sản phẩm</span></button>
     <button class="tab" role="tab" type="button" data-view="year" id="tabYear"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="tl">Doanh thu năm</span><span class="ts">Năm</span></button>
   </nav>
 
@@ -627,6 +636,13 @@ body.pv .wrap{padding-bottom:120px}
     <div class="tbl-wrap"><table id="yearTbl"></table></div>
     <div id="yoyBox"></div>
     <p class="lhint" style="margin:10px 0 0">Tháng <span data-t="M"></span> so sánh bằng doanh thu dự kiến cả tháng. Cột "TB/ngày" giúp so sánh công bằng giữa các tháng có số ngày khác nhau. Tháng <span data-t="P"></span> và <span data-t="M"></span> lấy từ file hằng ngày; các tháng trước và năm trước lấy từ file doanh thu / số bill. Cột "% so năm trước" của tháng <span data-t="M"></span> so doanh thu dự kiến với cả tháng năm trước.</p>
+  </section>
+
+  <section class="card" id="prodSec">
+    <div class="sec-title"><h2>Sản phẩm bán tốt / bán yếu</h2><span class="note" id="prodNote"></span></div>
+    <p class="lhint">Theo file nhập xuất Fresh, lũy kế tháng. <b>Bán tốt</b>: tỷ lệ bán / nhập cao và tỷ lệ bán giảm giá thấp. <b>Bán yếu</b>: ngược lại. Điểm = bán / nhập × (1 − % bán giảm giá); % bán giảm giá = (SL s.thị bán giảm giá + SL giảm giá cận date) ÷ SL thực xuất. Chỉ xét sản phẩm có lượng nhập từ 1% lượng nhập của ngành trở lên.</p>
+    <div class="pd-bar"><label for="prodCat" class="muted" style="font-size:13px">Ngành hàng</label><select id="prodCat"><option value="">Tất cả</option></select></div>
+    <div id="prodBody"></div>
   </section>
 
   <section class="card" id="catSec">
@@ -830,8 +846,8 @@ async function exportGoalPdf(btn,filename){
   }catch(e){console.error(e);alert('Không tạo được PDF.')}
   finally{btn.disabled=false;btn.innerHTML=old}
 }
-const __R=(window.__ME||{}).role;let CAN_EDIT=__R==='admin'||__R==='editor';const IS_ADMIN=__R==='admin';let VIEW='goal';try{if(/^#(dash|dashboard)$/i.test(location.hash))VIEW='dash';if(/^#thi-?dua$/i.test(location.hash))VIEW='comp';if(/^#(doanh-?thu-?)?nam$/i.test(location.hash))VIEW='year';if(/^#muc-?tieu$/i.test(location.hash))VIEW='goal';if(/^#(thi-?dua-?)?nganh(-?hang)?$/i.test(location.hash))VIEW='cat';if(VIEW==='comp'&&matchMedia('(max-width:760px)').matches)VIEW='goal'}catch(e){}
-function applyView(){const w=document.querySelector('.wrap');if(!w)return;w.classList.toggle('v-comp',VIEW==='comp');w.classList.toggle('v-cat',VIEW==='cat');w.classList.toggle('v-year',VIEW==='year');w.classList.toggle('v-goal',VIEW==='goal');
+const __R=(window.__ME||{}).role;let CAN_EDIT=__R==='admin'||__R==='editor';const IS_ADMIN=__R==='admin';let VIEW='goal';try{if(/^#(dash|dashboard)$/i.test(location.hash))VIEW='dash';if(/^#thi-?dua$/i.test(location.hash))VIEW='comp';if(/^#(doanh-?thu-?)?nam$/i.test(location.hash))VIEW='year';if(/^#muc-?tieu$/i.test(location.hash))VIEW='goal';if(/^#(thi-?dua-?)?nganh(-?hang)?$/i.test(location.hash))VIEW='cat';if(/^#san-?pham$/i.test(location.hash))VIEW='prod';if(VIEW==='comp'&&matchMedia('(max-width:760px)').matches)VIEW='goal'}catch(e){}
+function applyView(){const w=document.querySelector('.wrap');if(!w)return;w.classList.toggle('v-comp',VIEW==='comp');w.classList.toggle('v-cat',VIEW==='cat');w.classList.toggle('v-year',VIEW==='year');w.classList.toggle('v-goal',VIEW==='goal');w.classList.toggle('v-prod',VIEW==='prod');
   document.querySelectorAll('.tabs .tab').forEach(b=>{const on=b.dataset.view===VIEW;b.setAttribute('aria-selected',on);b.classList.toggle('on',on)})}
 function setView(v){VIEW=v;applyView();window.scrollTo({top:0});if(v==='dash')requestAnimationFrame(()=>drawCurrent&&drawCurrent())} // vẽ lại biểu đồ đúng chiều rộng khi mở tab
 document.addEventListener('click',e=>{const b=e.target.closest('.tabs .tab');if(b)setView(b.dataset.view)});
@@ -1352,6 +1368,29 @@ function render(){
     document.getElementById('compTbl').innerHTML=h+'</tbody>';
     document.getElementById('compPrize').innerHTML=`<b>Thưởng:</b> Top 1 ${przTxt(PRZ[0])} · Top 2 ${przTxt(PRZ[1])} · Top 3 ${przTxt(PRZ[2])}. <b>Điều kiện nhận thưởng:</b> doanh thu dự kiến tháng ${M} tăng trưởng so tháng ${P} đạt mục tiêu (từ ${gLbl} trở lên). Thưởng theo đúng vị trí xếp hạng: quản lý ở vị trí nào và đạt điều kiện thì nhận mức thưởng của vị trí đó; vị trí chưa đạt điều kiện thì bỏ trống, không chuyển cho người kế tiếp.`;}
 
+  // Tab Sản phẩm: mỗi ngành hàng top 5 bán tốt (bán / nhập cao, bán giảm giá thấp) và 5 bán yếu
+  {const box=document.getElementById('prodBody'),note=document.getElementById('prodNote'),sel=document.getElementById('prodCat');
+   const L=D.loss&&D.loss.px&&D.loss.y===D.cur.y&&D.loss.m===D.cur.m?D.loss:null;
+   if(!L){box.innerHTML=`<p class="hint">Chưa có số liệu theo sản phẩm tháng ${M}. ${CAN_EDIT?'Bấm <b>Tải file lên</b> và chọn file nhập xuất Fresh tháng này <b>từ ngày 1</b> (có cột SL thực xuất, SL s.thị bán giảm giá).':'Quản trị sẽ tải file lên.'}</p>`;note.textContent='';sel.parentElement.hidden=true}
+   else{sel.parentElement.hidden=false;
+    const scope=cur==='all'?SHOPS:[cur],P={};
+    scope.forEach(s=>{const o=L.px[s];if(!o)return;for(const q in o){const a=P[q]||(P[q]=[0,0,0,0]);for(let i=0;i<4;i++)a[i]+=o[q][i]||0}});
+    const grp=c=>String(c||'Khác').trim();
+    const G={};for(const q in P){const [n,x,g,tt]=P[q];if(!(n>0))continue;const pi=(L.prod||{})[q]||[q,''];const k=grp(pi[1]);(G[k]||(G[k]=[])).push({q,nm:pi[0]||q,n,x,g,tt,s:x/n,dr:x>0?Math.min(1,g/x):0})}
+    const sc=p=>Math.min(p.s,1.2)*(1-p.dr);
+    const cats=Object.keys(G).map(k=>({k,ps:G[k],tt:G[k].reduce((a,p)=>a+p.tt,0),N:G[k].reduce((a,p)=>a+p.n,0)})).sort((a,b)=>b.tt-a.tt);
+    const pick=sel.value;sel.innerHTML='<option value="">Tất cả</option>'+cats.map(c=>`<option${c.k===pick?' selected':''}>${esc(c.k)}</option>`).join('');
+    const qf=v=>nf(Math.abs(v)<100&&v%1?1:0).format(v);
+    const tbl=(ps,good)=>`<div class="tbl-wrap"><table><thead><tr><th class="l">Sản phẩm</th><th>Bán / nhập</th><th>% bán giảm giá</th><th>SL bán</th><th>SL nhập</th><th>Doanh thu</th></tr></thead><tbody>${ps.map(p=>`<tr><td class="l">${esc(p.nm)}</td><td class="${p.s>=.95?'pos':p.s<.8?'neg':''}"><b>${pct(p.s)}</b></td><td class="${p.dr<=.05?'pos':p.dr>=.2?'neg':''}">${pct(p.dr)}</td><td>${qf(p.x)}</td><td>${qf(p.n)}</td><td>${moneyS(p.tt)}</td></tr>`).join('')}</tbody></table></div>`;
+    let h='',nC=0;
+    cats.forEach(c=>{if(pick&&c.k!==pick)return;const min=Math.max(scope.length>1?10:3,c.N*.01);const el=c.ps.filter(p=>p.n>=min);if(el.length<2)return;nC++;
+      const srt=el.slice().sort((a,b)=>sc(b)-sc(a)||b.x-a.x);const good=srt.slice(0,Math.min(5,Math.ceil(el.length/2))),gs=new Set(good);const weak=srt.slice().reverse().filter(p=>!gs.has(p)).slice(0,5);
+      const cs=c.ps.reduce((a,p)=>a+p.x,0),cg=c.ps.reduce((a,p)=>a+p.g,0);
+      h+=`<div class="pd-card"><h3>${esc(c.k)}</h3><div class="pd-sub">${el.length} sản phẩm được xét · bán / nhập cả ngành ${c.N>0?pct(cs/c.N):'—'} · % bán giảm giá ${cs>0?pct(cg/cs):'—'} · doanh thu ${moneyS(c.tt)}</div>
+        <h4 class="good">👍 Top ${good.length} bán tốt</h4>${tbl(good,true)}${weak.length?`<h4 class="bad">👎 ${weak.length} sản phẩm bán yếu</h4>${tbl(weak,false)}`:''}</div>`});
+    box.innerHTML=h||'<p class="hint">Chưa đủ sản phẩm để xếp hạng.</p>';
+    note.textContent=`Lũy kế tháng ${M}, đến ngày ${L.days}/${M} · ${cur==='all'?'Toàn khu vực':shopName(cur)}${nC?` · ${nC} ngành`:''}`}}
+
   // Thi đua ngành hàng (chương trình tải lên từ file Excel)
   {const box=document.getElementById('catBody'),note=document.getElementById('catNote');
    // thi đua Cá - Trứng (bán / nhập): chỉ tài khoản Quản trị xem
@@ -1592,6 +1631,7 @@ function render(){
   const one=cur!=='all';['rankSec','freshShopHead','freshShopWrap'].forEach(id=>document.getElementById(id).hidden=one);
   document.getElementById('freshNote').textContent=cur==='all'?`Lợi nhuận và tỷ lệ doanh thu / giá vốn cơ bản, lũy kế tháng ${M}`:'Đang xem: '+shopName(cur);
 }
+document.getElementById('prodCat').addEventListener('change',()=>render());
 function rowClick(e){const tr=e.target.closest('tr[data-s]');if(!tr)return;setShop(cur===tr.dataset.s?'all':tr.dataset.s)}
 {const ft0=document.getElementById('freshCatTbl');const tog=e=>{const sr=e.target.closest('tr[data-fs]');if(sr){setShop(sr.dataset.fs);return}
   const tr=e.target.closest('tr[data-fcat]');if(!tr)return;const c=tr.dataset.fcat;freshOpen=freshOpen===c?null:c;render();const n=document.querySelector(`#freshCatTbl tr[data-fcat="${CSS.escape(c)}"]`);n&&n.focus()};
@@ -1718,10 +1758,17 @@ async function readFile(f){
       rows.forEach(r=>{const d=toYMD(r[cD]);if(!d||d.y!==y||d.m!==m)return;const code=nz(r[cS]).split(' - ')[0].trim(),pc=nz(r[cP]);if(!code||!pc)return;const nm=cPN>=0?nz(r[cPN]):pc;if(!CPN(nm))return;const vx=numU(r[cX]);if(!vx)return;
         cpn[pc]=nm;const a=cpd[code]||(cpd[code]={}),b=a[d.d]||(a[d.d]={});b[pc]=(b[pc]||0)+vx});
       for(const s in cpd)for(const k in cpd[s])for(const q in cpd[s][k])cpd[s][k][q]=r3(cpd[s][k][q]);if(Object.keys(cpn).length){LO.cpd=cpd;LO.cpn=cpn}}
+    // tab Sản phẩm: lũy kế theo siêu thị × sản phẩm [SL nhập, SL bán, SL bán giảm giá, doanh thu]; giữ riêng số ngày cuối để tải lại cùng ngày
+    let lpx=null;{const cG1=ix('SL s.thị bán giảm giá'),cG2=ix('SL giảm giá cận date'),cTT=ix('Thành tiền phải thu khách hàng (chưa VAT)');
+      if(cP>=0&&cX>=0){const px={};lpx={};
+        rows.forEach(r=>{const d=toYMD(r[cD]);if(!d||d.y!==y||d.m!==m)return;const code=nz(r[cS]).split(' - ')[0].trim(),pc=nz(r[cP]);if(!code||!pc)return;
+          const v=[numU(r[cN]),numU(r[cX]),(cG1>=0?numU(r[cG1]):0)+(cG2>=0?numU(r[cG2]):0),cTT>=0?numU(r[cTT]):0];if(!v[0]&&!v[1])return;
+          const add=(T)=>{const o=T[code]||(T[code]={}),a=o[pc]||(o[pc]=[0,0,0,0]);for(let i=0;i<4;i++)a[i]+=v[i]};add(px);if(d.d===days)add(lpx)});
+        const rd=T=>{for(const s in T)for(const q in T[s])T[s][q]=T[s][q].map((v,i)=>i===3?Math.round(v):r3(v))};rd(px);rd(lpx);LO.px=px}}
     // số đầy đủ của ngày cuối trong file: để tải lại cùng ngày (cập nhật liên tục trong ngày) thì thay số ngày đó, không cộng 2 lần
     {const lr={};for(const s in dr[days]||{}){lr[s]={};for(const c in dr[days][s])lr[s][c]=dr[days][s][c].map(r3)}
      const lp={};if(cP>=0)for(const s in pdA){const o=pdA[s][days];if(o)lp[s]=Object.entries(o).map(([q,b])=>[q,r3(b[0]),r3(b[1])])}
-     LO.last={day:days,rows:lr,pr:cP>=0?lp:null}}
+     LO.last={day:days,rows:lr,pr:cP>=0?lp:null};if(LO.px)LO.last.px=lpx}
     return{kind:'loss',loss:LO,label:'Nhập xuất Fresh (hủy)',desc:`tháng ${m}/${y}, ${mn>1?`ngày ${mn}–${days}`:`đến ngày ${days}`}, ${fmtN.format(n)} dòng`}}
   const FRESH_CATS=new Set(['Thịt','Cá (Hải sản)','Rau Củ Quả CL','Trái cây','Trứng']);
   if(ix('Ngành hàng BHX')>=0){
@@ -1828,6 +1875,13 @@ function merge(B,list){
         const nl={...base,rows,daily,days:n.days,last:n.last};delete nl.min;if(hx)nl.hasX=true;else delete nl.hasX;
         if(base.cpd&&n.cpd){const cp=cl(base.cpd);for(const sh in cp)for(let q=n.min;q<=n.days;q++)delete cp[sh][q];for(const sh in n.cpd)Object.assign(cp[sh]||(cp[sh]={}),n.cpd[sh]);nl.cpd=cp;nl.cpn=Object.assign({},base.cpn,n.cpn)}
         else{delete nl.cpd;delete nl.cpn;if(n.cpd)info.push(`Nhập xuất Fresh ${mm}: số đã lưu chưa có sản lượng bán theo sản phẩm (thi đua SP heo C.P). Tải lại file nhập xuất từ ngày 1 để tính.`)}
+        // tab Sản phẩm: trừ số ngày cuối đã lưu (nếu tải lại cùng ngày) rồi cộng số mới
+        {const LLp=loss.last&&loss.last.day===n.min&&loss.last.px;
+         if(base.px&&n.px&&(n.min!==loss.days||LLp)){const px=cl(base.px);
+           if(n.min===loss.days)for(const sh in LLp){const o=px[sh];if(!o)continue;for(const q in LLp[sh]){const b=o[q];if(b)o[q]=b.map((v,i)=>i===3?Math.round(v-(LLp[sh][q][i]||0)):r3(v-(LLp[sh][q][i]||0)))}}
+           for(const sh in n.px){const o=px[sh]||(px[sh]={});for(const q in n.px[sh]){const a=n.px[sh][q],b=o[q];o[q]=b?a.map((v,i)=>i===3?Math.round(v+(b[i]||0)):r3(v+(b[i]||0))):a.slice()}}
+           nl.px=px}
+         else{delete nl.px;if(n.px)info.push(`Nhập xuất Fresh ${mm}: số đã lưu chưa có số liệu theo sản phẩm (tab Sản phẩm). Tải lại file nhập xuất từ ngày 1 để tính.`)}}
         if(base.pr&&n.pr){const pr={};const sh=new Set([...Object.keys(base.pr),...Object.keys(n.pr)]);
           sh.forEach(x=>{const m={};(base.pr[x]||[]).forEach(([q,a,b])=>m[q]=[a,b]);(n.pr[x]||[]).forEach(([q,a,b])=>{const o=m[q]||(m[q]=[0,0]);o[0]+=a;o[1]+=b});pr[x]=Object.entries(m).map(([q,[a,b]])=>[q,r3(a),r3(b)])});
           nl.pr=pr;nl.prod=Object.assign({},loss.prod,n.prod);nl.prd=n.prd}
@@ -1870,6 +1924,7 @@ function merge(B,list){
   if(!p||!p.bills)errs.push(`file doanh thu (số bill) tháng ${pm.m}/${pm.y}`);
   if(errs.length)return{errs,c};
   const pack=o=>({daily:o.daily,cat:o.cat,days:o.days,bills:o.bills,billDays:o.billDays,fday:o.fday,catLast:o.catLast});
+  if(loss&&loss.px&&shops){const keep=T=>{const o={};for(const s in T||{})if(shops[s])o[s]=T[s];return o};loss={...loss,px:keep(loss.px)};if(loss.last&&loss.last.px)loss.last={...loss.last,px:keep(loss.last.px)}}
   const D={shops,freshCats:B.freshCats,cur:{m:c.m,y:c.y,dim:dimOf(c.y,c.m)},prev:{m:pm.m,y:pm.y,dim:dimOf(pm.y,pm.m)},aug:pack(p),sep:pack(c),fresh,freshMonth,loss,ytd,ly,catm,lossm,contests,goalPct:(PREVIEW_D||B).goalPct||0};
   const warn=[...info];
   if(p.days<dimOf(pm.y,pm.m))warn.push(`Doanh thu tháng ${pm.m} mới có đến ngày ${p.days}. Nên tải thêm file ngành hàng tháng ${pm.m} đủ cả tháng để so sánh chính xác.`);
