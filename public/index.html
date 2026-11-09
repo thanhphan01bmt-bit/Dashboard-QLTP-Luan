@@ -1384,7 +1384,7 @@ function render(){
     const tbl=(ps,good)=>`<div class="tbl-wrap"><table><thead><tr><th class="l">Sản phẩm</th><th>Bán / nhập</th><th>% bán giảm giá</th><th>SL bán</th><th>SL nhập</th><th>Doanh thu</th></tr></thead><tbody>${ps.map(p=>`<tr><td class="l">${esc(p.nm)}</td><td class="${p.s>=.95?'pos':p.s<.8?'neg':''}"><b>${pct(p.s)}</b></td><td class="${p.dr<=.05?'pos':p.dr>=.2?'neg':''}">${pct(p.dr)}</td><td>${qf(p.x)}</td><td>${qf(p.n)}</td><td>${moneyS(p.tt)}</td></tr>`).join('')}</tbody></table></div>`;
     let h='',nC=0;
     cats.forEach(c=>{if(pick&&c.k!==pick)return;const min=Math.max(scope.length>1?10:3,c.N*.01);const el=c.ps.filter(p=>p.n>=min);if(el.length<2)return;nC++;
-      const srt=el.slice().sort((a,b)=>sc(b)-sc(a)||b.x-a.x);const good=srt.slice(0,Math.min(5,Math.ceil(el.length/2))),gs=new Set(good);const weak=srt.slice().reverse().filter(p=>!gs.has(p)).slice(0,5);
+      const srt=el.slice().sort((a,b)=>sc(b)-sc(a)||b.x-a.x);const TOP=pick?10:5,good=srt.slice(0,Math.min(TOP,Math.ceil(el.length/2))),gs=new Set(good);const weak=srt.slice().reverse().filter(p=>!gs.has(p)).slice(0,TOP);
       const cs=c.ps.reduce((a,p)=>a+p.x,0),cg=c.ps.reduce((a,p)=>a+p.g,0);
       h+=`<div class="pd-card"><h3>${esc(c.k)}</h3><div class="pd-sub">${el.length} sản phẩm được xét · bán / nhập cả ngành ${c.N>0?pct(cs/c.N):'—'} · % bán giảm giá ${cs>0?pct(cg/cs):'—'} · doanh thu ${moneyS(c.tt)}</div>
         <h4 class="good">👍 Top ${good.length} bán tốt</h4>${tbl(good,true)}${weak.length?`<h4 class="bad">👎 ${weak.length} sản phẩm bán yếu</h4>${tbl(weak,false)}`:''}</div>`});
