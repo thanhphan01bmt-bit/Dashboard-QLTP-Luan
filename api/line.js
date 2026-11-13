@@ -4,7 +4,7 @@
 // Gõ "menu" (hoặc "bc", "báo cáo") để hiện menu Mục tiêu ngày: bấm 1 mục thì bot gửi ảnh mục đó (ảnh tạo mỗi lần lưu số liệu).
 // Quản lý tự đăng ký 1 lần trong nhóm: "dt dk <mã siêu thị hoặc user QL>" → bot tag tên khi siêu thị cần nhắc (Hủy thủy hải sản / Bán trứng, từ 21h).
 // "dt huy dk": bỏ đăng ký của mình · "dt ds": xem siêu thị nào đã / chưa có quản lý đăng ký.
-// "dt tk": thống kê từ đầu tháng số ngày mỗi siêu thị rơi vào diện bị nhắc tên (hủy thủy hải sản > 10%, bán trứng 3 ngày liền < 100%).
+// "dt tk": thống kê (top 5) từ đầu tháng số ngày mỗi siêu thị rơi vào diện bị nhắc tên (hủy thủy hải sản > 10%, bán trứng 3 ngày liền < 100%).
 import crypto from 'node:crypto';
 import { json } from './_lib/auth.js';
 import { readJSON, writeJSON, useRequest } from './_lib/store.js';
@@ -167,9 +167,9 @@ export default {
             const st = nagStats(doc && doc.data);
             if (!st || !st.last) { await reply(token, ev.replyToken, 'Chưa có số liệu nhập xuất Fresh tháng này để thống kê.'); continue; }
             const who = (s) => { const i = shops[s] || {}, q = i.qlName || (reg[s] || {}).n || ''; return `${q ? q + ' – ' : ''}${i.name || s}`; };
-            const top = (o) => Object.entries(o).sort((a, b) => b[1] - a[1] || who(a[0]).localeCompare(who(b[0]))).map(([s, n], i) => `${i + 1}. ${who(s)}: ${n} ngày`);
+            const top = (o) => Object.entries(o).sort((a, b) => b[1] - a[1] || who(a[0]).localeCompare(who(b[0]))).slice(0, 5).map(([s, n], i) => `${i + 1}. ${who(s)}: ${n} ngày`);
             const A = top(st.loss), B = top(st.egg);
-            const out = [`📋 Thống kê nhắc tên tháng ${st.m} (đến ngày ${st.last}/${st.m})`, '', '🐟 Hủy thủy hải sản trên 10%:', ...(A.length ? A : ['✅ Không có siêu thị nào']), '', '🥚 Bán trứng 3 ngày liền dưới 100%:',
+            const out = [`📋 Thống kê nhắc tên tháng ${st.m} (đến ngày ${st.last}/${st.m})`, '', '🐟 Top 5 hủy thủy hải sản trên 10%:', ...(A.length ? A : ['✅ Không có siêu thị nào']), '', '🥚 Top 5 bán trứng 3 ngày liền dưới 100%:',
               ...(!st.hasX ? ['(File nhập xuất chưa có cột SL thực xuất)'] : B.length ? B : ['✅ Không có siêu thị nào'])];
             await reply(token, ev.replyToken, out.join('\n'));
             continue;
