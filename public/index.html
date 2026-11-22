@@ -734,7 +734,7 @@ body.pv .wrap{padding-bottom:120px}
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="upTitle">
     <div class="sec-title"><h2 id="upTitle">Cập nhật dữ liệu</h2><button class="btn" id="upClose" type="button" aria-label="Đóng">Đóng</button></div>
     <p class="hint">Chọn một hoặc nhiều file Excel. Trang nhận diện file theo tên cột, không cần đổi tên file. File nào không chọn thì giữ số liệu cũ.</p>
-    <div class="posbm" id="posBox"><b>📥 Lấy số thẳng từ POS</b> (máy tính): kéo nút <a id="posBm" class="btn primary" href="#" draggable="true">📥 Lấy số POS</a> lên thanh dấu trang của trình duyệt (làm 1 lần). Khi cần cập nhật: mở <b>pos.bachhoaxanh.com</b> (đã đăng nhập) rồi bấm nút đó trên thanh dấu trang. Dashboard tự mở, nhận đủ 4 báo cáo (doanh thu siêu thị, ngành hàng, hiệu quả Fresh, nhập xuất Fresh), bạn chỉ cần bấm <b>Áp dụng</b> rồi <b>Lưu</b>.<div class="posst" id="posSt" hidden></div></div>
+    <div class="posbm" id="posBox"><b>📥 Lấy số thẳng từ POS</b> (máy tính): kéo nút <a id="posBm" class="btn primary" href="#" draggable="true">📥 Lấy số POS</a> lên thanh dấu trang của trình duyệt (làm 1 lần). Khi cần cập nhật: mở <b>pos.bachhoaxanh.com</b> (đã đăng nhập) rồi bấm nút đó trên thanh dấu trang. Dashboard tự mở, nhận đủ 4 báo cáo (doanh thu siêu thị, ngành hàng, hiệu quả Fresh, nhập xuất Fresh), bạn chỉ cần bấm <b>Lưu dashboard</b>.<div class="posst" id="posSt" hidden></div></div>
     <ul class="kinds">
       <li><b>Báo cáo doanh thu theo ngành hàng</b>: chỉ cần file của <b>ngày mới</b>, dashboard tự ghép vào số đã lưu của tháng (trong ngày tải lại bao nhiêu lần cũng được)</li>
       <li><b>Doanh thu / số bill</b>: chỉ cần file của <b>ngày mới</b> (có thể trùng ngày đã lưu, dashboard thay số các ngày đó)</li>
@@ -752,7 +752,7 @@ body.pv .wrap{padding-bottom:120px}
     </label>
     <div id="upList" class="uplist"></div>
     <div id="upSum" class="upsum" hidden></div>
-    <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" id="upCancel" type="button">Huỷ</button><button class="btn primary" id="upApply" type="button" disabled>Xem trước dashboard</button></div>
+    <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" id="upCancel" type="button">Huỷ</button><button class="btn primary" id="upApply" type="button" disabled>Lưu dashboard</button></div>
   </div>
 </div>
 
@@ -2026,12 +2026,12 @@ function posBookmarklet(){
     const files=[],errs=[];
     for(const [k,a,b,label] of jobs){
       try{say(label+': đang lấy…');const aoa=await run(R[k],a,b,st,label);if(aoa.length>1)files.push({name:'POS '+label,aoa});else errs.push(label+': không có dòng nào')}
-      catch(e){errs.push(e.message||String(e))}
+      catch(e){errs.push(e.message||String(e));if(/không phải dữ liệu|chuyển tới|Failed to fetch/i.test(e.message||''))break}
     }
     if(!files.length)throw new Error(errs.join('\n')||'Không lấy được báo cáo nào.');
     w.postMessage({type:'qltp-pos-data',files,errs,at:Date.now()},DASH);
     try{w.focus()}catch(e){}
-    end('Đã gửi '+files.length+' báo cáo sang dashboard.'+(errs.length?'\nChưa lấy được: '+errs.join('; '):'')+'\nTrên dashboard bấm Áp dụng rồi Lưu.',!errs.length);
+    end('Đã gửi '+files.length+' báo cáo sang dashboard.'+(errs.length?'\nChưa lấy được: '+errs.join('; '):'')+'\nTrên dashboard bấm Lưu dashboard.',!errs.length);
   })().catch(e=>end('Lỗi: '+(e.message||e),false));
 }
 // thông tin dashboard gửi cho nút Lấy số POS: danh sách siêu thị và các ngày đã lưu (để chỉ lấy phần còn thiếu)
@@ -2040,7 +2040,7 @@ window.__posInfo=()=>{if(typeof ARCH!=='undefined'&&ARCH)return{ok:false,msg:'Da
   const B=BASE_D||{},cu=B.cur||{},L=B.loss,same=o=>!!o&&o.y===cu.y&&o.m===cu.m;
   return{ok:true,shops:Object.keys(B.shops||{}),cur:{y:cu.y,m:cu.m},sepDays:(B.sep||{}).days||0,billDays:(B.sep||{}).billDays||0,lossDays:same(L)?L.days||0:0,lossPx:!!(same(L)&&L.px)}};
 window.__posProgress=t=>{const el=$('posSt');if(!el)return;if(panel.hidden)openPanel();el.hidden=false;el.textContent='⏳ '+t};
-window.__posImport=(files,errs)=>{openPanel();const el=$('posSt');el.hidden=false;el.textContent='✅ Đã nhận số liệu từ POS lúc '+new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})+(errs&&errs.length?' · chưa lấy được: '+errs.join('; '):'')+'. Kiểm tra rồi bấm Áp dụng → Lưu.';handleFiles(files)};
+window.__posImport=(files,errs)=>{openPanel();const el=$('posSt');el.hidden=false;el.textContent='✅ Đã nhận số liệu từ POS lúc '+new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})+(errs&&errs.length?' · chưa lấy được: '+errs.join('; '):'')+'. Kiểm tra rồi bấm Lưu dashboard.';handleFiles(files)};
 {const a=$('posBm');if(a){a.href='javascript:'+encodeURIComponent('('+posBookmarklet.toString()+')()');a.addEventListener('click',e=>{e.preventDefault();alert('Kéo nút này lên thanh dấu trang (bookmark bar) của trình duyệt. Sau đó mở pos.bachhoaxanh.com và bấm nút trên thanh dấu trang.')})}}
 function closePanel(){panel.hidden=true;const b=$('uploadBtn');b&&b.focus()}
 document.addEventListener('click',e=>{if(e.target.closest('#uploadBtn'))openPanel()});
@@ -2091,7 +2091,9 @@ async function handleFiles(files){
   applyBtn.disabled=false;
 }
 applyBtn.addEventListener('click',()=>{if(!merged||!merged.D)return;PREVIEW_D=merged.D;panel.hidden=true;rerender(PREVIEW_D);
-  bar.hidden=false;document.body.classList.add('pv');pvMsg.textContent='Chưa lưu. Người khác vẫn thấy số liệu cũ.';saveBtn.disabled=false;saveBtn.hidden=false;window.scrollTo({top:0})});
+  bar.hidden=false;document.body.classList.add('pv');pvMsg.textContent='Đang lưu…';saveBtn.disabled=false;saveBtn.hidden=false;window.scrollTo({top:0});
+  // lưu luôn, không dừng ở bước xem trước (vẽ xong dashboard với số mới rồi mới lưu để bảng xếp hạng / ảnh bot dùng đúng số)
+  setTimeout(()=>saveBtn.click(),80)});
 window.__setGoal=v=>{const nd=JSON.parse(JSON.stringify(PREVIEW_D||BASE_D));nd.goalPct=v;PREVIEW_D=nd;rerender(nd);bar.hidden=false;document.body.classList.add('pv');pvMsg.textContent='Đã đổi % tăng trưởng. Bấm Lưu để người xem cùng thấy mục tiêu mới.';saveBtn.disabled=false;saveBtn.hidden=false};
 $('pvCancel').addEventListener('click',()=>{PREVIEW_D=null;bar.hidden=true;document.body.classList.remove('pv');rerender(BASE_D)});
 saveBtn.addEventListener('click',async()=>{
