@@ -205,6 +205,10 @@ tr.muted-row td{color:var(--muted)}
 .wrap:not(.v-comp) #compSec{display:none}
 .wrap:not(.v-cat) #catSec{display:none}
 .wrap:not(.v-prod) #prodSec{display:none}
+.posbm{font-size:13px;line-height:1.55;background:var(--accent-soft);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 10px}
+.posbm .btn{display:inline-flex;margin:0 2px;padding:3px 10px;font-size:13px;cursor:grab}
+.posst{margin-top:6px;font-weight:600;color:var(--accent)}
+@media (max-width:760px){.posbm{display:none}}
 .wrap.v-prod>section:not(#prodSec),.wrap.v-prod>.two,.wrap.v-prod .alertbar{display:none!important}
 .pd-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 12px}
 .pd-bar select{font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
@@ -730,6 +734,7 @@ body.pv .wrap{padding-bottom:120px}
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="upTitle">
     <div class="sec-title"><h2 id="upTitle">Cập nhật dữ liệu</h2><button class="btn" id="upClose" type="button" aria-label="Đóng">Đóng</button></div>
     <p class="hint">Chọn một hoặc nhiều file Excel. Trang nhận diện file theo tên cột, không cần đổi tên file. File nào không chọn thì giữ số liệu cũ.</p>
+    <div class="posbm" id="posBox"><b>📥 Lấy số thẳng từ POS</b> (máy tính): kéo nút <a id="posBm" class="btn primary" href="#" draggable="true">📥 Lấy số POS</a> lên thanh dấu trang của trình duyệt (làm 1 lần). Khi cần cập nhật: mở <b>pos.bachhoaxanh.com</b> (đã đăng nhập) rồi bấm nút đó trên thanh dấu trang. Dashboard tự mở, nhận đủ 4 báo cáo (doanh thu siêu thị, ngành hàng, hiệu quả Fresh, nhập xuất Fresh), bạn chỉ cần bấm <b>Áp dụng</b> rồi <b>Lưu</b>.<div class="posst" id="posSt" hidden></div></div>
     <ul class="kinds">
       <li><b>Báo cáo doanh thu theo ngành hàng</b>: chỉ cần file của <b>ngày mới</b>, dashboard tự ghép vào số đã lưu của tháng (trong ngày tải lại bao nhiêu lần cũng được)</li>
       <li><b>Doanh thu / số bill</b>: chỉ cần file của <b>ngày mới</b> (có thể trùng ngày đã lưu, dashboard thay số các ngày đó)</li>
@@ -1709,7 +1714,7 @@ async function readSheet(buf,pick){
   return Array.from(out,r=>r||[]);
 }
 async function readFile(f){
-  const fbuf=await f.arrayBuffer();const aoa=await readSheet(fbuf);
+  const aoa=f.aoa||await readSheet(await f.arrayBuffer());
   const KEYS=['nganh hang bhx','tong so bill','ln luy ke','ma st','sl huy ton','chuong trinh thi dua','dieu kien nhan thuong'];
   const hi=aoa.findIndex((r,i)=>i<15&&r&&r.some(c=>KEYS.includes(hk(c))));
   if(hi<0)throw new Error('Không nhận ra loại file: không thấy cột "Ngành hàng BHX", "Tổng số bill", "LN lũy kế" hoặc "Mã ST".');
@@ -1942,6 +1947,99 @@ function buildHtml(D){
 function rerender(D){const w=document.querySelector('.wrap');const tmp=document.createElement('div');tmp.innerHTML=WRAP0;w.replaceWith(tmp.firstElementChild);app(D)}
 const panel=$('upPanel'),list=$('upList'),sum=$('upSum'),applyBtn=$('upApply'),bar=$('pvBar'),pvMsg=$('pvMsg'),saveBtn=$('pvSave');
 function openPanel(){parsed=[];merged=null;list.innerHTML='';sum.hidden=true;applyBtn.disabled=true;$('upFiles').value='';panel.hidden=false;$('upClose').focus()}
+// ---- Lấy số POS: nút trên thanh dấu trang chạy ở pos.bachhoaxanh.com (phiên đăng nhập POS của chính người dùng),
+// gọi 4 báo cáo rồi gửi bảng số sang cửa sổ dashboard (postMessage). Tài khoản POS không rời khỏi máy người dùng.
+function posBookmarklet(){
+  const DASH='https://luan56605.app',POS='https://pos.bachhoaxanh.com';
+  if(location.origin!==POS){alert('Hãy mở trang pos.bachhoaxanh.com (đã đăng nhập) rồi bấm lại nút Lấy số POS.');return}
+  if(window.__qltpPos){alert('Đang lấy số, chờ chút…');return}
+  window.__qltpPos=1;
+  const box=document.createElement('div');
+  box.style.cssText='position:fixed;right:16px;bottom:16px;z-index:2147483647;background:#0d6b53;color:#fff;font:14px/1.45 system-ui,sans-serif;padding:12px 16px;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.25);max-width:380px;white-space:pre-line';
+  document.body.appendChild(box);
+  const w=window.open(DASH+'/#pos','qltp_pos');
+  const say=t=>{box.textContent='📥 Lấy số POS\n'+t;try{w&&w.postMessage({type:'qltp-pos-progress',text:t},DASH)}catch(e){}};
+  const end=(t,ok)=>{say(t);box.style.background=ok?'#0d6b53':'#c02f2f';window.__qltpPos=0;setTimeout(()=>box.remove(),ok?10000:30000)};
+  if(!w){end('Trình duyệt chặn mở cửa sổ dashboard. Cho phép cửa sổ bật lên (popup) rồi bấm lại.');return}
+  say('Đang mở dashboard… (cần đăng nhập dashboard bằng tài khoản Quản trị hoặc Cập nhật dữ liệu)');
+  const p2=n=>String(n).padStart(2,'0'),dmy=(y,m,d)=>p2(d)+'/'+p2(m)+'/'+y+' 00:00';
+  const P=(name,val,type,ctl,dt,split)=>({CONTROLTYPE:ctl,OBJECTVALUE:val,PARAMNAME:name,PARAMTYPE:type,DATATYPE:dt||'',ISSPLITVALUE:split?'true':'false',ISHIDDEN:'false',ROOTCONTROLDATATYPE:''});
+  const num=(v,k)=>k!=='productid'&&typeof v==='string'&&/^-?[\d,]+(\.\d+)?$/.test(v.trim())?Number(v.replace(/,/g,'')):v;
+  const R={
+    bill:{id:'1127',name:' Doanh Thu Theo Siêu Thị',sp:'bachhoaxanh.rpt_generalsalereportbystore_dyn',cs:'ConnectionStringIMS01_Logical',guid:'dcb44d71-1df8-4071-b39e-d3240cb48dac',to:'360',eo:'true',ss:'true',
+      H:['Ngày','Mã siêu thị','Tên siêu thị','Loại kho','Ngày khai trương','Tên size vật lý','Doanh thu offline','Doanh thu Online','Tổng số bill','Tỉnh/TP','DT offline (đã VAT)','DT Online (Đã VAT)','Tổng số bill online'],
+      F:['datekey','storeid','storename','storetypename','openingday','storetypebymanualname','revenueoffline','revenueonline','totalvoucher','provincename','revenueofflinevat','revenueonlinevat','totalonlinevoucher'],
+      prm:(a,b,st)=>[P('p_fromdate',a,'TIMESTAMP','DATE','',1),P('p_todate',b,'TIMESTAMP','DATE','',1),P('p_storeidlist',st,'TEXT','MULTISELECT','STORE',0),P('p_viewtype','0','INTEGER','COMBOBOX','TìmtheoST',0)]},
+    nganh:{id:'875',name:'Báo cáo doanh thu theo ngành hàng BHX',sp:'bachhoaxanh.rpt_generalsalereport_dyn_bybhxmaingroup',cs:'ConnectionStringBHXRerport',guid:'fd3ade40-d937-4905-9551-130b07f5e419',to:'300',eo:'true',ss:'true',
+      H:['Ngày xuất','AM','Mã siêu thị','Loại kho','Ngành hàng BHX','Doanh thu','Doanh thu bán SLL','Doanh thu tiktok','Doanh thu quy đổi','Doanh thu quy đổi SLL','Doanh thu tiktok quy đổi'],
+      F:['outputdate','storegroupname','storeid','storetypename','bhxmaingroupname','revenue','revenue_sll','revenue_tiktok','convertrevenue','convertrevenue_sll','convertrevenue_tiktok'],
+      prm:(a,b,st)=>[P('p_fromdate',a,'TIMESTAMP','DATE','',1),P('p_todate',b,'TIMESTAMP','DATE','',1),P('p_storeidlist',st,'TEXT','MULTISELECT','STORE',0),P('p_bhxmaingroupidlist','','TEXT','MULTISELECT','NganhhangBHX',0),P('p_maingroupids','','TEXT','MULTISELECT','MAINGROUP',0),P('p_subgroupids','','TEXT','MULTISELECT','SUBGROUP',0)]},
+    fresh:{id:'3933',name:'Báo cáo hiệu quả bán Fresh siêu thị',sp:'reward.rpt_performancegroupsalefresh_getgroup_dyn',cs:'ConnectionStringReward',guid:'5b7fced1-b1c3-4e22-95a5-5ba63b870b08',to:'600',eo:'false',ss:'',
+      H:['Tháng','Mã siêu thị','Tên siêu thị','Mã ngành hàng','Ngành hàng','SL thực nhập hôm nay','Giá vốn cơ bản hôm nay','DT FRESH tính giá vốn','Giá vốn cơ bản lũy kế đến ngày hôm qua','Tỉ lệ doanh thu trên giá vốn cơ bản','LN lũy kế','LN TB 3 tháng trước','Chênh lệch LN so với 3 tháng trước'],
+      F:['month','storeid','storename','maingroupid','maingroupname','realinputquantity2_now','totalcostprice_now','revenue_freshcostprice','basiccostprice','completerate','profit_luyke','avgprofit3monthago','difprofit'],
+      prm:(mo,_,st)=>[P('p_month',mo,'TIMESTAMP','MONTH','',0),P('p_storeids',st,'TEXT','MULTISELECT','STORE',0)]},
+    loss:{id:'3624',name:'BC nhập xuất Rau Đà Lạt, Trứng',sp:'bachhoaxanh.rpt_inoutsale_dalatvegetables_dyn',cs:'ConnectionStringBHXRerport',guid:'266cc7a9-5f31-4b04-bdc8-aca32ad7b569',to:'600',eo:'true',ss:'true',
+      H:['Ngày','AM','RSM','Mã siêu thị','Tên siêu thị','Mã sản phẩm','Tên sản phẩm','Mã nhóm SP tính doanh thu','Ngành hàng - Phân tích','SL thực nhập','SL thực xuất','SL s.thị bán giảm giá','SL giảm giá cận date','SL hủy tồn','SL mất mát kiểm kê','ĐVT quy đổi','Thành tiền phải thu khách hàng (chưa VAT)','SL tặng','SL xuất hủy NCC','SL Nhập bù HHNCC','SL xuất hủy hao hụt tự nhiên'],
+      F:['datekey','storegroupnameam','storegroupnamersm','storeid','storename','productid','productname','salegroupid','salegroupname','actualinputquantity','realoutputquantity','discountoutputquantity','slggcandate','stockcancelquantity','inventorylossquantity','exchangequantity','totalamountbfvat','promoquantity','xuathuyncc','nhapbuhuyncc','xuathhhtn'],
+      prm:(a,b,st)=>[P('p_fromdate',a,'TIMESTAMP','DATE','',0),P('p_todate',b,'TIMESTAMP','DATE','',0),P('p_storeidlist',st,'TEXT','MULTISELECT','STORE',1),P('p_maingroupidlist','','TEXT','MULTISELECT','MAINGROUP',0),P('p_subgroupidlist','','TEXT','MULTISELECT','SUBGROUP',0),P('p_productidlist','','TEXT','MULTISELECT','PRODUCT',0),P('p_salegroupidlist','','TEXT','MULTISELECT','NhomSPtinhdoanhthu',0),P('p_rpttype','1','INTEGER','COMBOBOX','LoaibaocaoBHX',0)]}
+  };
+  async function run(R,a,b,st,label){
+    const out=[];let skip=0,total=null;const size=20000;
+    for(;;){
+      let j=null;
+      for(let t=0;t<4;t++){
+        const pg=String(skip/size+1);
+        const body={dynamicReportId:R.id,dynamicReportName:R.name,listParam:R.prm(a,b,st),storeName:R.sp,timeOut:R.to,connectionString:R.cs,isExportOnly:R.eo,isGridView:'true',isDataLake:'false',sourceType:'DATABASE',pageIndex:pg,pageSize:String(size),reportGuid:R.guid,note:'',isShowSchedule:R.ss,take:String(size),skip:String(skip),page:pg};
+        try{const r=await fetch('/reports/Home/FilterDataDynamicReport',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json;charset=UTF-8','X-Requested-With':'XMLHttpRequest'},body:JSON.stringify(body)});j=await r.json()}catch(e){j=null}
+        if(j&&j.Success)break;
+        say(label+': POS chưa trả số, thử lại lần '+(t+1)+'…');await new Promise(z=>setTimeout(z,3000*(t+1)));
+      }
+      if(!j||!j.Success)throw new Error(label+': '+((j&&j.Message)?String(j.Message).split('\n')[0]:'không lấy được số (phiên POS hết hạn? hãy đăng nhập lại POS)'));
+      const rows=(j.Data&&j.Data.listResult)||[];
+      for(const o of rows)out.push(R.F.map(k=>num(o[k],k)));
+      if(total==null)total=+((j.Data&&j.Data.totalRow)||(rows[0]&&rows[0].totalrow)||rows.length);
+      say(label+': '+out.length.toLocaleString('vi-VN')+(total?' / '+total.toLocaleString('vi-VN'):'')+' dòng');
+      if(!rows.length||out.length>=total)break;
+      skip+=size;
+    }
+    return [R.H,...out];
+  }
+  (async()=>{
+    const info=await new Promise((ok,no)=>{
+      const h=e=>{if(e.origin!==DASH||e.source!==w)return;const d=e.data||{};if(d.type==='qltp-pos-hello'){removeEventListener('message',h);ok(d)}};
+      addEventListener('message',h);setTimeout(()=>{removeEventListener('message',h);no(new Error('Không kết nối được dashboard. Hãy đăng nhập dashboard trong cửa sổ vừa mở rồi bấm lại nút.'))},120000)});
+    if(!info.ok)throw new Error(info.msg||'Dashboard không nhận số liệu.');
+    const st=(info.shops||[]).join(',');if(!st)throw new Error('Dashboard chưa có danh sách siêu thị (file Base).');
+    const now=new Date(),Y=now.getFullYear(),M=now.getMonth()+1,D=now.getDate(),same=!!info.cur&&info.cur.y===Y&&info.cur.m===M;
+    const dim=(y,m)=>new Date(y,m,0).getDate(),today=dmy(Y,M,D);
+    const from=dd=>dmy(Y,M,same&&dd>0?dd:1);
+    // tháng đã lưu là tháng trước (vừa sang tháng): lấy nốt các ngày còn thiếu của tháng trước
+    const prev=!same&&!!info.cur&&((info.cur.y===Y&&info.cur.m===M-1)||(M===1&&info.cur.y===Y-1&&info.cur.m===12));
+    const jobs=[];
+    if(prev){const cy=info.cur.y,cm=info.cur.m,last=dim(cy,cm);
+      if(info.sepDays<last)jobs.push(['nganh',dmy(cy,cm,Math.max(1,info.sepDays)),dmy(cy,cm,last),'Ngành hàng T'+cm]);
+      if(info.billDays<last)jobs.push(['bill',dmy(cy,cm,Math.max(1,info.billDays)),dmy(cy,cm,last),'Doanh thu siêu thị T'+cm])}
+    jobs.push(['bill',from(info.billDays),today,'Doanh thu siêu thị'],['nganh',from(info.sepDays),today,'Doanh thu ngành hàng'],['fresh',p2(M)+'/'+Y,'','Hiệu quả Fresh'],['loss',from(info.lossPx?info.lossDays:0),today,'Nhập xuất Fresh']);
+    const files=[],errs=[];
+    for(const [k,a,b,label] of jobs){
+      try{say(label+': đang lấy…');const aoa=await run(R[k],a,b,st,label);if(aoa.length>1)files.push({name:'POS '+label,aoa});else errs.push(label+': không có dòng nào')}
+      catch(e){errs.push(e.message||String(e))}
+    }
+    if(!files.length)throw new Error(errs.join('\n')||'Không lấy được báo cáo nào.');
+    w.postMessage({type:'qltp-pos-data',files,errs,at:Date.now()},DASH);
+    try{w.focus()}catch(e){}
+    end('Đã gửi '+files.length+' báo cáo sang dashboard.'+(errs.length?'\nChưa lấy được: '+errs.join('; '):'')+'\nTrên dashboard bấm Áp dụng rồi Lưu.',!errs.length);
+  })().catch(e=>end('Lỗi: '+(e.message||e),false));
+}
+// thông tin dashboard gửi cho nút Lấy số POS: danh sách siêu thị và các ngày đã lưu (để chỉ lấy phần còn thiếu)
+window.__posInfo=()=>{if(typeof ARCH!=='undefined'&&ARCH)return{ok:false,msg:'Dashboard đang xem số liệu tháng cũ, hãy chuyển về tháng hiện tại.'};
+  if(!CAN_EDIT)return{ok:false,msg:'Tài khoản dashboard này chỉ được xem. Cần tài khoản Quản trị hoặc Cập nhật dữ liệu.'};
+  const B=BASE_D||{},cu=B.cur||{},L=B.loss,same=o=>!!o&&o.y===cu.y&&o.m===cu.m;
+  return{ok:true,shops:Object.keys(B.shops||{}),cur:{y:cu.y,m:cu.m},sepDays:(B.sep||{}).days||0,billDays:(B.sep||{}).billDays||0,lossDays:same(L)?L.days||0:0,lossPx:!!(same(L)&&L.px)}};
+window.__posProgress=t=>{const el=$('posSt');if(!el)return;if(panel.hidden)openPanel();el.hidden=false;el.textContent='⏳ '+t};
+window.__posImport=(files,errs)=>{openPanel();const el=$('posSt');el.hidden=false;el.textContent='✅ Đã nhận số liệu từ POS lúc '+new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})+(errs&&errs.length?' · chưa lấy được: '+errs.join('; '):'')+'. Kiểm tra rồi bấm Áp dụng → Lưu.';handleFiles(files)};
+{const a=$('posBm');if(a){a.href='javascript:'+encodeURIComponent('('+posBookmarklet.toString()+')()');a.addEventListener('click',e=>{e.preventDefault();alert('Kéo nút này lên thanh dấu trang (bookmark bar) của trình duyệt. Sau đó mở pos.bachhoaxanh.com và bấm nút trên thanh dấu trang.')})}}
+
 function closePanel(){panel.hidden=true;const b=$('uploadBtn');b&&b.focus()}
 document.addEventListener('click',e=>{if(e.target.closest('#uploadBtn'))openPanel()});
 $('upClose').addEventListener('click',closePanel);$('upCancel').addEventListener('click',closePanel);
@@ -2031,6 +2129,17 @@ async function api(path,opt={}){
   return{ok:r.ok,status:r.status,j:j||{}};
 }
 window.__api=api;
+// Nhận số liệu từ nút "Lấy số POS" (chạy trên pos.bachhoaxanh.com, mở dashboard với #pos): chỉ tin cửa sổ POS đã mở trang này
+(function(){const POS='https://pos.bachhoaxanh.com';if(!window.opener||!/^#pos/.test(location.hash))return;
+  let sent=false;const hello=()=>{if(sent||!window.__posInfo||!window.opener)return;let info;try{info=window.__posInfo()}catch(e){return}if(!info)return;sent=true;try{window.opener.postMessage({type:'qltp-pos-hello',v:1,...info},POS)}catch(e){}};
+  const tm=setInterval(()=>{hello();if(sent)clearInterval(tm)},700);setTimeout(()=>clearInterval(tm),180000);
+  addEventListener('message',e=>{if(e.origin!==POS||e.source!==window.opener)return;const d=e.data||{};
+    if(d.type==='qltp-pos-progress'&&window.__posProgress)window.__posProgress(String(d.text||'').slice(0,300));
+    if(d.type==='qltp-pos-data'&&Array.isArray(d.files)&&window.__posImport){
+      const files=d.files.filter(f=>f&&typeof f.name==='string'&&Array.isArray(f.aoa)&&f.aoa.length>1).map(f=>({name:f.name.replace(/[^\p{L}\p{N} ._-]/gu,'').slice(0,60)+'.xlsx',aoa:f.aoa}));
+      try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+      window.__posImport(files,Array.isArray(d.errs)?d.errs.map(String):[])}});
+})();
 const fmtTime=iso=>{try{return new Date(iso).toLocaleString('vi-VN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'})}catch(e){return iso}};
 function msg(t){$('bootMsg').hidden=false;$('bootMsg').innerHTML=t}
 
