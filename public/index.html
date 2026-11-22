@@ -1952,6 +1952,7 @@ function openPanel(){parsed=[];merged=null;list.innerHTML='';sum.hidden=true;app
 function posBookmarklet(){
   const DASH='https://luan56605.app',POS='https://pos.bachhoaxanh.com';
   if(location.origin!==POS){alert('Hãy mở trang pos.bachhoaxanh.com (đã đăng nhập) rồi bấm lại nút Lấy số POS.');return}
+  if(!/^\/reports\//i.test(location.pathname)){if(confirm('Nút Lấy số POS cần chạy trên một trang báo cáo của POS. Mở trang báo cáo Doanh thu ngay bây giờ?\n(Trang mở xong, bấm lại nút Lấy số POS)'))location.href=POS+'/reports/home/dashboard/145';return}
   if(window.__qltpPos){alert('Đang lấy số, chờ chút…');return}
   window.__qltpPos=1;
   const box=document.createElement('div');
@@ -1986,15 +1987,17 @@ function posBookmarklet(){
   async function run(R,a,b,st,label){
     const out=[];let skip=0,total=null;const size=20000;
     for(;;){
-      let j=null;
+      let j=null,why='';
       for(let t=0;t<4;t++){
         const pg=String(skip/size+1);
         const body={dynamicReportId:R.id,dynamicReportName:R.name,listParam:R.prm(a,b,st),storeName:R.sp,timeOut:R.to,connectionString:R.cs,isExportOnly:R.eo,isGridView:'true',isDataLake:'false',sourceType:'DATABASE',pageIndex:pg,pageSize:String(size),reportGuid:R.guid,note:'',isShowSchedule:R.ss,take:String(size),skip:String(skip),page:pg};
-        try{const r=await fetch('/reports/Home/FilterDataDynamicReport',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json;charset=UTF-8','X-Requested-With':'XMLHttpRequest'},body:JSON.stringify(body)});j=await r.json()}catch(e){j=null}
+        try{const r=await fetch(POS+'/reports/Home/FilterDataDynamicReport',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json;charset=UTF-8','X-Requested-With':'XMLHttpRequest'},body:JSON.stringify(body)});
+          const txt=await r.text();try{j=JSON.parse(txt)}catch(e){j=null}
+          why='HTTP '+r.status+(r.redirected?', bị chuyển tới '+new URL(r.url).pathname:'')+(j?'':', không phải dữ liệu: '+txt.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,80))}catch(e){j=null;why=String(e&&e.message||e)}
         if(j&&j.Success)break;
         say(label+': POS chưa trả số, thử lại lần '+(t+1)+'…');await new Promise(z=>setTimeout(z,3000*(t+1)));
       }
-      if(!j||!j.Success)throw new Error(label+': '+((j&&j.Message)?String(j.Message).split('\n')[0]:'không lấy được số (phiên POS hết hạn? hãy đăng nhập lại POS)'));
+      if(!j||!j.Success)throw new Error(label+': '+((j&&j.Message)?String(j.Message).split('\n')[0]:'không lấy được số ('+why+'). Hãy mở 1 trang báo cáo POS, bấm Xem báo cáo 1 lần cho chắc đã đăng nhập, rồi bấm lại nút.'));
       const rows=(j.Data&&j.Data.listResult)||[];
       for(const o of rows)out.push(R.F.map(k=>num(o[k],k)));
       if(total==null)total=+((j.Data&&j.Data.totalRow)||(rows[0]&&rows[0].totalrow)||rows.length);
@@ -2039,7 +2042,6 @@ window.__posInfo=()=>{if(typeof ARCH!=='undefined'&&ARCH)return{ok:false,msg:'Da
 window.__posProgress=t=>{const el=$('posSt');if(!el)return;if(panel.hidden)openPanel();el.hidden=false;el.textContent='⏳ '+t};
 window.__posImport=(files,errs)=>{openPanel();const el=$('posSt');el.hidden=false;el.textContent='✅ Đã nhận số liệu từ POS lúc '+new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})+(errs&&errs.length?' · chưa lấy được: '+errs.join('; '):'')+'. Kiểm tra rồi bấm Áp dụng → Lưu.';handleFiles(files)};
 {const a=$('posBm');if(a){a.href='javascript:'+encodeURIComponent('('+posBookmarklet.toString()+')()');a.addEventListener('click',e=>{e.preventDefault();alert('Kéo nút này lên thanh dấu trang (bookmark bar) của trình duyệt. Sau đó mở pos.bachhoaxanh.com và bấm nút trên thanh dấu trang.')})}}
-
 function closePanel(){panel.hidden=true;const b=$('uploadBtn');b&&b.focus()}
 document.addEventListener('click',e=>{if(e.target.closest('#uploadBtn'))openPanel()});
 $('upClose').addEventListener('click',closePanel);$('upCancel').addEventListener('click',closePanel);
