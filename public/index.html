@@ -208,7 +208,8 @@ tr.muted-row td{color:var(--muted)}
 .posbm{font-size:13px;line-height:1.55;background:var(--accent-soft);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 10px}
 .posbm .btn{display:inline-flex;margin:0 2px;padding:3px 10px;font-size:13px;cursor:grab}
 .posst{margin-top:6px;font-weight:600;color:var(--accent)}
-@media (max-width:760px){.posbm{display:none}}
+.pos-mb{display:none}
+@media (max-width:760px){.pos-pc{display:none}.pos-mb{display:inline}.posbm .btn{cursor:pointer;margin-left:6px}}
 .wrap.v-prod>section:not(#prodSec),.wrap.v-prod>.two,.wrap.v-prod .alertbar{display:none!important}
 .pd-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 12px}
 .pd-bar select{font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
@@ -734,7 +735,7 @@ body.pv .wrap{padding-bottom:120px}
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="upTitle">
     <div class="sec-title"><h2 id="upTitle">Cập nhật dữ liệu</h2><button class="btn" id="upClose" type="button" aria-label="Đóng">Đóng</button></div>
     <p class="hint">Chọn một hoặc nhiều file Excel. Trang nhận diện file theo tên cột, không cần đổi tên file. File nào không chọn thì giữ số liệu cũ.</p>
-    <div class="posbm" id="posBox"><b>📥 Lấy số thẳng từ POS</b> (máy tính): kéo nút <a id="posBm" class="btn primary" href="#" draggable="true">📥 Lấy số POS</a> lên thanh dấu trang của trình duyệt (làm 1 lần). Khi cần cập nhật: mở <b>pos.bachhoaxanh.com</b> (đã đăng nhập) rồi bấm nút đó trên thanh dấu trang. Dashboard tự mở, nhận đủ 4 báo cáo (doanh thu siêu thị, ngành hàng, hiệu quả Fresh, nhập xuất Fresh), bạn chỉ cần bấm <b>Lưu dashboard</b>.<div class="posst" id="posSt" hidden></div></div>
+    <div class="posbm" id="posBox"><span class="pos-pc"><b>📥 Lấy số thẳng từ POS</b> (máy tính): kéo nút <a id="posBm" class="btn primary" href="#" draggable="true">📥 Lấy số POS</a> lên thanh dấu trang của trình duyệt (làm 1 lần). Khi cần cập nhật: mở trang báo cáo trên <b>pos.bachhoaxanh.com</b> (đã đăng nhập) rồi bấm nút đó trên thanh dấu trang. Dashboard tự mở, nhận đủ 4 báo cáo (doanh thu siêu thị, ngành hàng, hiệu quả Fresh, nhập xuất Fresh), bạn chỉ cần bấm <b>Lưu dashboard</b>.</span><span class="pos-mb"><b>📥 Lấy số thẳng từ POS trên điện thoại</b> <button class="btn primary" id="posCopy" type="button">Sao chép mã nút</button><br><b>Cài 1 lần:</b> bấm Sao chép mã nút → trong Safari lưu dấu trang cho trang bất kỳ, đặt tên <b>Lấy số POS</b> → mở Dấu trang → Sửa → chọn dấu trang đó, xóa địa chỉ cũ và dán mã vừa sao chép. (Chrome Android: sửa dấu trang tương tự.)<br><b>Khi cập nhật:</b> mở trang báo cáo trên pos.bachhoaxanh.com (đã đăng nhập) → bấm dấu trang <b>Lấy số POS</b> (Chrome Android: gõ "Lấy số POS" vào thanh địa chỉ rồi chọn dấu trang) → dashboard mở ở tab mới, bấm <b>Lưu dashboard</b>. Lần đầu lấy nhập xuất Fresh từ ngày 1 khá nặng, nên làm trên máy tính.</span><div class="posst" id="posSt" hidden></div></div>
     <ul class="kinds">
       <li><b>Báo cáo doanh thu theo ngành hàng</b>: chỉ cần file của <b>ngày mới</b>, dashboard tự ghép vào số đã lưu của tháng (trong ngày tải lại bao nhiêu lần cũng được)</li>
       <li><b>Doanh thu / số bill</b>: chỉ cần file của <b>ngày mới</b> (có thể trùng ngày đã lưu, dashboard thay số các ngày đó)</li>
@@ -2041,7 +2042,11 @@ window.__posInfo=()=>{if(typeof ARCH!=='undefined'&&ARCH)return{ok:false,msg:'Da
   return{ok:true,shops:Object.keys(B.shops||{}),cur:{y:cu.y,m:cu.m},sepDays:(B.sep||{}).days||0,billDays:(B.sep||{}).billDays||0,lossDays:same(L)?L.days||0:0,lossPx:!!(same(L)&&L.px)}};
 window.__posProgress=t=>{const el=$('posSt');if(!el)return;if(panel.hidden)openPanel();el.hidden=false;el.textContent='⏳ '+t};
 window.__posImport=(files,errs)=>{openPanel();const el=$('posSt');el.hidden=false;el.textContent='✅ Đã nhận số liệu từ POS lúc '+new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})+(errs&&errs.length?' · chưa lấy được: '+errs.join('; '):'')+'. Kiểm tra rồi bấm Lưu dashboard.';handleFiles(files)};
-{const a=$('posBm');if(a){a.href='javascript:'+encodeURIComponent('('+posBookmarklet.toString()+')()');a.addEventListener('click',e=>{e.preventDefault();alert('Kéo nút này lên thanh dấu trang (bookmark bar) của trình duyệt. Sau đó mở pos.bachhoaxanh.com và bấm nút trên thanh dấu trang.')})}}
+{const code='javascript:'+encodeURIComponent('('+posBookmarklet.toString()+')()');
+ const cp=$('posCopy');if(cp)cp.addEventListener('click',async()=>{let ok=false;try{await navigator.clipboard.writeText(code);ok=true}catch(e){}
+   if(!ok){const t=document.createElement('textarea');t.value=code;t.setAttribute('readonly','');t.style.cssText='position:fixed;top:0;left:0;opacity:0';document.body.appendChild(t);t.select();t.setSelectionRange(0,code.length);try{ok=document.execCommand('copy')}catch(e){}t.remove()}
+   cp.textContent=ok?'✓ Đã sao chép':'Không sao chép được';setTimeout(()=>cp.textContent='Sao chép mã nút',2500)});
+ const a=$('posBm');if(a){a.href=code;a.addEventListener('click',e=>{e.preventDefault();alert('Kéo nút này lên thanh dấu trang (bookmark bar) của trình duyệt. Sau đó mở pos.bachhoaxanh.com và bấm nút trên thanh dấu trang.')})}}
 function closePanel(){panel.hidden=true;const b=$('uploadBtn');b&&b.focus()}
 document.addEventListener('click',e=>{if(e.target.closest('#uploadBtn'))openPanel()});
 $('upClose').addEventListener('click',closePanel);$('upCancel').addEventListener('click',closePanel);
