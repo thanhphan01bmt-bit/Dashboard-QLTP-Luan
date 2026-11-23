@@ -177,6 +177,9 @@ tr.sel td{background:var(--hl)}
 .tbl-wrap>table[data-stk] td.l,.tbl-wrap>table[data-stk="2"] tr>td:nth-child(2){white-space:normal;min-width:96px;max-width:150px}
 /* cơ cấu ngành hàng: danh sách có thanh tỷ trọng thay cho biểu đồ tròn */
 #mix.pie{display:block;margin-top:12px}
+#mix .pl .r{grid-template-columns:minmax(0,1fr) auto}
+.trend-tbl tr.we>td{background:var(--warn-bg)}.trend-tbl tr.we>td:first-child{color:var(--warn);background:var(--warn-bg)}
+.trend-tbl td.we8{box-shadow:inset 3px 0 0 var(--warn)}
 #mix .pl{gap:9px}
 #mix .pl .r{row-gap:4px}
 #mix .pl .r .bar{grid-column:2/4;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
@@ -204,6 +207,7 @@ tr.muted-row td{color:var(--muted)}
 @media (max-width:520px){.tab{flex:0 0 auto;padding:9px 12px;font-size:13px}}
 .wrap:not(.v-comp) #compSec{display:none}
 .wrap:not(.v-cat) #catSec{display:none}
+#tabCat,#catSec{display:none!important} /* đã bỏ phần thi đua ngành hàng */
 .wrap:not(.v-prod) #prodSec{display:none}
 .posbm{font-size:13px;line-height:1.55;background:var(--accent-soft);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 10px}
 .posbm .btn{display:inline-flex;margin:0 2px;padding:3px 10px;font-size:13px;cursor:grab}
@@ -678,12 +682,12 @@ body.pv .wrap{padding-bottom:120px}
     <div class="sec-title">
       <h2>Xu hướng doanh thu theo ngày</h2>
       <div class="row">
-        <div class="legend"><span><i class="sw" style="background:var(--s9)"></i>Tháng <span data-t="M"></span></span><span><i class="sw" style="background:var(--s8)"></i>Tháng <span data-t="P"></span></span></div>
-        <button class="btn" id="trendToggle" aria-pressed="false" type="button">Xem bảng</button>
+        <span class="note">Thứ 7, Chủ nhật tô nền vàng</span>
+        <button class="btn" id="trendToggle" aria-pressed="false" type="button" hidden>Xem bảng</button>
       </div>
     </div>
-    <div class="chart" id="trend"></div>
-    <div class="tbl-wrap" id="trendTbl" hidden></div>
+    <div class="chart" id="trend" hidden></div>
+    <div class="tbl-wrap" id="trendTbl"></div>
   </section>
 
   <div class="two">
@@ -852,7 +856,7 @@ async function exportGoalPdf(btn,filename){
   }catch(e){console.error(e);alert('Không tạo được PDF.')}
   finally{btn.disabled=false;btn.innerHTML=old}
 }
-const __R=(window.__ME||{}).role;let CAN_EDIT=__R==='admin'||__R==='editor';const IS_ADMIN=__R==='admin';let VIEW='goal';try{if(/^#(dash|dashboard)$/i.test(location.hash))VIEW='dash';if(/^#thi-?dua$/i.test(location.hash))VIEW='comp';if(/^#(doanh-?thu-?)?nam$/i.test(location.hash))VIEW='year';if(/^#muc-?tieu$/i.test(location.hash))VIEW='goal';if(/^#(thi-?dua-?)?nganh(-?hang)?$/i.test(location.hash))VIEW='cat';if(/^#san-?pham$/i.test(location.hash))VIEW='prod';if(VIEW==='comp'&&matchMedia('(max-width:760px)').matches)VIEW='goal'}catch(e){}
+const __R=(window.__ME||{}).role;let CAN_EDIT=__R==='admin'||__R==='editor';const IS_ADMIN=__R==='admin';let VIEW='goal';try{if(/^#(dash|dashboard)$/i.test(location.hash))VIEW='dash';if(/^#thi-?dua$/i.test(location.hash))VIEW='comp';if(/^#(doanh-?thu-?)?nam$/i.test(location.hash))VIEW='year';if(/^#muc-?tieu$/i.test(location.hash))VIEW='goal';if(/^#san-?pham$/i.test(location.hash))VIEW='prod';if(VIEW==='comp'&&matchMedia('(max-width:760px)').matches)VIEW='goal'}catch(e){}
 function applyView(){const w=document.querySelector('.wrap');if(!w)return;w.classList.toggle('v-comp',VIEW==='comp');w.classList.toggle('v-cat',VIEW==='cat');w.classList.toggle('v-year',VIEW==='year');w.classList.toggle('v-goal',VIEW==='goal');w.classList.toggle('v-prod',VIEW==='prod');
   document.querySelectorAll('.tabs .tab').forEach(b=>{const on=b.dataset.view===VIEW;b.setAttribute('aria-selected',on);b.classList.toggle('on',on)})}
 function setView(v){VIEW=v;applyView();window.scrollTo({top:0});if(v==='dash')requestAnimationFrame(()=>drawCurrent&&drawCurrent())} // vẽ lại biểu đồ đúng chiều rộng khi mở tab
@@ -1281,9 +1285,15 @@ function render(){
 
   // trend
   trendData={s9,s8};if(!tEl.hidden)drawTrend();
-  let th=`<table><thead><tr><th>Ngày</th><th>Tháng ${M}</th><th>Tháng ${P}</th><th>Chênh lệch</th></tr></thead><tbody>`;
-  for(let i=0;i<31;i++){const a=s9[i],b=s8[i];th+=`<tr><td>${i+1}</td><td>${a!=null?tr(a)+' tr':'—'}</td><td>${b!=null?tr(b)+' tr':'—'}</td><td class="${a!=null&&b?(a>=b?'pos':'neg'):''}">${a!=null&&b?sgn(a/b-1):''}</td></tr>`}
-  th+=`</tbody><tfoot><tr><th>Tổng</th><th>${tr(cum9)} tr</th><th>${tr(aug)} tr</th><th></th></tr></tfoot></table>`;tTbl.innerHTML=th;
+  {const v9=sumDaily(D.sep.bills||{},shops,31),v8=sumDaily(D.aug.bills||{},shops,31),PY0=M===1?D.cur.y-1:D.cur.y;
+   const WD=['CN','T2','T3','T4','T5','T6','T7'],wd=(y,m,d)=>new Date(y,m-1,d).getDay();
+   const nb=v=>v==null?'—':f0.format(v),bv=(a,b)=>a!=null&&b?nf(0).format(a/b/1000)+'k':'—';
+   const nD=Math.max(DIM9,D.prev&&D.prev.dim||31);
+   let th=`<table class="trend-tbl"><thead><tr><th class="l">Ngày</th><th>DT T${M}</th><th>DT T${P}</th><th>± DT</th><th>Bill T${M}</th><th>Bill T${P}</th><th>Giá trị bill T${M}</th><th>Giá trị bill T${P}</th></tr></thead><tbody>`;
+   for(let i=0;i<nD;i++){const d=i+1,a=s9[i],b=s8[i],x=v9[i],y=v8[i],w9=d<=DIM9?wd(D.cur.y,M,d):-1,w8=D.prev&&d<=(D.prev.dim||31)?wd(D.prev.y,P,d):-1,we=w9===0||w9===6,we8=w8===0||w8===6;
+     th+=`<tr class="${we?'we':''}"><td class="l">${d<=DIM9?`<b>${WD[w9]}</b> ${d}/${M}`:`${d}`}</td><td>${a!=null?tr(a)+' tr':'—'}</td><td class="${we8?'we8':''}" title="${w8>=0?WD[w8]+' '+d+'/'+P:''}">${b!=null?tr(b)+' tr':'—'}</td><td class="${a!=null&&b?(a>=b?'pos':'neg'):''}">${a!=null&&b?sgn(a/b-1):''}</td><td>${nb(x)}</td><td class="${we8?'we8':''}">${nb(y)}</td><td>${bv(a,x)}</td><td class="${we8?'we8':''}">${bv(b,y)}</td></tr>`}
+   const X=tot(v9.filter(v=>v!=null)),Y=tot(v8.filter(v=>v!=null));
+   th+=`</tbody><tfoot><tr><th class="l">Tổng</th><th>${tr(cum9)} tr</th><th>${tr(aug)} tr</th><th></th><th>${f0.format(X)}</th><th>${f0.format(Y)}</th><th>${X?nf(0).format(cum9/X/1000)+'k':'—'}</th><th>${Y?nf(0).format(aug/Y/1000)+'k':'—'}</th></tr></tfoot></table>`;tTbl.innerHTML=th}
 
   // category mix
   const cats=Object.keys({...c9,...c8}).map(n=>({n,p:(c9[n]||0)/d9*DIM9,a:c8[n]||0,fr:FRESH.has(n)})).sort((a,b)=>b.p-a.p);
@@ -1295,7 +1305,7 @@ function render(){
   const MIX_HIDE=new Set(['khác','bhx - hàng khuyến mãi','sơ chế cl']);
   const mixEl=document.getElementById('mix');
   const pos=cats.filter(c=>c.p>0);
-  const topN=pos.filter(c=>!MIX_HIDE.has(c.n.normalize('NFC').trim().toLowerCase())).slice(0,10);
+  const topN=pos.filter(c=>!MIX_HIDE.has(c.n.normalize('NFC').trim().toLowerCase())).slice(0,15);
   const topSet=new Set(topN.map(c=>c.n));
   const rest=pos.filter(c=>!topSet.has(c.n));
   const sl=topN.map((c,i)=>({n:c.n,p:c.p,col:`var(--c${i+1})`,fr:c.fr,tg:true}));
@@ -1306,7 +1316,7 @@ function render(){
     return `M${P(R,a)}A${R} ${R} 0 ${L} 1 ${P(R,b)}L${P(r0,b)}A${r0} ${r0} 0 ${L} 0 ${P(r0,a)}Z`};
   const ttl=c=>`${c.n}: ${moneyS(c.p)} (${pct(c.p/pt)})${c.sub?` · gồm ${c.sub} ngành`:''}`;
   const paths=sl.map((c,i)=>{const a=a0,b=a0+c.p/pt*2*Math.PI;a0=b;return `<path d="${arc(a,b)}" fill="${c.col}" data-i="${i}"><title>${esc(ttl(c))}</title></path>`}).join('');
-  const mxP=Math.max(...sl.map(c=>c.p));mixEl.innerHTML=`<div class="pl">${sl.map((c,i)=>`<div class="r" data-i="${i}" title="${esc(ttl(c))}"><i style="background:${c.col}"></i><span class="nm">${esc(c.n)}${c.tg?tagf(c):''}</span><span class="v num"><b>${pct(c.p/pt)}</b> · ${moneyS(c.p)}</span><span class="bar"><b style="width:${(c.p/mxP*100).toFixed(1)}%;background:${c.col}"></b></span></div>`).join('')}</div>`;
+  const mxP=Math.max(...sl.map(c=>c.p));mixEl.innerHTML=`<div class="pl">${sl.map((c,i)=>`<div class="r" data-i="${i}" title="${esc(ttl(c))}"><span class="nm">${esc(c.n)}${c.tg?tagf(c):''}</span><span class="v num"><b>${pct(c.p/pt)}</b> · ${moneyS(c.p)}</span></div>`).join('')}</div>`;
 
   // category compare
   const cc=cats.filter(c=>c.a>0&&Math.max(c.p/pt,c.a/aug)>=0.002).map(c=>({...c,ch:c.p/c.a-1,d:c.p-c.a}));
@@ -1556,8 +1566,7 @@ function render(){
     (window.__NEAR||[]).sort((a,b)=>a.v-b.v);
     const G=[{k:'A',h:`Doanh thu ngày ${T.fdL}/${M} chưa đạt cần/ngày`,it:T.A,ok:T.fdL>=1?'Đều đạt doanh thu cần/ngày.':'Chưa có ngày đủ số liệu.'},
       {k:'B',h:`Hủy thủy hải sản cao${T.ld?` · ngày ${T.ld}/${M}`:''}`,it:T.B,ok:T.ld?'Không có hủy cao bất thường.':'Chưa có file nhập xuất Fresh.'},
-      {k:'C',h:`Bán trứng thấp${T.ldE?` · ${T.dayLbE}`:''}`,it:T.C,ok:!T.ldE?'Chưa có file nhập xuất Fresh.':!T.HX?'File nhập xuất chưa có SL thực xuất.':'Bán trứng ổn.'},
-      {k:'D',h:'Sắp lên mức thi đua',it:window.__NEAR||[],ok:'Chưa có siêu thị sát mức kế.'}];
+      {k:'C',h:`Bán trứng thấp${T.ldE?` · ${T.dayLbE}`:''}`,it:T.C,ok:!T.ldE?'Chưa có file nhập xuất Fresh.':!T.HX?'File nhập xuất chưa có SL thực xuất.':'Bán trứng ổn.'}];
     const LIM=4,open=JSON.parse(box.dataset.open||"{}");const nT=new Set([...T.A,...T.B,...T.C].map(x=>x.s)).size;
     box.hidden=false;box.innerHTML=`<div class="td-h"><b>Việc cần làm hôm nay</b><small>${esc(T.nm)} · ${nT?(T.single?'cần chú ý':`${nT} siêu thị cần chú ý`):'không có việc gấp'}${T.single?'':' · bấm tên siêu thị để xem riêng'}</small></div><div class="td-g">${G.map(g=>{const sh=open[g.k]?g.it:g.it.slice(0,LIM);
       return `<div class="td-c ${g.k}${g.it.length?'':' ok'}"><div class="td-ch">${g.h}${g.it.length?`<span class="n">${g.it.length}</span>`:''}</div>${g.it.length?`<ul>${sh.map(x=>`<li${T.single?'':` data-s="${x.s}" data-k="${g.k}" tabindex="0" role="button"`}>${T.single?'':`<b>${esc(shopName(x.s))}</b>`}${esc(x.t)}</li>`).join('')}</ul>${g.it.length>LIM?`<button class="btn" type="button" data-more="${g.k}">${open[g.k]?'Thu gọn':`Xem tất cả (${g.it.length})`}</button>`:''}`:`<div class="ok">✓ ${g.ok}</div>`}</div>`}).join('')}</div>`;
@@ -2207,7 +2216,7 @@ function showUbar(me){
   $('ubUsers').onclick=()=>{openPanel('usersPanel');loadUsers()};
   $('ubBackup').onclick=()=>{openPanel('backupPanel');loadBackups()};$('ubAuto').hidden=me.role!=='admin';$('ubAuto').onclick=()=>{openPanel('autoPanel');loadAuto()};
 }
-function setUpd(meta){$('ubUpd').textContent=meta&&meta.updatedAt?`Số liệu lưu lúc ${fmtTime(meta.updatedAt)}${meta.byName||meta.by?' bởi '+(meta.byName||meta.by):''}${meta.restored?' (khôi phục '+meta.restored+')':''}`:''}
+function setUpd(meta){$('ubUpd').textContent=meta&&meta.updatedAt?`Số liệu lưu lúc ${fmtTime(meta.updatedAt)}${meta.restored?' (khôi phục '+meta.restored+')':''}`:''}
 
 // ---- hộp thoại
 let lastFocus=null;
@@ -2517,7 +2526,7 @@ async function checkNew(auto){
   try{const r=await api('/api/version');if(!r.ok||!r.j.updatedAt)return;
     if(r.j.updatedAt!==window.__META.updatedAt&&new Date(r.j.updatedAt)>new Date(window.__META.updatedAt||0)){
       if(auto&&!busy()){if(!(await refreshData()))location.reload();return}
-      const b=$('newData');$('newDataTxt').textContent=`Đã có số liệu mới lưu lúc ${fmtTime(r.j.updatedAt)}${r.j.byName||r.j.by?' bởi '+(r.j.byName||r.j.by):''}.`;b.hidden=false}}
+      const b=$('newData');$('newDataTxt').textContent=`Đã có số liệu mới lưu lúc ${fmtTime(r.j.updatedAt)}.`;b.hidden=false}}
   catch(e){}finally{chkBusy=false}}
 $('newDataBtn').onclick=async()=>{$('newDataBtn').disabled=true;if(!(await refreshData()))location.reload()};
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){checkNew(true);recordView()}});
