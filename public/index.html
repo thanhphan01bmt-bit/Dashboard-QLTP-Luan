@@ -734,9 +734,9 @@ body.pv .wrap{padding-bottom:120px}
 <div class="ov" id="upPanel" data-page hidden>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="upTitle">
     <div class="sec-title"><h2 id="upTitle">Cập nhật dữ liệu</h2><button class="btn" id="upClose" type="button" aria-label="Đóng">Đóng</button></div>
-    <p class="hint">Chọn một hoặc nhiều file Excel. Trang nhận diện file theo tên cột, không cần đổi tên file. File nào không chọn thì giữ số liệu cũ.</p>
+    <p class="hint" hidden>Chọn một hoặc nhiều file Excel. Trang nhận diện file theo tên cột, không cần đổi tên file. File nào không chọn thì giữ số liệu cũ.</p>
     <div class="posbm" id="posBox"><span class="pos-pc"><b>📥 Lấy số thẳng từ POS</b> (máy tính): kéo nút <a id="posBm" class="btn primary" href="#" draggable="true">📥 Lấy số POS</a> lên thanh dấu trang của trình duyệt (làm 1 lần). Khi cần cập nhật: mở trang báo cáo trên <b>pos.bachhoaxanh.com</b> (đã đăng nhập) rồi bấm nút đó trên thanh dấu trang. Dashboard tự mở, nhận đủ 4 báo cáo (doanh thu siêu thị, ngành hàng, hiệu quả Fresh, nhập xuất Fresh), bạn chỉ cần bấm <b>Lưu dashboard</b>.</span><span class="pos-mb"><b>📥 Lấy số thẳng từ POS trên điện thoại</b> <button class="btn primary" id="posCopy" type="button">Sao chép mã nút</button><br><b>Cài 1 lần:</b> bấm Sao chép mã nút → trong Safari lưu dấu trang cho trang bất kỳ, đặt tên <b>Lấy số POS</b> → mở Dấu trang → Sửa → chọn dấu trang đó, xóa địa chỉ cũ và dán mã vừa sao chép. (Chrome Android: sửa dấu trang tương tự.)<br><b>Khi cập nhật:</b> mở trang báo cáo trên pos.bachhoaxanh.com (đã đăng nhập) → bấm dấu trang <b>Lấy số POS</b> (Chrome Android: gõ "Lấy số POS" vào thanh địa chỉ rồi chọn dấu trang) → dashboard mở ở tab mới, bấm <b>Lưu dashboard</b>. Lần đầu lấy nhập xuất Fresh từ ngày 1 khá nặng, nên làm trên máy tính.</span><div class="posst" id="posSt" hidden></div></div>
-    <ul class="kinds">
+    <ul class="kinds" hidden>
       <li><b>Báo cáo doanh thu theo ngành hàng</b>: chỉ cần file của <b>ngày mới</b>, dashboard tự ghép vào số đã lưu của tháng (trong ngày tải lại bao nhiêu lần cũng được)</li>
       <li><b>Doanh thu / số bill</b>: chỉ cần file của <b>ngày mới</b> (có thể trùng ngày đã lưu, dashboard thay số các ngày đó)</li>
       <li><b>Báo cáo hiệu quả bán Fresh</b> (gửi hằng ngày)</li>
