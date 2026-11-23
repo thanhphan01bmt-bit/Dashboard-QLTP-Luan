@@ -1959,9 +1959,9 @@ function posBookmarklet(){
   const box=document.createElement('div');
   box.style.cssText='position:fixed;right:16px;bottom:16px;z-index:2147483647;background:#0d6b53;color:#fff;font:14px/1.45 system-ui,sans-serif;padding:12px 16px;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.25);max-width:380px;white-space:pre-line';
   document.body.appendChild(box);
-  const w=window.open(DASH+'/#pos','qltp_pos');
+  const AUTO=!!window.__qltpAuto;const w=window.open(DASH+(AUTO?'/#pos-auto':'/#pos'),'qltp_pos');
   const say=t=>{box.textContent='📥 Lấy số POS\n'+t;try{w&&w.postMessage({type:'qltp-pos-progress',text:t},DASH)}catch(e){}};
-  const end=(t,ok)=>{say(t);box.style.background=ok?'#0d6b53':'#c02f2f';window.__qltpPos=0;setTimeout(()=>box.remove(),ok?10000:30000)};
+  const end=(t,ok)=>{say(t);box.style.background=ok?'#0d6b53':'#c02f2f';window.__qltpPos=0;window.__qltpLast={ok:!!ok,text:t,at:Date.now()};setTimeout(()=>box.remove(),ok?10000:30000)};
   if(!w){end('Trình duyệt chặn mở cửa sổ dashboard. Cho phép cửa sổ bật lên (popup) rồi bấm lại.');return}
   say('Đang mở dashboard… (cần đăng nhập dashboard bằng tài khoản Quản trị hoặc Cập nhật dữ liệu)');
   const p2=n=>String(n).padStart(2,'0'),dmy=(y,m,d)=>p2(d)+'/'+p2(m)+'/'+y+' 00:00';
@@ -2044,7 +2044,11 @@ window.__posInfo=()=>{if(typeof ARCH!=='undefined'&&ARCH)return{ok:false,msg:'Da
   const B=BASE_D||{},cu=B.cur||{},L=B.loss,same=o=>!!o&&o.y===cu.y&&o.m===cu.m;
   return{ok:true,savedAt:(window.__META||{}).updatedAt||null,shops:Object.keys(B.shops||{}),cur:{y:cu.y,m:cu.m},sepDays:(B.sep||{}).days||0,billDays:(B.sep||{}).billDays||0,lossDays:same(L)?L.days||0:0,lossPx:!!(same(L)&&L.px)}};
 window.__posProgress=t=>{const el=$('posSt');if(!el)return;if(panel.hidden)openPanel();el.hidden=false;el.textContent='⏳ '+t};
-window.__posImport=(files,errs)=>{openPanel();const el=$('posSt');el.hidden=false;el.textContent='✅ Đã nhận số liệu từ POS lúc '+new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})+(errs&&errs.length?' · chưa lấy được: '+errs.join('; '):'')+'. Kiểm tra rồi bấm Lưu dashboard.';handleFiles(files)};
+window.__posImport=async(files,errs)=>{openPanel();const el=$('posSt');el.hidden=false;el.textContent='✅ Đã nhận số liệu từ POS lúc '+new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})+(errs&&errs.length?' · chưa lấy được: '+errs.join('; '):'')+'. Kiểm tra rồi bấm Lưu dashboard.';await handleFiles(files);
+  // tác vụ hẹn giờ (#pos-auto): đọc file xong, không lỗi thì tự bấm Lưu dashboard
+  if(/^#pos-auto/.test(location.hash)||window.__posAutoSave){window.__posAutoSave=0;
+    if(!applyBtn.disabled&&merged&&merged.D){el.textContent+=' · Đang tự lưu…';applyBtn.click()}
+    else el.textContent='⚠️ Không tự lưu được: '+(sum.textContent||'số liệu chưa đủ').slice(0,200)}};
 {const code='javascript:'+encodeURIComponent('('+posBookmarklet.toString()+')()');
  const cp=$('posCopy');if(cp)cp.addEventListener('click',async()=>{let ok=false;try{await navigator.clipboard.writeText(code);ok=true}catch(e){}
    if(!ok){const t=document.createElement('textarea');t.value=code;t.setAttribute('readonly','');t.style.cssText='position:fixed;top:0;left:0;opacity:0';document.body.appendChild(t);t.select();t.setSelectionRange(0,code.length);try{ok=document.execCommand('copy')}catch(e){}t.remove()}
@@ -2149,7 +2153,7 @@ window.__api=api;
     if(d.type==='qltp-pos-progress'&&window.__posProgress)window.__posProgress(String(d.text||'').slice(0,300));
     if(d.type==='qltp-pos-data'&&Array.isArray(d.files)&&window.__posImport){
       const files=d.files.filter(f=>f&&typeof f.name==='string'&&Array.isArray(f.aoa)&&f.aoa.length>1).map(f=>({name:f.name.replace(/[^\p{L}\p{N} ._-]/gu,'').slice(0,60)+'.xlsx',aoa:f.aoa}));
-      try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+      if(/^#pos-auto/.test(location.hash))window.__posAutoSave=1;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
       window.__posImport(files,Array.isArray(d.errs)?d.errs.map(String):[])}});
 })();
 const fmtTime=iso=>{try{return new Date(iso).toLocaleString('vi-VN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'})}catch(e){return iso}};
