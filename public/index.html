@@ -2016,7 +2016,10 @@ function posBookmarklet(){
     const st=(info.shops||[]).join(',');if(!st)throw new Error('Dashboard chưa có danh sách siêu thị (file Base).');
     const now=new Date(),Y=now.getFullYear(),M=now.getMonth()+1,D=now.getDate(),same=!!info.cur&&info.cur.y===Y&&info.cur.m===M;
     const dim=(y,m)=>new Date(y,m,0).getDate(),today=dmy(Y,M,D);
-    const from=dd=>dmy(Y,M,same&&dd>0?dd:1);
+    // ngày cuối đã lưu: nếu lần lưu trước diễn ra sau khi ngày đó đã qua (số liệu đủ cả ngày) thì bắt đầu từ ngày kế tiếp,
+    // còn nếu lưu ngay trong ngày đó (vd 21h) thì lấy lại ngày đó để có đủ số các giờ còn lại
+    const sv=info.savedAt?new Date(info.savedAt):null,svD=sv&&sv.getFullYear()===Y&&sv.getMonth()+1===M?sv.getDate():(sv&&sv>new Date(Y,M-1,1)?99:0);
+    const from=dd=>{if(!(same&&dd>0))return dmy(Y,M,1);const full=svD>dd;return dmy(Y,M,Math.min(D,full?dd+1:dd))};
     // tháng đã lưu là tháng trước (vừa sang tháng): lấy nốt các ngày còn thiếu của tháng trước
     const prev=!same&&!!info.cur&&((info.cur.y===Y&&info.cur.m===M-1)||(M===1&&info.cur.y===Y-1&&info.cur.m===12));
     const jobs=[];
@@ -2025,10 +2028,12 @@ function posBookmarklet(){
       if(info.billDays<last)jobs.push(['bill',dmy(cy,cm,Math.max(1,info.billDays)),dmy(cy,cm,last),'Doanh thu siêu thị T'+cm])}
     jobs.push(['bill',from(info.billDays),today,'Doanh thu siêu thị'],['nganh',from(info.sepDays),today,'Doanh thu ngành hàng'],['fresh',p2(M)+'/'+Y,'','Hiệu quả Fresh'],['loss',from(info.lossPx?info.lossDays:0),today,'Nhập xuất Fresh']);
     const files=[],errs=[];
-    for(const [k,a,b,label] of jobs){
-      try{say(label+': đang lấy…');const aoa=await run(R[k],a,b,st,label);if(aoa.length>1)files.push({name:'POS '+label,aoa});else errs.push(label+': không có dòng nào')}
-      catch(e){errs.push(e.message||String(e));if(/không phải dữ liệu|chuyển tới|Failed to fetch/i.test(e.message||''))break}
-    }
+    // thử báo cáo đầu tiên trước (kiểm tra phiên đăng nhập POS), rồi lấy các báo cáo còn lại cùng lúc
+    const one=async([k,a,b,label])=>{try{const aoa=await run(R[k],a,b,st,label);if(aoa.length>1)files.push({name:'POS '+label,aoa});else errs.push(label+': không có dòng nào')}catch(e){errs.push(e.message||String(e));return /không phải dữ liệu|chuyển tới|Failed to fetch/i.test(e.message||'')}};
+    say('Đang lấy '+jobs.length+' báo cáo…');
+    const fatal=await one(jobs[0]);
+    if(!fatal)await Promise.all(jobs.slice(1).map(one));
+    const ord=jobs.map(j=>'POS '+j[3]);files.sort((x,y)=>ord.indexOf(x.name)-ord.indexOf(y.name));
     if(!files.length)throw new Error(errs.join('\n')||'Không lấy được báo cáo nào.');
     w.postMessage({type:'qltp-pos-data',files,errs,at:Date.now()},DASH);
     try{w.focus()}catch(e){}
@@ -2039,7 +2044,7 @@ function posBookmarklet(){
 window.__posInfo=()=>{if(typeof ARCH!=='undefined'&&ARCH)return{ok:false,msg:'Dashboard đang xem số liệu tháng cũ, hãy chuyển về tháng hiện tại.'};
   if(!CAN_EDIT)return{ok:false,msg:'Tài khoản dashboard này chỉ được xem. Cần tài khoản Quản trị hoặc Cập nhật dữ liệu.'};
   const B=BASE_D||{},cu=B.cur||{},L=B.loss,same=o=>!!o&&o.y===cu.y&&o.m===cu.m;
-  return{ok:true,shops:Object.keys(B.shops||{}),cur:{y:cu.y,m:cu.m},sepDays:(B.sep||{}).days||0,billDays:(B.sep||{}).billDays||0,lossDays:same(L)?L.days||0:0,lossPx:!!(same(L)&&L.px)}};
+  return{ok:true,savedAt:(window.__META||{}).updatedAt||null,shops:Object.keys(B.shops||{}),cur:{y:cu.y,m:cu.m},sepDays:(B.sep||{}).days||0,billDays:(B.sep||{}).billDays||0,lossDays:same(L)?L.days||0:0,lossPx:!!(same(L)&&L.px)}};
 window.__posProgress=t=>{const el=$('posSt');if(!el)return;if(panel.hidden)openPanel();el.hidden=false;el.textContent='⏳ '+t};
 window.__posImport=(files,errs)=>{openPanel();const el=$('posSt');el.hidden=false;el.textContent='✅ Đã nhận số liệu từ POS lúc '+new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})+(errs&&errs.length?' · chưa lấy được: '+errs.join('; '):'')+'. Kiểm tra rồi bấm Lưu dashboard.';handleFiles(files)};
 {const code='javascript:'+encodeURIComponent('('+posBookmarklet.toString()+')()');
