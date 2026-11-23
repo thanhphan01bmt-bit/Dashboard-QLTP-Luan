@@ -215,6 +215,8 @@ tr.muted-row td{color:var(--muted)}
 .pos-mb{display:none}
 @media (max-width:760px){.pos-pc{display:none}.pos-mb{display:inline}.posbm .btn{cursor:pointer;margin-left:6px}}
 .wrap.v-prod>section:not(#prodSec),.wrap.v-prod>.two,.wrap.v-prod .alertbar{display:none!important}
+.img-btn{padding:4px 9px;font-size:12.5px;margin-left:auto}
+.sec-title .img-btn{flex:0 0 auto}
 .pd-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 12px}
 .pd-bar select{font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
 .pd-card{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:12px;background:var(--surface)}
@@ -620,7 +622,7 @@ body.pv .wrap{padding-bottom:120px}
   </nav>
 
   <section class="card" id="goalSec">
-    <div class="sec-title"><h2 id="goalTitle">Mục tiêu ngày</h2><div class="row"><span class="note" id="goalNote"></span><button class="btn primary no-cap" id="goalPdf" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 10l6 6 6-6M4 20h16"/></svg>Tải PDF</button></div></div>
+    <div class="sec-title"><h2 id="goalTitle">Mục tiêu ngày</h2><div class="row"><span class="note" id="goalNote"></span><button class="btn no-cap" id="goalImgBtn" type="button" title="Tải 1 ảnh chung cả mục tiêu ngày">🖼️ Tải ảnh</button><button class="btn primary no-cap" id="goalPdf" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 10l6 6 6-6M4 20h16"/></svg>Tải PDF</button></div></div>
     <div class="goalbar"><label for="goalPct" class="ed-only" hidden>Mục tiêu tăng trưởng so với tháng <span data-t="P"></span>: <input type="number" id="goalPct" step="1" min="-50" max="100" value="0"> %</label><span class="view-only" style="font-size:12.5px;color:var(--ink2)">Mục tiêu tăng trưởng so với tháng <span data-t="P"></span>: <b id="goalPctTxt"></b></span><span class="muted m-hide" style="font-size:12px" id="goalHint"></span></div>
     <div class="todo" id="goalTodo" hidden></div>
     <div class="warnbox" id="goalWarn" hidden style="display:none"></div>
@@ -788,17 +790,20 @@ function buildPdf(pages){ // pages: [{jpg:Uint8Array,w,h}] ; A4 portrait
   return new Blob(parts,{type:'application/pdf'});
 }
 async function renderGoalPages(opt={}){
-  const PW=1240,PH=8000,MG=44,UW=PW-2*MG,OW=2480,OH=3508;const F='"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif';
+  // S: độ nét (điện thoại dùng 1 để không vượt giới hạn kích thước ảnh của Safari)
+  const S=opt.image&&(matchMedia('(max-width:760px)').matches||/iP(hone|ad|od)/.test(navigator.userAgent))?1:2;
+  const PW=1240,PH=S===1?12000:8000,MG=44,UW=PW-2*MG,OW=2480,OH=3508;const F='"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif';
   const C={ink:'#0f1a16',ink2:'#4a5752',muted:'#7d8984',grid:'#e4e9e6',head:'#f2f5f3',good:'#0a7a2f',goodBg:'#e3f4e7',bad:'#c02f2f',badBg:'#fbe7e6',acc:'#0d6b53',accSoft:'#e2f1ec'};
   const pages=[];let cv,ctx,y;
-  const newPage=()=>{cv=document.createElement('canvas');cv.width=PW*2;cv.height=PH*2;ctx=cv.getContext('2d');ctx.scale(2,2);ctx.fillStyle='#fff';ctx.fillRect(0,0,PW,PH);ctx.textBaseline='middle';pages.push(cv);y=MG};
+  const newPage=()=>{cv=document.createElement('canvas');cv.width=PW*S;cv.height=PH*S;ctx=cv.getContext('2d');ctx.scale(S,S);ctx.fillStyle='#fff';ctx.fillRect(0,0,PW,PH);ctx.textBaseline='middle';pages.push(cv);y=MG};
   newPage();
   const txt=(t,x,yy,font,col,align='left')=>{ctx.font=font;ctx.fillStyle=col;ctx.textAlign=align;ctx.fillText(t,x,yy)};
   const T=id=>(document.getElementById(id)||{}).textContent||'';
-  txt(T('goalTitle'),MG,y+14,`700 26px ${F}`,C.ink);y+=40;
+  txt(opt.head||T('goalTitle'),MG,y+14,`700 26px ${F}`,C.ink);y+=40;
   const noteEl=document.querySelector('#goalNote .lg')||document.getElementById('goalNote');
   const sub=[(noteEl||{}).textContent||'',(document.querySelector('.view-only')||{}).textContent||'',T('goalHint')].filter(Boolean).join('  ·  ');
-  if(!opt.secs){txt(sub,MG,y+8,`400 15px ${F}`,C.ink2);y+=34}else y+=6;
+  if(opt.head){if(opt.sub){txt(opt.sub,MG,y+8,`400 15px ${F}`,C.ink2);y+=30}else y+=6}
+  else if(!opt.secs){txt(sub,MG,y+8,`400 15px ${F}`,C.ink2);y+=34}else y+=6;
   const wrapLines=(t,font,maxW)=>{ctx.font=font;const words=t.split(' ');const out=[];let line='';for(const w of words){const tt=line?line+' '+w:w;if(ctx.measureText(tt).width>maxW&&line){out.push(line);line=w}else line=tt}if(line)out.push(line);return out};
   const table=(title,tbl)=>{
     const rows=[...tbl.querySelectorAll('tr')].filter(tr=>!tr.classList.contains('lxd')).map(tr=>({kind:tr.parentElement.tagName,cells:[...tr.children].map(td=>{const pill=td.querySelector('.pill');const small=td.querySelector('small');
@@ -823,14 +828,16 @@ async function renderGoalPages(opt={}){
         x+=w});
       ctx.fillStyle=C.grid;ctx.fillRect(MG,y+RH-1,UW,1);y+=RH};
     const head=rows.filter(r=>r.kind==='THEAD');
-    txt(title,MG,y+12,`700 18px ${F}`,C.ink);y+=30;
+    if(title){txt(title,MG,y+12,`700 18px ${F}`,C.ink);y+=30}
     head.forEach(drawRow);
     rows.filter(r=>r.kind!=='THEAD').forEach(drawRow);
     y+=20};
-  if(opt.secs)opt.secs.forEach(([g,t])=>table(T(g),document.getElementById(t)));else table(T('gh1'),document.getElementById('goalTbl'));
+  // các dòng chữ ngoài bảng (ô số, chú thích…) của 1 ô dashboard
+  if(opt.lines&&opt.lines.length){opt.lines.forEach(l=>{const big=l.length<=22&&/\d/.test(l);const font=big?`700 20px ${F}`:`400 15px ${F}`;wrapLines(l,font,UW).forEach(w=>{txt(w,MG,y+12,font,big?C.ink:C.ink2);y+=big?30:24})});y+=14}
+  if(opt.secs)opt.secs.forEach(([g,t])=>{const el=typeof t==='string'?document.getElementById(t):t;if(el)table(typeof g==='string'?T(g):String((g&&g.t)||''),el)});else table(T('gh1'),document.getElementById('goalTbl'));
   if(opt.image){// ảnh PNG của 1 hoặc vài mục, để gửi kèm tin nhắn nhóm
-    const ch=y+MG-20,im=document.createElement('canvas');im.width=PW*2;im.height=ch*2;const g=im.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,im.width,im.height);
-    g.drawImage(cv,0,0,PW*2,ch*2,0,0,PW*2,ch*2);g.font=`400 22px ${F}`;g.fillStyle=C.muted;g.textAlign='right';g.textBaseline='middle';g.fillText('Doanh thu khu vực QLTP Luân · luan56605.app',PW*2-MG*2,ch*2-28);
+    const ch=Math.min(PH,y+MG-20),im=document.createElement('canvas');im.width=PW*S;im.height=ch*S;const g=im.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,im.width,im.height);
+    g.drawImage(cv,0,0,PW*S,ch*S,0,0,PW*S,ch*S);g.font=`400 ${11*S}px ${F}`;g.fillStyle=C.muted;g.textAlign='right';g.textBaseline='middle';g.fillText('Doanh thu khu vực QLTP Luân · luan56605.app',PW*S-MG*S,ch*S-14*S);
     return await new Promise(r=>im.toBlob(r,opt.jpeg?'image/jpeg':'image/png',.85))}
   table(T('gh2'),document.getElementById('goalFresh'));
   table(T('gh3'),document.getElementById('goalLoss'));
@@ -844,7 +851,31 @@ async function renderGoalPages(opt={}){
   const b=await new Promise(r=>out.toBlob(r,'image/jpeg',0.9));const out2=[{jpg:new Uint8Array(await b.arrayBuffer()),w:OW,h:OH}];
   return out2;
 }
-window.__goalImage=secs=>renderGoalPages({image:true,secs});window.__goalImageJ=secs=>renderGoalPages({image:true,secs,jpeg:true});
+window.__goalImage=secs=>renderGoalPages({image:true,secs});
+// ---- Tải ảnh: tab Mục tiêu 1 ảnh chung; các tab khác mỗi ô 1 nút
+const imgName=t=>String(t||'anh').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,60)+'.png';
+async function saveImg(blob,name){if(!blob){alert('Không tạo được ảnh.');return}
+  const file=new File([blob],name,{type:blob.type||'image/png'});
+  // điện thoại: mở bảng chia sẻ (Lưu hình ảnh / gửi Zalo); máy tính: tải file
+  if(matchMedia('(max-width:760px)').matches&&navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file]});return}catch(e){if(e&&e.name==='AbortError')return}}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)}
+async function withBusy(btn,fn){const old=btn.innerHTML;btn.disabled=true;btn.textContent='Đang tạo ảnh…';try{if(document.fonts&&document.fonts.ready)await document.fonts.ready;await fn()}catch(e){console.error(e);alert('Không tạo được ảnh.')}finally{btn.disabled=false;btn.innerHTML=old}}
+async function goalImage(btn){await withBusy(btn,async()=>{const b=await renderGoalPages({image:true,secs:[['gh1','goalTbl'],['gh2','goalFresh'],['gh3','goalLoss'],['gh4','goalEgg'],['gh5','goalBill']]});
+  await saveImg(b,imgName((document.getElementById('goalTitle')||{}).textContent||'Muc_tieu_ngay'))})}
+async function cardImage(sec,btn){await withBusy(btn,async()=>{
+  const h=sec.querySelector('.sec-title h2'),title=((h&&h.textContent)||'').replace(/\s+/g,' ').trim(),note=((sec.querySelector('.sec-title .note')||{}).textContent||'').replace(/\s+/g,' ').trim();
+  const tables=[...sec.querySelectorAll('table')].filter(t=>!t.closest('[hidden]')&&t.rows.length);
+  // chữ ngoài bảng: chép ô sang 1 khung ẩn để đọc đúng xuống dòng
+  const cl=sec.cloneNode(true);cl.querySelectorAll('table,.tbl-wrap,button,select,label,svg,.sec-title,.lhint,.ct-how,[hidden],.chart,.legend').forEach(e=>e.remove());
+  const box=document.createElement('div');box.style.cssText='position:fixed;left:-99999px;top:0;width:900px';box.appendChild(cl);document.body.appendChild(box);
+  const lines=cl.innerText.split('\n').map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean).slice(0,120);box.remove();
+  const secs=tables.map(t=>{const card=t.closest('.pd-card');let p=t.closest('.tbl-wrap')||t,q=p.previousElementSibling;while(q&&!/^H[3-5]$/.test(q.tagName))q=q.previousElementSibling;
+    return[{t:[card&&card.querySelector('h3')?card.querySelector('h3').textContent:'',q?q.textContent:''].filter(Boolean).join(' · ').replace(/\s+/g,' ').trim()},t]});
+  const b=await renderGoalPages({image:true,head:title,sub:[note,(document.getElementById('shopSel')||{}).selectedOptions?.[0]?.textContent||''].filter(Boolean).join(' · '),lines:tables.length?lines.slice(0,40):lines,secs});
+  await saveImg(b,imgName(title))})}
+document.getElementById('goalImgBtn').addEventListener('click',e=>goalImage(e.currentTarget));
+document.querySelectorAll('.wrap > section.card, .wrap > .two > section.card').forEach(sec=>{if(sec.id==='goalSec'||sec.id==='catSec')return;const st=sec.querySelector(':scope > .sec-title');if(!st||st.querySelector('.img-btn'))return;
+  const b=document.createElement('button');b.type='button';b.className='btn img-btn no-cap';b.title='Tải ảnh ô này';b.textContent='🖼️ Ảnh';b.addEventListener('click',()=>cardImage(sec,b));st.appendChild(b)});window.__goalImageJ=secs=>renderGoalPages({image:true,secs,jpeg:true});
 async function exportGoalPdf(btn,filename){
   const old=btn.innerHTML;btn.disabled=true;btn.textContent='Đang tạo PDF…';
   try{
