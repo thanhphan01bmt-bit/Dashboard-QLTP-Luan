@@ -1959,11 +1959,12 @@ function posBookmarklet(){
   const box=document.createElement('div');
   box.style.cssText='position:fixed;right:16px;bottom:16px;z-index:2147483647;background:#0d6b53;color:#fff;font:14px/1.45 system-ui,sans-serif;padding:12px 16px;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.25);max-width:380px;white-space:pre-line';
   document.body.appendChild(box);
-  const AUTO=!!window.__qltpAuto;const w=window.open(DASH+(AUTO?'/#pos-auto':'/#pos'),'qltp_pos');
+  // PRE: thông tin dashboard đưa sẵn (tác vụ hẹn giờ) → không mở cửa sổ mới, xong thì chuyển chính tab này sang dashboard kèm số liệu
+  const PRE=window.__qltpInfo||null;const w=PRE?null:window.open(DASH+'/#pos','qltp_pos');
   const say=t=>{box.textContent='📥 Lấy số POS\n'+t;try{w&&w.postMessage({type:'qltp-pos-progress',text:t},DASH)}catch(e){}};
   const end=(t,ok)=>{say(t);box.style.background=ok?'#0d6b53':'#c02f2f';window.__qltpPos=0;window.__qltpLast={ok:!!ok,text:t,at:Date.now()};setTimeout(()=>box.remove(),ok?10000:30000)};
-  if(!w){end('Trình duyệt chặn mở cửa sổ dashboard. Cho phép cửa sổ bật lên (popup) rồi bấm lại.');return}
-  say('Đang mở dashboard… (cần đăng nhập dashboard bằng tài khoản Quản trị hoặc Cập nhật dữ liệu)');
+  if(!w&&!PRE){end('Trình duyệt chặn mở cửa sổ dashboard. Cho phép cửa sổ bật lên (popup) rồi bấm lại.');return}
+  say(PRE?'Đang lấy số…':'Đang mở dashboard… (cần đăng nhập dashboard bằng tài khoản Quản trị hoặc Cập nhật dữ liệu)');
   const p2=n=>String(n).padStart(2,'0'),dmy=(y,m,d)=>p2(d)+'/'+p2(m)+'/'+y+' 00:00';
   const P=(name,val,type,ctl,dt,split)=>({CONTROLTYPE:ctl,OBJECTVALUE:val,PARAMNAME:name,PARAMTYPE:type,DATATYPE:dt||'',ISSPLITVALUE:split?'true':'false',ISHIDDEN:'false',ROOTCONTROLDATATYPE:''});
   const num=(v,k)=>k!=='productid'&&typeof v==='string'&&/^-?[\d,]+(\.\d+)?$/.test(v.trim())?Number(v.replace(/,/g,'')):v;
@@ -2009,7 +2010,7 @@ function posBookmarklet(){
     return [R.H,...out];
   }
   (async()=>{
-    const info=await new Promise((ok,no)=>{
+    const info=PRE||await new Promise((ok,no)=>{
       const h=e=>{if(e.origin!==DASH||e.source!==w)return;const d=e.data||{};if(d.type==='qltp-pos-hello'){removeEventListener('message',h);ok(d)}};
       addEventListener('message',h);setTimeout(()=>{removeEventListener('message',h);no(new Error('Không kết nối được dashboard. Hãy đăng nhập dashboard trong cửa sổ vừa mở rồi bấm lại nút.'))},120000)});
     if(!info.ok)throw new Error(info.msg||'Dashboard không nhận số liệu.');
@@ -2033,9 +2034,17 @@ function posBookmarklet(){
     if(!fatal)await Promise.all(jobs.slice(1).map(one));
     const ord=jobs.map(j=>'POS '+j[3]);files.sort((x,y)=>ord.indexOf(x.name)-ord.indexOf(y.name));
     if(!files.length)throw new Error(errs.join('\n')||'Không lấy được báo cáo nào.');
+    if(!w){ // không có cửa sổ dashboard: nén số liệu rồi chuyển chính tab này sang dashboard
+      const txt=JSON.stringify({files,errs,at:Date.now()});
+      const buf=new Uint8Array(await new Response(new Blob([txt]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer());
+      let bs='';for(let i=0;i<buf.length;i+=32768)bs+=String.fromCharCode.apply(null,buf.subarray(i,i+32768));
+      const u=DASH+'/#posdata='+btoa(bs).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+      if(u.length>1900000)throw new Error('Số liệu quá lớn để chuyển sang dashboard trong 1 lần ('+Math.round(u.length/1e6)+' MB).');
+      window.__qltpLast={ok:!errs.length,text:'Đã lấy '+files.length+' báo cáo, đang chuyển sang dashboard',at:Date.now()};
+      say('Đã lấy xong, đang chuyển sang dashboard để lưu…');setTimeout(()=>{location.href=u},300);return}
     w.postMessage({type:'qltp-pos-data',files,errs,at:Date.now()},DASH);
     try{w.focus()}catch(e){}
-    end('Đã gửi '+files.length+' báo cáo sang dashboard.'+(errs.length?'\nChưa lấy được: '+errs.join('; '):'')+'\nTrên dashboard bấm Lưu dashboard.',!errs.length);
+    end('Đã gửi '+files.length+' báo cáo sang dashboard.'+(errs.length?'\nChưa lấy được: '+errs.join('; '):'')+'\nDashboard tự lưu khi đủ số liệu.',!errs.length);
   })().catch(e=>end('Lỗi: '+(e.message||e),false));
 }
 // thông tin dashboard gửi cho nút Lấy số POS: danh sách siêu thị và các ngày đã lưu (để chỉ lấy phần còn thiếu)
@@ -2044,11 +2053,15 @@ window.__posInfo=()=>{if(typeof ARCH!=='undefined'&&ARCH)return{ok:false,msg:'Da
   const B=BASE_D||{},cu=B.cur||{},L=B.loss,same=o=>!!o&&o.y===cu.y&&o.m===cu.m;
   return{ok:true,savedAt:(window.__META||{}).updatedAt||null,shops:Object.keys(B.shops||{}),cur:{y:cu.y,m:cu.m},sepDays:(B.sep||{}).days||0,billDays:(B.sep||{}).billDays||0,lossDays:same(L)?L.days||0:0,lossPx:!!(same(L)&&L.px)}};
 window.__posProgress=t=>{const el=$('posSt');if(!el)return;if(panel.hidden)openPanel();el.hidden=false;el.textContent='⏳ '+t};
-window.__posImport=async(files,errs)=>{openPanel();const el=$('posSt');el.hidden=false;el.textContent='✅ Đã nhận số liệu từ POS lúc '+new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})+(errs&&errs.length?' · chưa lấy được: '+errs.join('; '):'')+'. Kiểm tra rồi bấm Lưu dashboard.';await handleFiles(files);
-  // tác vụ hẹn giờ (#pos-auto): đọc file xong, không lỗi thì tự bấm Lưu dashboard
-  if(/^#pos-auto/.test(location.hash)||window.__posAutoSave){window.__posAutoSave=0;
-    if(!applyBtn.disabled&&merged&&merged.D){el.textContent+=' · Đang tự lưu…';applyBtn.click()}
-    else el.textContent='⚠️ Không tự lưu được: '+(sum.textContent||'số liệu chưa đủ').slice(0,200)}};
+window.__posImport=async(files,errs)=>{openPanel();const el=$('posSt');el.hidden=false;const hm=new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+  el.textContent='⏳ Đã nhận số liệu từ POS lúc '+hm+', đang đọc…';await handleFiles(files);
+  // đủ số liệu thì tự lưu; thiếu báo cáo hoặc lỗi thì chỉ cảnh báo, không lưu (vẫn bấm Lưu dashboard tay được)
+  if(errs&&errs.length){el.textContent='⚠️ Chưa tự lưu vì thiếu số liệu: '+errs.join('; ');return}
+  if(applyBtn.disabled||!merged||!merged.D){el.textContent='⚠️ Chưa tự lưu: '+(sum.textContent||'số liệu chưa đủ').slice(0,220);return}
+  el.textContent='✅ Đã nhận số liệu từ POS lúc '+hm+' · đang tự lưu…';
+  // có người khác vừa lưu (hỏi ghi đè): không tự ghi đè
+  const oc=window.confirm;window.confirm=()=>false;setTimeout(()=>{window.confirm=oc},60000);
+  applyBtn.click()};
 {const code='javascript:'+encodeURIComponent('('+posBookmarklet.toString()+')()');
  const cp=$('posCopy');if(cp)cp.addEventListener('click',async()=>{let ok=false;try{await navigator.clipboard.writeText(code);ok=true}catch(e){}
    if(!ok){const t=document.createElement('textarea');t.value=code;t.setAttribute('readonly','');t.style.cssText='position:fixed;top:0;left:0;opacity:0';document.body.appendChild(t);t.select();t.setSelectionRange(0,code.length);try{ok=document.execCommand('copy')}catch(e){}t.remove()}
@@ -2145,6 +2158,14 @@ async function api(path,opt={}){
   return{ok:r.ok,status:r.status,j:j||{}};
 }
 window.__api=api;
+// Nhận số liệu nén trong đường dẫn #posdata= (nút Lấy số POS chạy không mở được cửa sổ mới, vd tác vụ hẹn giờ)
+(function(){const h=location.hash;if(!/^#posdata=/.test(h))return;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+  (async()=>{try{const bin=atob(h.slice(9).replace(/-/g,'+').replace(/_/g,'/'));const u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
+    const d=JSON.parse(await new Response(new Blob([u8]).stream().pipeThrough(new DecompressionStream('gzip'))).text());
+    for(let i=0;i<90&&!window.__posImport;i++)await new Promise(r=>setTimeout(r,1000));
+    if(!window.__posImport)return;
+    const files=(d.files||[]).filter(f=>f&&typeof f.name==='string'&&Array.isArray(f.aoa)&&f.aoa.length>1).map(f=>({name:f.name.replace(/[^\p{L}\p{N} ._-]/gu,'').slice(0,60)+'.xlsx',aoa:f.aoa}));
+    window.__posImport(files,Array.isArray(d.errs)?d.errs.map(String):[])}catch(e){console.error('posdata',e)}})()})();
 // Nhận số liệu từ nút "Lấy số POS" (chạy trên pos.bachhoaxanh.com, mở dashboard với #pos): chỉ tin cửa sổ POS đã mở trang này
 (function(){const POS='https://pos.bachhoaxanh.com';if(!window.opener||!/^#pos/.test(location.hash))return;
   let sent=false;const hello=()=>{if(sent||!window.__posInfo||!window.opener)return;let info;try{info=window.__posInfo()}catch(e){return}if(!info)return;sent=true;try{window.opener.postMessage({type:'qltp-pos-hello',v:1,...info},POS)}catch(e){}};
@@ -2153,7 +2174,7 @@ window.__api=api;
     if(d.type==='qltp-pos-progress'&&window.__posProgress)window.__posProgress(String(d.text||'').slice(0,300));
     if(d.type==='qltp-pos-data'&&Array.isArray(d.files)&&window.__posImport){
       const files=d.files.filter(f=>f&&typeof f.name==='string'&&Array.isArray(f.aoa)&&f.aoa.length>1).map(f=>({name:f.name.replace(/[^\p{L}\p{N} ._-]/gu,'').slice(0,60)+'.xlsx',aoa:f.aoa}));
-      if(/^#pos-auto/.test(location.hash))window.__posAutoSave=1;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+      try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
       window.__posImport(files,Array.isArray(d.errs)?d.errs.map(String):[])}});
 })();
 const fmtTime=iso=>{try{return new Date(iso).toLocaleString('vi-VN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'})}catch(e){return iso}};
