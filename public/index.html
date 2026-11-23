@@ -2016,16 +2016,14 @@ function posBookmarklet(){
     const st=(info.shops||[]).join(',');if(!st)throw new Error('Dashboard chưa có danh sách siêu thị (file Base).');
     const now=new Date(),Y=now.getFullYear(),M=now.getMonth()+1,D=now.getDate(),same=!!info.cur&&info.cur.y===Y&&info.cur.m===M;
     const dim=(y,m)=>new Date(y,m,0).getDate(),today=dmy(Y,M,D);
-    // ngày cuối đã lưu: nếu lần lưu trước diễn ra sau khi ngày đó đã qua (số liệu đủ cả ngày) thì bắt đầu từ ngày kế tiếp,
-    // còn nếu lưu ngay trong ngày đó (vd 21h) thì lấy lại ngày đó để có đủ số các giờ còn lại
-    const sv=info.savedAt?new Date(info.savedAt):null,svD=sv&&sv.getFullYear()===Y&&sv.getMonth()+1===M?sv.getDate():(sv&&sv>new Date(Y,M-1,1)?99:0);
-    const from=dd=>{if(!(same&&dd>0))return dmy(Y,M,1);const full=svD>dd;return dmy(Y,M,Math.min(D,full?dd+1:dd))};
+    // chỉ lấy các ngày sau ngày đã lưu (không lấy lại ngày đã lưu); đã lưu đến hôm nay thì lấy lại hôm nay để cập nhật số mới
+    const from=dd=>dmy(Y,M,same&&dd>0?Math.min(D,dd+1):1);
     // tháng đã lưu là tháng trước (vừa sang tháng): lấy nốt các ngày còn thiếu của tháng trước
     const prev=!same&&!!info.cur&&((info.cur.y===Y&&info.cur.m===M-1)||(M===1&&info.cur.y===Y-1&&info.cur.m===12));
     const jobs=[];
     if(prev){const cy=info.cur.y,cm=info.cur.m,last=dim(cy,cm);
-      if(info.sepDays<last)jobs.push(['nganh',dmy(cy,cm,Math.max(1,info.sepDays)),dmy(cy,cm,last),'Ngành hàng T'+cm]);
-      if(info.billDays<last)jobs.push(['bill',dmy(cy,cm,Math.max(1,info.billDays)),dmy(cy,cm,last),'Doanh thu siêu thị T'+cm])}
+      if(info.sepDays<last)jobs.push(['nganh',dmy(cy,cm,info.sepDays+1),dmy(cy,cm,last),'Ngành hàng T'+cm]);
+      if(info.billDays<last)jobs.push(['bill',dmy(cy,cm,info.billDays+1),dmy(cy,cm,last),'Doanh thu siêu thị T'+cm])}
     jobs.push(['bill',from(info.billDays),today,'Doanh thu siêu thị'],['nganh',from(info.sepDays),today,'Doanh thu ngành hàng'],['fresh',p2(M)+'/'+Y,'','Hiệu quả Fresh'],['loss',from(info.lossPx?info.lossDays:0),today,'Nhập xuất Fresh']);
     const files=[],errs=[];
     // thử báo cáo đầu tiên trước (kiểm tra phiên đăng nhập POS), rồi lấy các báo cáo còn lại cùng lúc
